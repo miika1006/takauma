@@ -1,6 +1,24 @@
 # Takauma
 
-Sovellus jossa voi luoda tapahtuman ja jakaa linkin, jonka kautta kuka tahansa voi ladata kuvia tapahtuman alle.
+Sovellus jossa voi luoda tapahtuman ja jakaa linkin, jonka kautta kuka tahansa voi ladata kuvia tapahtuman alle. Tästä muodostuu takauma jostakin hetkestä. Kuvat tallentuvat käyttäjän oman pilvipalvelun tallennustilaan esim. google driveen.
+
+### TODO
+
+- [x] Nextjs pohja
+- [ ] Etusivunäkymä, jossa info sovelluksesta ja kirjautuminen
+- [ ] Kirjautuminen google tunnuksella
+- [ ] Google drive yhdistäminen sovellukseen
+- [ ] Google drive kansion luonti tai olemassaolevan käyttö
+- [ ] Google drive kuvan/kuvien lähetys kansioon
+- [ ] Tapahtumien listausnäkymä
+- [ ] Tapahtuman avaus
+- [ ] Tapahtuman luontinäkymä
+- [ ] Jaettavan linkin luonti ja jako whatsappiin
+- [ ] Tapahtuman muokkausnäkymä
+- [ ] Tapahtumanäkymä
+- [ ] Kuvien listaus tapahtumaan
+- [ ] Kuvien lähetys tapahtumaan ja lataus google driveen
+- [ ] Kuvalistauksen reaaliaikainen päivitys kaikille
 
 # Nextjs dokumentaatio
 

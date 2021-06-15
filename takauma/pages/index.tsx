@@ -12,12 +12,13 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
+      <Image src="/logo.svg" alt="Logo" width={72} height={72} />
+         
        TODO: Landing page
       </main>
 
       <footer className={styles.footer}>
-      <Image src="/logo.svg" alt="Logo" width={72} height={72} />
-         
+     
       </footer>
     </div>
   )

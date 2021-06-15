@@ -6,10 +6,12 @@ import Providers from "next-auth/providers"
 export default NextAuth({
   // https://next-auth.js.org/configuration/providers
   providers: [
-   
+   //https://next-auth.js.org/providers/google
     Providers.Google({
       clientId: process.env.GOOGLE_ID,
       clientSecret: process.env.GOOGLE_SECRET,
+      scope: "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/drive.file",
+      authorizationUrl: process.env.NODE_ENV == "development" ?  'https://accounts.google.com/o/oauth2/v2/auth?prompt=consent&access_type=offline&response_type=code' : "",
     }),
   ],
   // Database optional. MySQL, Maria DB, Postgres and MongoDB are supported.

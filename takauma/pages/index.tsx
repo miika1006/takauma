@@ -1,25 +1,15 @@
-import Head from 'next/head'
+  
+import Layout from '../components/layout'
 import Image from 'next/image'
-import styles from '../styles/Home.module.css'
 
-export default function Home() {
+export default function Page () {
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Takauma</title>
-        <meta name="description" content="Luo tapahtuma ja jaa linkki. Linkin saajat voivat ladata kuvia tapahtuman alle. Kuvat tallentuvat sivun pilvipalveluusi kansioihin." />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main className={styles.main}>
-      <Image src="/logo.svg" alt="Logo" width={72} height={72} />
-         
-       TODO: Landing page
-      </main>
-
-      <footer className={styles.footer}>
-     
-      </footer>
-    </div>
+    <Layout>
+      <h1>Takauma</h1>
+      <Image src="/logo.svg" alt="Logo" width={100} height={100} />
+      <p>
+        This is an example site to demonstrate how to use <a href={`https://next-auth.js.org`}>NextAuth.js</a> for authentication.
+      </p>
+    </Layout>
   )
 }

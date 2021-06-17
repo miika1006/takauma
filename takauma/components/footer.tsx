@@ -1,30 +1,34 @@
-import Link from "next/link"
-import styles from "./footer.module.css"
-import { dependencies } from "../package.json"
+import { TFunction } from "next-i18next";
+import Link from "next/link";
+import styles from "./footer.module.css";
 
-export default function Footer() {
-  return (
-    <footer className={styles.footer}>
-      <hr />
-      <ul className={styles.navItems}>
-        <li className={styles.navItem}>
-          <a href="https://next-auth.js.org">Documentation</a>
-        </li>
-        <li className={styles.navItem}>
-          <a href="https://www.npmjs.com/package/next-auth">NPM</a>
-        </li>
-        <li className={styles.navItem}>
-          <a href="https://github.com/nextauthjs/next-auth-example">GitHub</a>
-        </li>
-        <li className={styles.navItem}>
-          <Link href="/policy">
-            <a>Policy</a>
-          </Link>
-        </li>
-        <li className={styles.navItem}>
-          <em>next-auth@{dependencies["next-auth"]}</em>
-        </li>
-      </ul>
-    </footer>
-  )
+interface FooterProps {
+	t: TFunction;
+}
+
+export default function Footer({ t }: FooterProps) {
+	return (
+		<footer className={styles.footer}>
+			<hr />
+			<ul className={styles.navItems}>
+				<li className={styles.navItem}>
+					<Link href="/privacy">
+						<a>{t("privacypolicy")}</a>
+					</Link>
+				</li>
+				<li className={styles.navItem}>
+					<Link href="/terms">
+						<a>{t("termsofservice")}</a>
+					</Link>
+				</li>
+
+				<li className={styles.navItemRight}>
+					<em>
+						{t("createdby")} Miika (
+						<a href="https://github.com/miika1006">miika1006</a>)
+					</em>
+				</li>
+			</ul>
+		</footer>
+	);
 }

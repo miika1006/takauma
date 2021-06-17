@@ -55,6 +55,7 @@ export default function Page({ locale }: PageProps) {
 }
 
 // Export the `session` prop to use sessions with Server Side Rendering
+// We need to use this for sessions, so using it for locales also
 export const getServerSideProps: GetServerSideProps<{
 	session: Session | null;
 }> = async (context) => {
@@ -66,7 +67,7 @@ export const getServerSideProps: GetServerSideProps<{
 		},
 	};
 };
-
+// We cannot use this, because serverside and static cannot coexist
 /*export const getStaticProps: GetStaticProps = async ({ locale }) => ({
 	props: {
 		...(await serverSideTranslations(locale as string, ["common"])),

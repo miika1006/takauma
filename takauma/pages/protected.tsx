@@ -6,8 +6,9 @@ import { Session } from "next-auth";
 import { GetServerSideProps, GetStaticProps } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { PageProps } from "../common/types";
 
-export default function Page() {
+export default function Page({ locale }: PageProps) {
 	const { t } = useTranslation("common");
 	// As this page uses Server Side Rendering, the `session` will be already
 	// populated on render without needing to go through a loading stage.
@@ -34,7 +35,7 @@ export default function Page() {
 	// If no session exists, display access denied message
 	if (!session) {
 		return (
-			<Layout t={t}>
+			<Layout t={t} locale={locale}>
 				<AccessDenied />
 			</Layout>
 		);
@@ -42,7 +43,7 @@ export default function Page() {
 
 	// If session exists, display content
 	return (
-		<Layout t={t}>
+		<Layout t={t} locale={locale}>
 			<h1>{t("apptitle")}</h1>
 			<p>{t("appdescription")}</p>
 			<h1>Protected Page</h1>
@@ -61,6 +62,7 @@ export const getServerSideProps: GetServerSideProps<{
 		props: {
 			session: await getSession(context),
 			...(await serverSideTranslations(context.locale as string, ["common"])),
+			locale: context.locale as string,
 		},
 	};
 };

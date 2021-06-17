@@ -3,11 +3,12 @@ import Image from "next/image";
 import { GetStaticProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
+import { PageProps } from "../common/types";
 
-export default function Page() {
+export default function Page({ locale }: PageProps) {
 	const { t } = useTranslation("common");
 	return (
-		<Layout t={t}>
+		<Layout t={t} locale={locale}>
 			<h1>Terms of service</h1>
 			<Image src="/logo.svg" alt="Logo" width={100} height={100} />
 			<p>TODO:</p>
@@ -309,5 +310,6 @@ export default function Page() {
 export const getStaticProps: GetStaticProps = async ({ locale }) => ({
 	props: {
 		...(await serverSideTranslations(locale as string, ["common"])),
+		locale: locale as string,
 	},
 });

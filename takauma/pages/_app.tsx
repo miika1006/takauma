@@ -1,11 +1,17 @@
 import { Provider } from "next-auth/client";
-import { appWithTranslation } from "next-i18next";
+import { appWithTranslation, SSRConfig } from "next-i18next";
 import type { AppProps } from "next/app";
 import "../styles/globals.css";
-
+//This is because i18next has custom type for app props that is not exported
+//This is taken from next-i18next code by copy & paste
+//We need this because we need to use appWithTranslation inside <Provider> for sessions
+//If using other way around, appWithTranslation as root, it will not work as espected
+declare type i18nextAppProps = AppProps & {
+	pageProps: SSRConfig;
+};
 // Use the <Provider> to improve performance and allow components that call
 // `useSession()` anywhere in your application to access the `session` object.
-function App({ Component, pageProps }: AppProps) {
+function App(props: AppProps) {
 	return (
 		<Provider
 			// Provider options are not required but can be useful in situations where
@@ -25,10 +31,14 @@ function App({ Component, pageProps }: AppProps) {
 				// windows / tabs will be updated to reflect the user is signed out.
 				keepAlive: 0,
 			}}
-			session={pageProps.session}
+			session={props.pageProps.session}
 		>
-			<Component {...pageProps} />
+			{/* Using appWithTranslation here because of i18next provider, if not, the session provider above will not work as espected */}
+			{appWithTranslation(Comp)(props as i18nextAppProps)}
 		</Provider>
 	);
 }
-export default appWithTranslation(App);
+function Comp({ Component, pageProps }: AppProps) {
+	return <Component {...pageProps} />;
+}
+export default App;

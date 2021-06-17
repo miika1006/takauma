@@ -1,5 +1,8 @@
 {
 	"apptitle": "Takauma",
 	"home": "Home",
-	"appdescription": "Create event. share link and allow all to upload photos that will be stored in your cloud directory."
+	"appdescription": "Create event. share link and allow all to upload photos that will be stored in your cloud directory.",
+	"createdby": "Created by",
+	"privacypolicy": "Privacy policy",
+	"termsofservice": "Terms of Service"
 }

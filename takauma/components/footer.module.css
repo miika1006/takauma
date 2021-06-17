@@ -1,14 +1,18 @@
 .footer {
-  margin-top: 2rem;
+	margin-top: 2rem;
 }
 
 .navItems {
-  margin-bottom: 1rem;
-  padding: 0;
-  list-style: none;
+	margin-bottom: 1rem;
+	padding: 0;
+	list-style: none;
 }
 
-.navItem {
-  display: inline-block;
-  margin-right: 1rem;
+.navItem,
+.navItemright {
+	display: inline-block;
+	margin-right: 1rem;
+}
+.navItemRight {
+	float: right;
 }

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Head from "next/head";
-import { signIn, signOut, useSession } from "next-auth/client";
+import { getSession, signIn, signOut, useSession } from "next-auth/client";
 import styles from "./header.module.css";
 import { TFunction } from "next-i18next";
 
@@ -10,11 +10,11 @@ import { TFunction } from "next-i18next";
 
 interface HeaderProps {
 	t: TFunction;
+	locale: string;
 }
 
-export default function Header({ t }: HeaderProps) {
+export default function Header({ t, locale }: HeaderProps) {
 	const [session, loading] = useSession();
-
 	return (
 		<header>
 			<Head>
@@ -109,13 +109,25 @@ export default function Header({ t }: HeaderProps) {
 							<a>Protected</a>
 						</Link>
 					</li>
-					<li className={styles.navItem}>
+					<li className={styles.navItemRight}>
 						<Link href="/" locale={"fi"}>
-							<a>Suomi</a>
+							<a
+								className={
+									locale === "fi" ? styles.boldtext : styles.normaltext
+								}
+							>
+								Suomi
+							</a>
 						</Link>
-						|
+						&nbsp;|&nbsp;
 						<Link href="/" locale={"en"}>
-							<a>English</a>
+							<a
+								className={
+									locale === "en" ? styles.boldtext : styles.normaltext
+								}
+							>
+								English
+							</a>
 						</Link>
 					</li>
 				</ul>

@@ -5,14 +5,15 @@ import { TFunction } from "next-i18next";
 interface LayoutProps {
 	children: React.ReactNode;
 	t: TFunction;
+	locale: string;
 }
 
-export default function Layout({ children, t }: LayoutProps) {
+export default function Layout({ children, t, locale }: LayoutProps) {
 	return (
 		<div className={styles.main}>
-			<Header t={t} />
+			<Header t={t} locale={locale} />
 			<main>{children}</main>
-			<Footer />
+			<Footer t={t} />
 		</div>
 	);
 }

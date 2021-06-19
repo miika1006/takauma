@@ -4,11 +4,15 @@ import { useTranslation } from "next-i18next";
 import { GetStaticProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { PageProps } from "../common/types";
+import { useEffect } from "react";
+import Privacy from "../components/privacy";
 
 export default function Page({ locale }: PageProps) {
 	const { t } = useTranslation("common");
+
 	return (
 		<Layout t={t} locale={locale}>
+			<Privacy t={t} />
 			<h1>Privacy policy</h1>
 			<Image src="/logo.svg" alt="Logo" width={100} height={100} />
 			<p>TODO:</p>

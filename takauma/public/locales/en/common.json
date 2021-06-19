@@ -4,5 +4,9 @@
 	"appdescription": "Create event. share link and allow all to upload photos that will be stored in your cloud directory.",
 	"createdby": "Created by",
 	"privacypolicy": "Privacy policy",
-	"termsofservice": "Terms of Service"
+	"termsofservice": "Terms of Service",
+	"youarenotsigned": "You are no signed in",
+	"googlesignin": "Sign in with google",
+	"signedinas": "Signed in as",
+	"signout": "Sign out"
 }

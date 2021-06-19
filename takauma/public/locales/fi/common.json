@@ -3,6 +3,10 @@
 	"home": "Etusivu",
 	"appdescription": "Luo tapahtuma ja jaa linkki, jolla kuka tahansa voi ladata kuvia tapahtumaan. Kuvat tallentuvat kansioihin sinun pilvipalveluusi.",
 	"createdby": "Luonut",
-	"privacypolicy": "Tietosuojakäytäntö",
-	"termsofservice": "Käyttöehdot"
+	"privacypolicy": "Tietosuoja",
+	"termsofservice": "Käyttöehdot",
+	"youarenotsigned": "Et ole kirjautunut sisään",
+	"googlesignin": "Kirjaudu sisään googletunnuksilla",
+	"signedinas": "Kirjauduttu sisään",
+	"signout": "Kirjaudu ulos"
 }

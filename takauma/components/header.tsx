@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Head from "next/head";
 import { getSession, signIn, signOut, useSession } from "next-auth/client";
-import styles from "./header.module.css";
+import styles from "../styles/header.module.css";
 import { TFunction } from "next-i18next";
 
 // The approach used in this component shows how to built a sign in and sign out
@@ -58,7 +58,7 @@ export default function Header({ t, locale }: HeaderProps) {
 					{!session && (
 						<>
 							<span className={styles.notSignedInText}>
-								You are not signed in
+								{t("youarenotsigned")}
 							</span>
 							<a
 								href={`/api/auth/signin`}
@@ -68,7 +68,7 @@ export default function Header({ t, locale }: HeaderProps) {
 									signIn("google"); //Google, because it is only provider
 								}}
 							>
-								Sign in
+								{t("googlesignin")}
 							</a>
 						</>
 					)}
@@ -79,7 +79,7 @@ export default function Header({ t, locale }: HeaderProps) {
 								className={styles.avatar}
 							/>
 							<span className={styles.signedInText}>
-								<small>Signed in as</small>
+								<small>{t("signedinas")}</small>
 								<br />
 								<strong>{session.user.email || session.user.name}</strong>
 							</span>
@@ -91,7 +91,7 @@ export default function Header({ t, locale }: HeaderProps) {
 									signOut();
 								}}
 							>
-								Sign out
+								{t("signout")}
 							</a>
 						</>
 					)}

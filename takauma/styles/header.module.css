@@ -91,6 +91,9 @@
 	display: inline-block;
 	margin-right: 1rem;
 }
+.navItem a {
+	text-decoration: none;
+}
 .navItemRight {
 	float: right;
 }

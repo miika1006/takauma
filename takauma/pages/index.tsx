@@ -2,7 +2,7 @@ import Layout from "../components/layout";
 import Image from "next/image";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { GetServerSideProps, GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { Session } from "next-auth";
 import { getSession } from "next-auth/client";
 import { PageProps } from "../common/types";

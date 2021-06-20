@@ -6,16 +6,44 @@ import { GetServerSideProps } from "next";
 import { Session } from "next-auth";
 import { getSession } from "next-auth/client";
 import { PageProps } from "../common/types";
+import styles from "../styles/home.module.css";
+import { Parallax, ParallaxProvider } from "react-scroll-parallax";
 
 export default function Page({ locale }: PageProps) {
 	const { t } = useTranslation("common");
+	const applicationDescription = t("appdescription");
 
 	return (
-		<Layout t={t} locale={locale}>
-			<h1>{t("apptitle")}</h1>
-			<Image src="/logo.svg" alt="Logo" width={100} height={100} />
-			<p>{t("appdescription")}</p>
-		</Layout>
+		<ParallaxProvider>
+			<Layout t={t} locale={locale}>
+				<Parallax y={[-40, 40]} className={styles.coverimage} tagOuter="div">
+					<Image
+						src="/images/metsa2.jpeg"
+						width={2048}
+						height={1367}
+						alt="Metsä kansikuva"
+					/>
+				</Parallax>
+
+				<div className={styles.cover}>
+					<h1 className={styles.apptitle}>
+						<div className={styles.applogo}>
+							<Image src="/logo.svg" alt="Logo" width={100} height={100} />
+						</div>
+						<Parallax y={[-70, 70]} tagOuter="div">
+							{t("apptitle")}
+						</Parallax>
+					</h1>
+					<Parallax y={[0, 60]} tagOuter="div">
+						<p className={styles.appdesc}>
+							{applicationDescription
+								.split(".")
+								.map((text) => (text != "" ? <div> {text}. </div> : null))}
+						</p>
+					</Parallax>
+				</div>
+			</Layout>
+		</ParallaxProvider>
 	);
 }
 

@@ -45,6 +45,11 @@ export default function Header({ t, locale }: HeaderProps) {
 					content="initial-scale=1.0, width=device-width"
 					key="viewport"
 				/>
+				<link rel="preconnect" href="https://fonts.gstatic.com" />
+				<link
+					href="https://fonts.googleapis.com/css2?family=Saira+Condensed&display=swap"
+					rel="stylesheet"
+				/>
 			</Head>
 			<noscript>
 				<style>{`.nojs-show { opacity: 1; top: 0; }`}</style>
@@ -57,7 +62,9 @@ export default function Header({ t, locale }: HeaderProps) {
 				>
 					{!session && (
 						<>
-							<span className={styles.notSignedInText}>
+							<span
+								className={styles.notSignedInText + " " + styles.specialtext}
+							>
 								{t("youarenotsigned")}
 							</span>
 							<a
@@ -78,14 +85,14 @@ export default function Header({ t, locale }: HeaderProps) {
 								style={{ backgroundImage: `url(${session.user.image})` }}
 								className={styles.avatar}
 							/>
-							<span className={styles.signedInText}>
+							<span className={styles.signedInText + " " + styles.specialtext}>
 								<small>{t("signedinas")}</small>
 								<br />
 								<strong>{session.user.email || session.user.name}</strong>
 							</span>
 							<a
 								href={`/api/auth/signout`}
-								className={styles.button}
+								className={styles.button + " " + styles.specialtext}
 								onClick={(e) => {
 									e.preventDefault();
 									signOut();
@@ -98,7 +105,7 @@ export default function Header({ t, locale }: HeaderProps) {
 				</p>
 			</div>
 			<nav>
-				<ul className={styles.navItems}>
+				<ul className={styles.navItems + " " + styles.specialtext}>
 					<li className={styles.navItem}>
 						<Link href="/">
 							<a>{t("home")}</a>

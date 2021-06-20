@@ -1,6 +1,6 @@
 .cover {
 	display: flex;
-	height: 85vh;
+	height: 80vh;
 	align-items: center;
 	flex-direction: column;
 }
@@ -46,9 +46,18 @@
 	position: absolute;
 	margin-left: -0.06em;
 	margin-top: -0.65em;
+	z-index: 1;
 }
 .applogo img {
 	width: 50px;
+}
+.frontcontent {
+	font-family: "Saira Condensed", sans-serif;
+	font-size: 1em;
+}
+.frontcontent h1,
+.frontcontent h2 {
+	font-size: 2.5em;
 }
 @media (orientation: portrait) {
 	.cover {
@@ -64,7 +73,7 @@
 	}
 	.applogo {
 		margin-left: -0.1em;
-		margin-top: -0.6em;
+		margin-top: -0.65em;
 	}
 	.applogo img {
 		width: unset;

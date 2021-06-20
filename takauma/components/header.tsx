@@ -106,16 +106,20 @@ export default function Header({ t, locale }: HeaderProps) {
 			</div>
 			<nav>
 				<ul className={styles.navItems + " " + styles.specialtext}>
-					<li className={styles.navItem}>
-						<Link href="/">
-							<a>{t("home")}</a>
-						</Link>
-					</li>
-					<li className={styles.navItem}>
-						<Link href="/protected">
-							<a>Protected</a>
-						</Link>
-					</li>
+					{session && (
+						<>
+							<li className={styles.navItem}>
+								<Link href="/">
+									<a>{t("home")}</a>
+								</Link>
+							</li>
+							<li className={styles.navItem}>
+								<Link href="/protected">
+									<a>Protected</a>
+								</Link>
+							</li>
+						</>
+					)}
 					<li className={styles.navItemRight}>
 						<Link href="/" locale={"fi"}>
 							<a

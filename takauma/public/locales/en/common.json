@@ -1,12 +1,22 @@
 {
 	"apptitle": "Takauma",
 	"home": "Home",
-	"appdescription": "Create event. share link and allow all to upload photos that will be stored in your cloud directory.",
-	"createdby": "Created by",
+	"appdescription": "Create event, share link and upload photos. Photos will be stored in a folder in your google drive.",
 	"privacypolicy": "Privacy policy",
 	"termsofservice": "Terms of Service",
-	"youarenotsigned": "You are no signed in",
+	"youarenotsigned": "You are not signed in",
 	"googlesignin": "Sign in with google",
 	"signedinas": "Signed in as",
-	"signout": "Sign out"
+	"signout": "Sign out",
+	"updated": "Updated",
+	"misconduct": "Misconduct",
+	"termsgeneral": "This page contains terms and conditions. By accessing or using the Service You agree to be bound by these Terms and Conditions.",
+	"misconductgeneral": "User account may be terminated and access denied immediately, without prior notice or liability, for any reason if suspected any misconduct of anykind.",
+	"liability": "Liability",
+	"liabilitygeneral": "The application is provided to You 'AS IS' and 'AS AVAILABLE' and with all faults and defects and loss of data without warranty of any kind.",
+	"changes": "Changes",
+	"ghangesgeneral": "Terms and Conditions may be changed at any time. Changes will be notified in this website. By continuing usage after changes, you accept new terms.",
+	"contact": "Contact",
+	"author": "Author",
+	"apprelatedcontact": "Contacts related to this application"
 }

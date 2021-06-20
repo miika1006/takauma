@@ -1,12 +1,22 @@
 {
 	"apptitle": "Takauma",
 	"home": "Etusivu",
-	"appdescription": "Luo tapahtuma ja jaa linkki, jolla kuka tahansa voi ladata kuvia tapahtumaan. Kuvat tallentuvat kansioihin sinun pilvipalveluusi.",
-	"createdby": "Luonut",
+	"appdescription": "Luo tapahtuma, jaa linkki ja lataa kuvia. Kuvat tallentuvat kansioon sinun google driveen.",
 	"privacypolicy": "Tietosuoja",
 	"termsofservice": "Käyttöehdot",
 	"youarenotsigned": "Et ole kirjautunut sisään",
 	"googlesignin": "Kirjaudu sisään googletunnuksilla",
 	"signedinas": "Kirjauduttu sisään",
-	"signout": "Kirjaudu ulos"
+	"signout": "Kirjaudu ulos",
+	"updated": "Päivitetty",
+	"misconduct": "Väärinkäyttö",
+	"termsgeneral": "Tällä sivulla on sovelluksen käyttöehtoihin liittyvät tiedot. Käyttämällä sovellusta hyväksyt kaikki käyttöehdot.",
+	"misconductgeneral": "Käyttäjätili voidaan lopettaa ja estää käyttö heti, ilman erillistä ilmoitusta tai vakuutta, mistä tahansa syystä jos epäillään mitä tahansa väärinkäytöstä.",
+	"liability": "Vastuu",
+	"liabilitygeneral": "Sovellus toimitetaan sellaisenaan mahdollisine virheineen ilman takuuta. Sovelluksen tekijät eivät vastaa mistään vahingoista, käyttökatkoista tai tietojen katoamisesta.",
+	"changes": "Muutokset",
+	"ghangesgeneral": "Käyttöehtoja voidaan muuttaa tarvittaessa. Muutoksista tiedotetaan sivustolla. Jatkamalla käyttöä hyväksyt käyttöehdot.",
+	"contact": "Yhteydenotto",
+	"author": "Tekijä",
+	"apprelatedcontact": "Sovellukseen liittyvät yhteydenotot"
 }

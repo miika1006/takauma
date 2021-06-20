@@ -143,6 +143,8 @@ export default function Header({ t, locale }: HeaderProps) {
 					</li>
 				</ul>
 			</nav>
+
+			<div className={styles.headerbar}></div>
 		</header>
 	);
 }

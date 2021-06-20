@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSideProps } from "next";
 import { Session } from "next-auth";
-import { getSession } from "next-auth/client";
+import { getSession, signIn } from "next-auth/client";
 import { PageProps } from "../common/types";
 import styles from "../styles/home.module.css";
 import { Parallax, ParallaxProvider } from "react-scroll-parallax";
@@ -36,23 +36,55 @@ export default function Page({ locale }: PageProps) {
 					</h1>
 					<Parallax y={[0, 60]} tagOuter="div">
 						<p className={styles.appdesc}>
-							{applicationDescription
-								.split(".")
-								.map((text) => (text != "" ? <div> {text}. </div> : null))}
+							{applicationDescription.split(".").map((text, index) =>
+								text != "" ? (
+									<span key={`appdesc-${index}`}>
+										{text}. <br />
+									</span>
+								) : null
+							)}
 						</p>
 					</Parallax>
 				</div>
 				<div className={styles.frontcontent}>
 					<article>
 						<h1>Mistä on kyse?</h1>
-						<p></p>
+						<p>
+							Web-sovellus, jolla voi luoda tapahtumia, jakaa tapahtumaan linkin
+							ja kaikki linkin saaneet voivat ladata ja selata kuvia
+							tapahtumaan.
+						</p>
+						<p>
+							Kuvat tallentuvat sinun Google Driveen kansioon tapahtuman
+							nimellä.
+						</p>
+						<p>Taltioi ja jaa hetket yhdessä monesta eri kamerasta.</p>
 					</article>
 
 					<article>
 						<h1>Näin pääset alkuun</h1>
 						<ol>
-							<ul></ul>
+							<li>
+								<a
+									href={`/api/auth/signin`}
+									onClick={(e) => {
+										e.preventDefault();
+										signIn("google"); //Google, because it is only provider
+									}}
+								>
+									{t("googlesignin")}
+								</a>
+							</li>
+							<li>
+								Salli sovelluksen lukea sähköpostiosoitteesi ja pääsy
+								tallentamaan kuvia google driveen. <br />
+								Pääsy on ainoastaan sovelluksen luomiin kuviin.
+							</li>
+							<li>Luo uusi tapahtuma.</li>
+							<li>Jaa linkki.</li>
+							<li>Lataa kuvia.</li>
 						</ol>
+						<p>Linkin saaneet näkevät kaikki ladatut kuvat.</p>
 					</article>
 				</div>
 			</Layout>

@@ -42,6 +42,19 @@ export default function Page({ locale }: PageProps) {
 						</p>
 					</Parallax>
 				</div>
+				<div className={styles.frontcontent}>
+					<article>
+						<h1>Mistä on kyse?</h1>
+						<p></p>
+					</article>
+
+					<article>
+						<h1>Näin pääset alkuun</h1>
+						<ol>
+							<ul></ul>
+						</ol>
+					</article>
+				</div>
 			</Layout>
 		</ParallaxProvider>
 	);

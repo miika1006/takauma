@@ -114,8 +114,8 @@ export default function Header({ t, locale }: HeaderProps) {
 								</Link>
 							</li>
 							<li className={styles.navItem}>
-								<Link href="/protected">
-									<a>Protected</a>
+								<Link href="/events">
+									<a>{t("eventstitle")}</a>
 								</Link>
 							</li>
 						</>

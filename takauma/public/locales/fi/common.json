@@ -18,5 +18,7 @@
 	"ghangesgeneral": "Käyttöehtoja voidaan muuttaa tarvittaessa. Muutoksista tiedotetaan sivustolla. Jatkamalla käyttöä hyväksyt käyttöehdot.",
 	"contact": "Yhteydenotto",
 	"author": "Tekijä",
-	"apprelatedcontact": "Sovellukseen liittyvät yhteydenotot"
+	"apprelatedcontact": "Sovellukseen liittyvät yhteydenotot",
+	"eventstitle": "Tapahtumat",
+	"accessdenied": "Pääsy estetty"
 }

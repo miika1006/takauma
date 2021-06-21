@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { getSession, useSession } from "next-auth/client";
 import Layout from "../components/layout";
 import AccessDenied from "../components/access-denied";
@@ -7,6 +7,7 @@ import { GetServerSideProps, GetStaticProps } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { PageProps } from "../common/types";
+import GoogleDriveUpload from "../components/googledriveupload";
 
 export default function Page({ locale }: PageProps) {
 	const { t } = useTranslation("common");
@@ -28,6 +29,7 @@ export default function Page({ locale }: PageProps) {
 	return (
 		<Layout t={t} locale={locale}>
 			<h1>{t("eventstitle")}</h1>
+			<GoogleDriveUpload t={t} />
 		</Layout>
 	);
 }

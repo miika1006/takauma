@@ -1,0 +1,20 @@
+.main {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	min-height: 100vh;
+}
+.main > header,
+.main > main {
+	width: 100%;
+	max-width: 1024px;
+	padding: 0.6rem 1rem;
+	padding-top: 0px;
+}
+.main > footer {
+	width: 100%;
+}
+.main > main {
+	flex-grow: 4;
+}

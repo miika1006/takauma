@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Head from "next/head";
 import { getSession, signIn, signOut, useSession } from "next-auth/client";
-import styles from "./header.module.css";
+import styles from "../styles/header.module.css";
 import { TFunction } from "next-i18next";
 
 // The approach used in this component shows how to built a sign in and sign out
@@ -45,6 +45,11 @@ export default function Header({ t, locale }: HeaderProps) {
 					content="initial-scale=1.0, width=device-width"
 					key="viewport"
 				/>
+				<link rel="preconnect" href="https://fonts.gstatic.com" />
+				<link
+					href="https://fonts.googleapis.com/css2?family=Saira+Condensed&display=swap"
+					rel="stylesheet"
+				/>
 			</Head>
 			<noscript>
 				<style>{`.nojs-show { opacity: 1; top: 0; }`}</style>
@@ -57,8 +62,10 @@ export default function Header({ t, locale }: HeaderProps) {
 				>
 					{!session && (
 						<>
-							<span className={styles.notSignedInText}>
-								You are not signed in
+							<span
+								className={styles.notSignedInText + " " + styles.specialtext}
+							>
+								{t("youarenotsigned")}
 							</span>
 							<a
 								href={`/api/auth/signin`}
@@ -68,7 +75,7 @@ export default function Header({ t, locale }: HeaderProps) {
 									signIn("google"); //Google, because it is only provider
 								}}
 							>
-								Sign in
+								{t("googlesignin")}
 							</a>
 						</>
 					)}
@@ -78,37 +85,41 @@ export default function Header({ t, locale }: HeaderProps) {
 								style={{ backgroundImage: `url(${session.user.image})` }}
 								className={styles.avatar}
 							/>
-							<span className={styles.signedInText}>
-								<small>Signed in as</small>
+							<span className={styles.signedInText + " " + styles.specialtext}>
+								<small>{t("signedinas")}</small>
 								<br />
 								<strong>{session.user.email || session.user.name}</strong>
 							</span>
 							<a
 								href={`/api/auth/signout`}
-								className={styles.button}
+								className={styles.button + " " + styles.specialtext}
 								onClick={(e) => {
 									e.preventDefault();
 									signOut();
 								}}
 							>
-								Sign out
+								{t("signout")}
 							</a>
 						</>
 					)}
 				</p>
 			</div>
 			<nav>
-				<ul className={styles.navItems}>
-					<li className={styles.navItem}>
-						<Link href="/">
-							<a>{t("home")}</a>
-						</Link>
-					</li>
-					<li className={styles.navItem}>
-						<Link href="/protected">
-							<a>Protected</a>
-						</Link>
-					</li>
+				<ul className={styles.navItems + " " + styles.specialtext}>
+					{session && (
+						<>
+							<li className={styles.navItem}>
+								<Link href="/">
+									<a>{t("home")}</a>
+								</Link>
+							</li>
+							<li className={styles.navItem}>
+								<Link href="/events">
+									<a>{t("eventstitle")}</a>
+								</Link>
+							</li>
+						</>
+					)}
 					<li className={styles.navItemRight}>
 						<Link href="/" locale={"fi"}>
 							<a
@@ -132,6 +143,8 @@ export default function Header({ t, locale }: HeaderProps) {
 					</li>
 				</ul>
 			</nav>
+
+			<div className={styles.headerbar}></div>
 		</header>
 	);
 }

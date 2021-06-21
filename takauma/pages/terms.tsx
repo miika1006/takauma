@@ -4,11 +4,15 @@ import { GetStaticProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
 import { PageProps } from "../common/types";
+import Terms from "../components/terms";
 
 export default function Page({ locale }: PageProps) {
 	const { t } = useTranslation("common");
 	return (
 		<Layout t={t} locale={locale}>
+			<Terms t={t} />
+
+			{/* 
 			<h1>Terms of service</h1>
 			<Image src="/logo.svg" alt="Logo" width={100} height={100} />
 			<p>TODO:</p>
@@ -302,7 +306,7 @@ export default function Page({ locale }: PageProps) {
 			</p>
 			<ul>
 				<li>By email: miikameht@gmail.com</li>
-			</ul>
+			</ul>*/}
 		</Layout>
 	);
 }

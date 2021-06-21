@@ -1,0 +1,28 @@
+.footer {
+	padding-top: 0.5rem;
+	font-size: 80%;
+	line-height: 150%;
+	background: rgb(195 239 225);
+}
+
+.navItems {
+	margin-bottom: 1rem;
+	padding: 0;
+	list-style: none;
+	max-width: 1024px;
+	margin-left: auto;
+	margin-right: auto;
+	padding-left: 0.5rem;
+}
+
+.navItem,
+.navItemright {
+	display: inline-block;
+	margin-right: 1rem;
+}
+.navItemRight {
+	padding-right: 0.5rem;
+}
+.navItemRight p {
+	margin-top: 0;
+}

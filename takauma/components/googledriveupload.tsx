@@ -7,6 +7,7 @@ interface GoogleDriveUploadProps {
 
 export default function GoogleDriveUpload({ t }: GoogleDriveUploadProps) {
 	const [image, setImage] = useState<File | null>(null);
+	const [eventName, setEventName] = useState<string>("");
 	const [createObjectURL, setCreateObjectURL] = useState<string>("");
 
 	const uploadToClient = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,6 +24,7 @@ export default function GoogleDriveUpload({ t }: GoogleDriveUploadProps) {
 			if (image == null) return;
 			const body = new FormData();
 			body.append("file", image);
+			body.append("eventName", eventName);
 			const response = await fetch("/api/file", {
 				method: "POST",
 				body,
@@ -38,6 +40,11 @@ export default function GoogleDriveUpload({ t }: GoogleDriveUploadProps) {
 					<img className={styles.thumbnail} alt="image" src={createObjectURL} />
 				)}
 				<h4>{t("selectimage")}</h4>
+				<input
+					type="text"
+					value={eventName}
+					onChange={(e) => setEventName(e.target.value)}
+				/>
 				<input type="file" onChange={uploadToClient} />
 				<button type="submit">{t("upload")}</button>
 			</form>

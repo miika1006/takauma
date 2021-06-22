@@ -53,8 +53,9 @@ export default NextAuth({
 	jwt: {
 		// A secret to use for key generation (you should set this explicitly)
 		// secret: 'INp8IvdIyeMcoGAgFGoA61DdBglwwSqnXJZkgz8PSnw',
+		secret: process.env.SECRET,
 		// Set to true to use encryption (default: false)
-		// encryption: true,
+		encryption: true,
 		// You can define your own encode/decode functions for signing and encryption
 		// if you want to override the default behaviour.
 		// encode: async ({ secret, token, maxAge }) => {},
@@ -78,6 +79,31 @@ export default NextAuth({
 	// when an action is performed.
 	// https://next-auth.js.org/configuration/callbacks
 	callbacks: {
+		/*async signIn(user, account, profile) {
+			console.log("signIn:", user, account, profile);
+
+			return true;
+		},
+		async jwt(token, user, account, profile, isNewUser) {
+			console.log("Jwt in:", token, user, account, profile, isNewUser);
+			// Add access_token to the token right after signin
+			if (account?.accessToken) {
+				token.accessToken = account.accessToken;
+			}
+			return token;
+		},*/
+		async jwt(token, user, account) {
+			if (account) {
+				token.accessToken = account.accessToken;
+				token.refreshToken = account.refreshToken;
+			}
+			return token;
+		},
+		async session(session, user) {
+			session.accessToken = user.accessToken;
+			session.refreshToken = user.refreshToken;
+			return session;
+		},
 		// async signIn(user, account, profile) { return true },
 		// async redirect(url, baseUrl) { return baseUrl },
 		// async session(session, user) { return session },
@@ -89,5 +115,6 @@ export default NextAuth({
 	events: {},
 
 	// Enable debug messages in the console if you are having problems
-	debug: false,
+	//debug: false,
+	debug: process.env.NODE_ENV === "development",
 });

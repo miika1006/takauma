@@ -20,5 +20,7 @@
 	"author": "Tekijä",
 	"apprelatedcontact": "Sovellukseen liittyvät yhteydenotot",
 	"eventstitle": "Tapahtumat",
-	"accessdenied": "Pääsy estetty"
+	"accessdenied": "Pääsy estetty",
+	"selectimage": "Valitse kuva",
+	"upload": "Lähetä"
 }

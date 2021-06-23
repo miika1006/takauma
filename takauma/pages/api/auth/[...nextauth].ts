@@ -1,4 +1,5 @@
-import NextAuth from "next-auth";
+import { JWT } from "next-auth/jwt";
+import NextAuth, { Session, User } from "next-auth";
 import Providers from "next-auth/providers";
 
 // For more information on each option (and a full list of options) go to
@@ -16,7 +17,7 @@ export default NextAuth({
 			authorizationUrl:
 				process.env.NODE_ENV == "development"
 					? "https://accounts.google.com/o/oauth2/v2/auth?prompt=consent&access_type=offline&response_type=code"
-					: "",
+					: undefined,
 		}),
 	],
 	// Database optional. MySQL, Maria DB, Postgres and MongoDB are supported.
@@ -92,18 +93,43 @@ export default NextAuth({
 			}
 			return token;
 		},*/
-		async jwt(token, user, account) {
-			if (account) {
-				token.accessToken = account.accessToken;
-				token.refreshToken = account.refreshToken;
+		async jwt(token, user, account, profile, isNewUser) {
+			// Initial sign in
+			if (account && user) {
+				return {
+					...token,
+					accessToken: account.accessToken,
+					accessTokenExpires: Date.now() + (account.expires_in ?? 0) * 1000,
+					refreshToken: account.refresh_token,
+					user,
+				};
 			}
-			return token;
+
+			// Return previous token if the access token has not expired yet
+			if (Date.now() < (token.accessTokenExpires as number)) {
+				return token;
+			}
+
+			// Access token has expired, try to update it
+			return refreshAccessToken(token as tokenWithRefresh);
 		},
-		async session(session, user) {
-			session.accessToken = user.accessToken;
-			session.refreshToken = user.refreshToken;
+		async session(session, userOrToken) {
+			if (userOrToken) {
+				console.log(
+					"Callback async session(session, userOrToken)",
+					userOrToken
+				);
+
+				session.user = userOrToken.user
+					? (userOrToken.user as User)
+					: (userOrToken as JWT);
+				session.accessToken = userOrToken.accessToken;
+				session.error = userOrToken.error;
+			}
+
 			return session;
 		},
+
 		// async signIn(user, account, profile) { return true },
 		// async redirect(url, baseUrl) { return baseUrl },
 		// async session(session, user) { return session },
@@ -118,3 +144,64 @@ export default NextAuth({
 	//debug: false,
 	debug: process.env.NODE_ENV === "development",
 });
+
+/**
+ * Extended type with tokens
+ */
+type tokenWithRefresh = {
+	refreshToken: string;
+	accessToken: string;
+	accessTokenExpires: number;
+} & (User | JWT);
+/**
+ * Takes a token, and returns a new token with updated
+ * `accessToken` and `accessTokenExpires`. If an error occurs,
+ * returns the old token and an error property
+ * Method from
+ *  https://next-auth.js.org/tutorials/refresh-token-rotation
+ *  Source: https://github.com/lawrencecchen/next-auth-refresh-tokens/blob/main/pages/api/auth/%5B...nextauth%5D.js
+ *
+ */
+async function refreshAccessToken(token: tokenWithRefresh) {
+	try {
+		console.log("refreshing access token", token);
+		const searchParams = new URLSearchParams();
+		searchParams.append("client_id", process.env.GOOGLE_CLIENT_ID ?? "");
+		searchParams.append(
+			"client_secret",
+			process.env.GOOGLE_CLIENT_SECRET ?? ""
+		);
+		searchParams.append("grant_type", "refresh_token");
+		searchParams.append("refresh_token", token.refreshToken);
+
+		const url =
+			"https://oauth2.googleapis.com/token?" + searchParams.toString();
+
+		const response = await fetch(url, {
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
+			},
+			method: "POST",
+		});
+
+		const refreshedTokens = await response.json();
+
+		if (!response.ok) {
+			throw refreshedTokens;
+		}
+
+		return {
+			...token,
+			accessToken: refreshedTokens.access_token,
+			accessTokenExpires: Date.now() + refreshedTokens.expires_in * 1000,
+			refreshToken: refreshedTokens.refresh_token ?? token.refreshToken, // Fall back to old refresh token
+		};
+	} catch (error) {
+		console.log("refreshAccessToken error", error);
+
+		return {
+			...token,
+			error: "RefreshAccessTokenError",
+		};
+	}
+}

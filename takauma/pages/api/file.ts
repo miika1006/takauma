@@ -24,35 +24,40 @@ export default async function protectedHandler(
 	if (session) {
 		if (req.method === "POST") {
 			const form = new formidable.IncomingForm();
-			const result = await new Promise<drive_v3.Schema$File | null>(
-				(resolve, reject) => {
-					form.parse(req, async function (err, fields, files) {
-						const file = files.file as formidable.File;
+			try {
+				const result = await new Promise<drive_v3.Schema$File | null>(
+					(resolve, reject) => {
+						form.parse(req, async function (err, fields, files) {
+							const file = files.file as formidable.File;
 
-						//TODO: Validate files and parameters
-						//...
+							if (!file) reject("file is required");
+							//TODO: Validate files and parameters
+							//...
 
-						const filePath = path.join(file.path, file.name ?? "");
-						console.log(
-							"Uploaded a file '" +
-								file.name +
-								"', now uploading it to google drive"
-						);
-						const pathSafeEventName = sanitize(fields.eventName as string);
-						const result = await UploadGoogleDriveFile(
-							session.accessToken as string,
-							session.refreshToken as string,
-							pathSafeEventName,
-							filePath
-						);
-						fs.unlinkSync(file.path);
-						resolve(result);
-						/**/
-						//return res.status(201).send(result);
-					});
-				}
-			);
-			return res.status(201).send(result);
+							const filePath = path.join(file.path, file.name ?? "");
+							console.log(
+								"Uploaded a file '" +
+									file.name +
+									"', now uploading it to google drive"
+							);
+							const pathSafeEventName = sanitize(fields.eventName as string);
+							if (pathSafeEventName === "") reject("eventName is required");
+
+							const result = await UploadGoogleDriveFile(
+								session.accessToken as string,
+								session.refreshToken as string,
+								pathSafeEventName,
+								filePath
+							);
+							fs.unlinkSync(file.path);
+							resolve(result);
+						});
+					}
+				);
+				return res.status(201).send(result);
+			} catch (error) {
+				res.status(400).send(error);
+			}
 		} else return res.status(201).send("");
 	}
 

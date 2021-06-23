@@ -22,5 +22,6 @@
 	"eventstitle": "Events",
 	"accessdenied": "Access denied",
 	"selectimage": "Select image",
-	"upload": "Upload"
+	"upload": "Upload",
+	"event": "Event"
 }

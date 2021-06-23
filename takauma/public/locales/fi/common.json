@@ -22,5 +22,6 @@
 	"eventstitle": "Tapahtumat",
 	"accessdenied": "Pääsy estetty",
 	"selectimage": "Valitse kuva",
-	"upload": "Lähetä"
+	"upload": "Lähetä",
+	"event": "Tapahtuma"
 }

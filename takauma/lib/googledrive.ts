@@ -53,10 +53,42 @@ export const GetGoogleDriveFiles = async (
 			fields: "nextPageToken, files(id, name)",
 		});*/
 		console.log("Status:", res.status);
-		const files = res.data.files;
-		return files ?? [];
+		return res.data.files ?? [];
 	} catch (error) {
 		console.log("GetGoogleDriveFiles error", error);
+		return [];
+	}
+};
+/**
+ * Query folders from Google Drive
+ * @param accessToken
+ * @param refreshToken
+ * @param folder
+ * @returns list of folders (id,name), empty array if none or error
+ */
+export const GetGoogleDriveFolders = async (
+	accessToken: string,
+	refreshToken: string,
+	folder?: string
+) => {
+	try {
+		console.log("Getting folders from Google Drive");
+		const drive = CreateGoogleDriveInstance(accessToken, refreshToken);
+		const res = await drive.files.list({
+			q:
+				"mimeType='application/vnd.google-apps.folder' and trashed=false" +
+				(folder ? `'${folder}' in parents` : ""),
+			fields: "nextPageToken, files(id, name)",
+			orderBy: "createdTime",
+		});
+		/*({
+			pageSize: 10,
+			fields: "nextPageToken, files(id, name)",
+		});*/
+		console.log("Status:", res.status);
+		return res.data.files ?? [];
+	} catch (error) {
+		console.log("GetGoogleDriveFolders error", error);
 		return [];
 	}
 };

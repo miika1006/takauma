@@ -23,5 +23,7 @@
 	"accessdenied": "Pääsy estetty",
 	"selectimage": "Valitse kuva",
 	"upload": "Lähetä",
-	"event": "Tapahtuma"
+	"event": "Tapahtuma",
+	"createnewevent": "Luo uusi tapahtuma",
+	"save": "Tallenna"
 }

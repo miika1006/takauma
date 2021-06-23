@@ -23,5 +23,7 @@
 	"accessdenied": "Access denied",
 	"selectimage": "Select image",
 	"upload": "Upload",
-	"event": "Event"
+	"event": "Event",
+	"createnewevent": "Create new event",
+	"save": "Save"
 }

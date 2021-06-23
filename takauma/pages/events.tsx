@@ -8,16 +8,16 @@ import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { PageProps } from "../common/types";
 import GoogleDriveUpload from "../components/googledriveupload";
-import { GetGoogleDriveFiles } from "../lib/googledrive";
+import { GetGoogleDriveFolders } from "../lib/googledrive";
 import { drive_v3 } from "googleapis";
 
 export interface EventPageProps {
-	files: drive_v3.Schema$File[];
+	folders: drive_v3.Schema$File[];
 }
-export default function Page({ locale, files }: PageProps & EventPageProps) {
+export default function Page({ locale, folders }: PageProps & EventPageProps) {
 	const { t } = useTranslation("common");
 	const [session, loading] = useSession();
-	console.log(files);
+	console.log("Folders:", folders);
 
 	// When rendering client side don't display anything until loading is complete
 	if (typeof window !== "undefined" && loading) return null;
@@ -34,7 +34,7 @@ export default function Page({ locale, files }: PageProps & EventPageProps) {
 	return (
 		<Layout t={t} locale={locale}>
 			<h1>{t("eventstitle")}</h1>
-			<GoogleDriveUpload t={t} />
+			<GoogleDriveUpload t={t} folders={folders} />
 		</Layout>
 	);
 }
@@ -51,8 +51,9 @@ export const getServerSideProps: GetServerSideProps<{
 			session: session,
 			...(await serverSideTranslations(context.locale as string, ["common"])),
 			locale: context.locale as string,
-			files: session
-				? await GetGoogleDriveFiles(
+
+			folders: session
+				? await GetGoogleDriveFolders(
 						session?.accessToken as string,
 						session?.refreshToken as string
 				  )

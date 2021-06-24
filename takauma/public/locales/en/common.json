@@ -25,5 +25,6 @@
 	"upload": "Upload",
 	"event": "Event",
 	"createnewevent": "Create new event",
-	"save": "Save"
+	"save": "Save",
+	"select": "Select"
 }

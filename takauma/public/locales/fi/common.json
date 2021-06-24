@@ -25,5 +25,6 @@
 	"upload": "Lähetä",
 	"event": "Tapahtuma",
 	"createnewevent": "Luo uusi tapahtuma",
-	"save": "Tallenna"
+	"save": "Tallenna",
+	"select": "Valitse"
 }

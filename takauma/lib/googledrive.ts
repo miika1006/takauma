@@ -14,8 +14,8 @@ const CreateGoogleDriveInstance = (
 	accessToken: string,
 	refreshToken: string
 ) => {
-	const clientId = process.env.GOOGLE_CLIENT_ID;
-	const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+	const clientId = process.env.GOOGLE_ID;
+	const clientSecret = process.env.GOOGLE_SECRET;
 	const auth = new google.auth.OAuth2({
 		clientId,
 		clientSecret,
@@ -41,18 +41,24 @@ export const GetGoogleDriveFiles = async (
 	try {
 		console.log("Getting files from Google Drive");
 		const drive = CreateGoogleDriveInstance(accessToken, refreshToken);
+		const folderByName = await GetGoogleDriveFolderByName(
+			accessToken,
+			refreshToken,
+			folder ?? ""
+		);
 		const res = await drive.files.list({
 			q:
-				"mimeType != 'application/vnd.google-apps.folder' and trashed=false" +
-				(folder ? `'${folder}' in parents` : ""),
-			fields: "nextPageToken, files(id, name)",
+				"mimeType!='application/vnd.google-apps.folder' and trashed=false" +
+				(folderByName ? ` and '${folderByName.id}' in parents` : ""),
+			fields: "nextPageToken, files(id, name,thumbnailLink,webContentLink)",
 			orderBy: "createdTime",
+			pageSize: 1000,
 		});
 		/*({
 			pageSize: 10,
 			fields: "nextPageToken, files(id, name)",
 		});*/
-		console.log("Status:", res.status);
+		console.log("GetGoogleDriveFiles Status:", res.status);
 		return res.data.files ?? [];
 	} catch (error) {
 		console.log("GetGoogleDriveFiles error", error);
@@ -85,7 +91,7 @@ export const GetGoogleDriveFolders = async (
 			pageSize: 10,
 			fields: "nextPageToken, files(id, name)",
 		});*/
-		console.log("Status:", res.status);
+		console.log("GetGoogleDriveFolders Status:", res.status);
 		return res.data.files ?? [];
 	} catch (error) {
 		console.log("GetGoogleDriveFolders error", error);
@@ -105,6 +111,8 @@ export const GetGoogleDriveFolderByName = async (
 	folder: string
 ): Promise<drive_v3.Schema$File | null> => {
 	try {
+		if (folder == "") return null;
+
 		console.log("Getting folder by foldername from Google Drive");
 		const drive = CreateGoogleDriveInstance(accessToken, refreshToken);
 		const res = await drive.files.list({
@@ -112,13 +120,12 @@ export const GetGoogleDriveFolderByName = async (
 				"mimeType='application/vnd.google-apps.folder' and trashed=false and name='" +
 				folder +
 				"'",
-			fields: "nextPageToken, files(id, name)",
+			fields: "nextPageToken, files(id, name, permissions)",
 		});
 
-		console.log("Status:", res.status);
+		console.log("GetGoogleDriveFolderByName Status:", res.status);
 		const files = res.data.files;
 		if (files && files.length > 0) {
-			console.log("  files[0]:", files[0]);
 			return files[0];
 		}
 		return null;
@@ -134,7 +141,7 @@ export const GetGoogleDriveFolderByName = async (
  * @param folder
  * @returns folder (id,name) = File, null if error
  */
-export const CreateGoogleDriveFolder = async (
+export const GetOrCreateGoogleDriveFolder = async (
 	accessToken: string,
 	refreshToken: string,
 	folder: string
@@ -146,22 +153,65 @@ export const CreateGoogleDriveFolder = async (
 			refreshToken,
 			folder
 		);
-
 		if (existingFolder) {
 			console.log("Folder '" + folder + "' exists in Google Drive, using it");
+
+			const hasAnyonePermisson =
+				existingFolder.permissions?.some((s) => s.type === "anyone") ?? false;
+			if (!hasAnyonePermisson) {
+				console.log(
+					"CreateGoogleDriveFolder Adding permissions to existing folder"
+				);
+
+				if (existingFolder.id) {
+					const permissionres = await drive.permissions.create({
+						fileId: existingFolder.id,
+						fields: "id",
+						requestBody: {
+							type: "anyone",
+							role: "reader",
+						},
+					});
+					console.log(
+						"CreateGoogleDriveFolder Adding permissions to existing folder Status: ",
+						permissionres.status
+					);
+				} else {
+					console.log(
+						"CreateGoogleDriveFolder Adding permissions failed because existingFolder.id is undefined or null"
+					);
+				}
+			}
 			return existingFolder;
 		}
 
 		console.log("Creating folder '" + folder + "' in Google Drive");
 		const res = await drive.files.create({
-			fields: "id",
+			fields: "id, name",
 			requestBody: {
 				name: folder,
 				mimeType: "application/vnd.google-apps.folder",
 			},
 		});
-		console.log("Status: ", res.status);
-		return res.data;
+		const data = res.data;
+		console.log("CreateGoogleDriveFolder Status: ", res.status);
+
+		if (data.id) {
+			console.log("CreateGoogleDriveFolder Adding permissions ");
+			const permissionres = await drive.permissions.create({
+				fileId: data.id,
+				fields: "id",
+				requestBody: {
+					type: "anyone",
+					role: "reader",
+				},
+			});
+			console.log(
+				"CreateGoogleDriveFolder Adding permissions Status: ",
+				permissionres.status
+			);
+		}
+		return data;
 	} catch (error) {
 		console.log("CreateGoogleDriveFolder error", error);
 		return null;
@@ -183,7 +233,7 @@ export const UploadGoogleDriveFile = async (
 ) => {
 	try {
 		const drive = CreateGoogleDriveInstance(accessToken, refreshToken);
-		const folderResult = await CreateGoogleDriveFolder(
+		const folderResult = await GetOrCreateGoogleDriveFolder(
 			accessToken,
 			refreshToken,
 			folder
@@ -198,6 +248,7 @@ export const UploadGoogleDriveFile = async (
 		const fileSize = (await fs.promises.stat(fileFolder)).size;
 		const res = await drive.files.create(
 			{
+				fields: "id,name",
 				requestBody: {
 					// a requestBody element is required if you want to use multipart
 					parents: [folderResult.id as string],
@@ -218,6 +269,22 @@ export const UploadGoogleDriveFile = async (
 				},
 			}
 		);
+		console.log("Uploading file " + fileName + " Status", res.status);
+
+		if (res.data?.id) {
+			//GoogleApi Returns 500 status - Error if creating new file with thumbnaillink and webcontentlink fields
+			//Extra request here to get those fields
+			console.log("Getting file details by fileid ", res.data.id);
+
+			const queryfiles = await drive.files.get({
+				fileId: res.data.id,
+				fields: "id,name,thumbnailLink,webContentLink",
+			});
+
+			console.log("Getting file details by fileid status ", res.status);
+
+			return queryfiles.data;
+		}
 		return res.data;
 	} catch (error) {
 		console.log("UploadGoogleDriveFile error", error);

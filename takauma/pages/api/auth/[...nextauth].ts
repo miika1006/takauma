@@ -109,17 +109,13 @@ export default NextAuth({
 			if (Date.now() < (token.accessTokenExpires as number)) {
 				return token;
 			}
-
+			//clear error if any
+			token.error = "";
 			// Access token has expired, try to update it
 			return refreshAccessToken(token as tokenWithRefresh);
 		},
 		async session(session, userOrToken) {
 			if (userOrToken) {
-				console.log(
-					"Callback async session(session, userOrToken)",
-					userOrToken
-				);
-
 				session.user = userOrToken.user
 					? (userOrToken.user as User)
 					: (userOrToken as JWT);
@@ -166,11 +162,8 @@ async function refreshAccessToken(token: tokenWithRefresh) {
 	try {
 		console.log("refreshing access token", token);
 		const searchParams = new URLSearchParams();
-		searchParams.append("client_id", process.env.GOOGLE_CLIENT_ID ?? "");
-		searchParams.append(
-			"client_secret",
-			process.env.GOOGLE_CLIENT_SECRET ?? ""
-		);
+		searchParams.append("client_id", process.env.GOOGLE_ID ?? "");
+		searchParams.append("client_secret", process.env.GOOGLE_SECRET ?? "");
 		searchParams.append("grant_type", "refresh_token");
 		searchParams.append("refresh_token", token.refreshToken);
 
@@ -185,7 +178,7 @@ async function refreshAccessToken(token: tokenWithRefresh) {
 		});
 
 		const refreshedTokens = await response.json();
-
+		console.log("refreshedTokens", refreshedTokens);
 		if (!response.ok) {
 			throw refreshedTokens;
 		}

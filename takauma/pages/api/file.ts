@@ -1,5 +1,7 @@
-import { UploadGoogleDriveFile } from "./../../lib/googledrive";
-// This is an example of to protect an API route
+import {
+	GetGoogleDriveFiles,
+	UploadGoogleDriveFile,
+} from "./../../lib/googledrive";
 
 import formidable from "formidable";
 import fs from "fs";
@@ -22,7 +24,33 @@ export default async function protectedHandler(
 	const session = await getSession({ req });
 
 	if (session) {
-		if (req.method === "POST") {
+		// Query files by eventname (=foldername) Google Drive
+		if (req.method === "GET") {
+			try {
+				const eventName = req.query.eventname as string;
+				console.log("Getting files for event '" + eventName + "'");
+				const pathSafeEventName = sanitize(eventName);
+				if (pathSafeEventName == "") throw new Error("eventName is required");
+				const result = await GetGoogleDriveFiles(
+					session.accessToken as string,
+					session.refreshToken as string,
+					pathSafeEventName
+				);
+				return res.status(200).send(
+					result?.map((item) => {
+						return {
+							id: item?.id,
+							name: item?.name,
+							webContentLink: item?.webContentLink,
+							thumbnailLink: item?.thumbnailLink,
+						};
+					}) ?? []
+				);
+			} catch (error) {
+				res.status(400).send(error);
+			}
+			// Upload new imagefile to event (=foldername)
+		} else if (req.method === "POST") {
 			const form = new formidable.IncomingForm();
 			try {
 				const result = await new Promise<drive_v3.Schema$File | null>(
@@ -31,8 +59,6 @@ export default async function protectedHandler(
 							const file = files.file as formidable.File;
 
 							if (!file) reject("file is required");
-							//TODO: Validate files and parameters
-							//...
 
 							const filePath = path.join(file.path, file.name ?? "");
 							console.log(
@@ -50,7 +76,12 @@ export default async function protectedHandler(
 								filePath
 							);
 							fs.unlinkSync(file.path);
-							resolve(result);
+							resolve({
+								id: result?.id,
+								name: result?.name,
+								webContentLink: result?.webContentLink,
+								thumbnailLink: result?.thumbnailLink,
+							});
 						});
 					}
 				);
@@ -58,7 +89,7 @@ export default async function protectedHandler(
 			} catch (error) {
 				res.status(400).send(error);
 			}
-		} else return res.status(201).send("");
+		} else return res.status(400).send("Invalid method");
 	}
 
 	res.status(403).send({

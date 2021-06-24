@@ -17,7 +17,6 @@ export interface EventPageProps {
 export default function Page({ locale, folders }: PageProps & EventPageProps) {
 	const { t } = useTranslation("common");
 	const [session, loading] = useSession();
-	console.log("Folders:", folders);
 
 	// When rendering client side don't display anything until loading is complete
 	if (typeof window !== "undefined" && loading) return null;

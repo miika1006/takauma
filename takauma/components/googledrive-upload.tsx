@@ -17,27 +17,27 @@ export default function GoogleDriveUpload({
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const [driveFiles, setDriveFiles] = useState<drive_v3.Schema$File[]>([]);
 
-	const getFiles = async (eventName: string) => {
-		try {
-			if (eventName === "") return;
-			const response = await fetch(`/api/file/${folder.id}`, {
-				headers: {
-					"Content-Type": "application/json",
-					Accept: "application/json",
-				},
-				method: "GET",
-			}).then((r) => r.json());
-			console.log("getFiles response", response);
-			setDriveFiles(response);
-		} catch (error) {
-			//TODO: Throw toast
-			console.error(error);
-		}
-	};
-
 	useEffect(() => {
+		const getFiles = async (eventName: string) => {
+			try {
+				if (eventName === "") return;
+				const response = await fetch(`/api/file/${folder.id}`, {
+					headers: {
+						"Content-Type": "application/json",
+						Accept: "application/json",
+					},
+					method: "GET",
+				}).then((r) => r.json());
+				console.log("getFiles response", response);
+				setDriveFiles(response);
+			} catch (error) {
+				//TODO: Throw toast
+				console.error(error);
+			}
+		};
+
 		getFiles(currentEvent?.name ?? "");
-	}, [currentEvent, getFiles]);
+	}, [currentEvent, folder.id]);
 
 	const setToPagePreview = (event: React.ChangeEvent<HTMLInputElement>) => {
 		if (event.target.files && event.target.files[0]) {
@@ -84,7 +84,6 @@ export default function GoogleDriveUpload({
 					src={file.thumbnailLink ?? ""}
 				/>
 			))}
-
 			{currentEvent && (
 				<form onSubmit={upload}>
 					<h4>{t("selectimage")}</h4>

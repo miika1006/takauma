@@ -12,8 +12,6 @@ Signed user then creates new event, and where a folder is actually created to Go
 
 #### Google service account
 
-Sovelluksessa kuka tahansa linkin saanut voi kirjautumatta ladata kuvia käyttäjän Google Driveen. Tästä tulee haaste googlen käyttöoikeuksien kanssa. Miten saadaan kuvat ladattua ja millä tunnuksella. Kirjautunut käyttäjä voi ladata kuvia kansioon, jollon ne tulevat kansioon käyttäjän luomina.
-
 In the app, anyone who receives the link can upload photos to Google Drive without signing in. This behaviour is a challenge with google permissions. How to upload photos to users Google Drive. A signed-in user can upload photos to a folder so that they appear to the folder created by the user.
 
 But, what about a situation where some unknown user wants to upload photos without signing in.

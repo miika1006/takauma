@@ -36,7 +36,7 @@ export default function Page({ locale }: PageProps) {
 	if (!session) {
 		return (
 			<Layout t={t} locale={locale}>
-				<AccessDenied />
+				<AccessDenied t={t} />
 			</Layout>
 		);
 	}

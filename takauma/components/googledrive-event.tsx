@@ -29,7 +29,7 @@ export default function GoogleDriveEvent({
 				window?.location?.origin + router.pathname + "/" + currentEvent?.id
 			);
 		}
-	}, [currentEvent]);
+	}, [currentEvent, router.pathname]);
 
 	/**
 	 * Creating new event

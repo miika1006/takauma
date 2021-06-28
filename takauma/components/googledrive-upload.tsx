@@ -17,10 +17,6 @@ export default function GoogleDriveUpload({
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const [driveFiles, setDriveFiles] = useState<drive_v3.Schema$File[]>([]);
 
-	useEffect(() => {
-		getFiles(currentEvent?.name ?? "");
-	}, [currentEvent]);
-
 	const getFiles = async (eventName: string) => {
 		try {
 			if (eventName === "") return;
@@ -38,6 +34,10 @@ export default function GoogleDriveUpload({
 			console.error(error);
 		}
 	};
+
+	useEffect(() => {
+		getFiles(currentEvent?.name ?? "");
+	}, [currentEvent, getFiles]);
 
 	const setToPagePreview = (event: React.ChangeEvent<HTMLInputElement>) => {
 		if (event.target.files && event.target.files[0]) {

@@ -6,7 +6,7 @@ import { GetServerSideProps } from "next";
 import { Session } from "next-auth";
 import { getSession, signIn } from "next-auth/client";
 import { PageProps } from "../common/types";
-import styles from "../styles/home.module.css";
+import styles from "../styles/Home.module.css";
 import { Parallax, ParallaxProvider } from "react-scroll-parallax";
 
 export default function Page({ locale }: PageProps) {

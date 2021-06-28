@@ -30,5 +30,6 @@
 	"eventnotfound": "Woops, Could not find the event?",
 	"eventnotfoundinfo": "Event is not shared or it is removed.",
 	"sharealink": "Share link",
-	"delete": "Delete"
+	"delete": "Delete",
+	"opensharelinkinfo": "Open link and start to upload photos"
 }

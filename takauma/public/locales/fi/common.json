@@ -30,5 +30,6 @@
 	"eventnotfound": "Oho, tapahtumaa ei löytynyt?",
 	"eventnotfoundinfo": "Tapahtumaa ei ole jaettu tai se on poistettu.",
 	"sharealink": "Jaa linkki",
-	"delete": "Poista"
+	"delete": "Poista",
+	"opensharelinkinfo": "Avaa linkki ja aloita lataamaan kuvia"
 }

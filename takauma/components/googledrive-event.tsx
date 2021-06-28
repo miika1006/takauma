@@ -192,7 +192,7 @@ export default function GoogleDriveEvent({
 			<br />
 			<br />
 			<a href={shareUrl} target="_blank" rel="noopener noreferrer">
-				Avaa linkki ja aloita lataamaan kuvia
+				{t("opensharelinkinfo")}
 			</a>
 		</>
 	);

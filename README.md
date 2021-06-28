@@ -1,4 +1,4 @@
-> [English](https://)
+> [English](https://github.com/miika1006/takauma/blob/main/README_en.md)
 
 # Takauma
 

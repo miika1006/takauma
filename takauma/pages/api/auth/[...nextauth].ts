@@ -12,6 +12,8 @@ export default NextAuth({
 			clientId: process.env.GOOGLE_ID,
 			clientSecret: process.env.GOOGLE_SECRET,
 			//https://www.googleapis.com/auth/userinfo.profile
+			//access users email address
+			//and View and manage Google Drive files and folders that you have opened or created with this app
 			scope:
 				"https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/drive.file",
 			authorizationUrl:

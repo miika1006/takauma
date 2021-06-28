@@ -8,7 +8,7 @@ import { GetGoogleDriveFolderByIdUsingServiceAccount } from "../../lib/googledri
 import { drive_v3 } from "googleapis";
 import { useRouter } from "next/router";
 import EventNotFound from "../../components/eventnotfound";
-import GoogleDriveUploadToFolder from "../../components/googledriveuploadtofolder";
+import GoogleDriveUpload from "../../components/googledrive-upload";
 
 export interface EventPageProps {
 	folder: drive_v3.Schema$File;
@@ -21,7 +21,7 @@ export default function Page({ locale, folder }: PageProps & EventPageProps) {
 			{folder && folder.shared ? (
 				<>
 					<h1>{folder.name}</h1>
-					<GoogleDriveUploadToFolder t={t} folder={folder} />
+					<GoogleDriveUpload t={t} folder={folder} />
 				</>
 			) : (
 				<EventNotFound t={t} />

@@ -2,15 +2,15 @@ import { drive_v3 } from "googleapis";
 import { TFunction } from "next-i18next";
 import { useEffect, useRef, useState } from "react";
 import styles from "../styles/googledriveupload.module.css";
-interface GoogleDriveUploadToFolderProps {
+interface GoogleDriveUploadProps {
 	t: TFunction;
 	folder: drive_v3.Schema$File;
 }
 
-export default function GoogleDriveUploadToFolder({
+export default function GoogleDriveUpload({
 	t,
 	folder,
-}: GoogleDriveUploadToFolderProps) {
+}: GoogleDriveUploadProps) {
 	const [image, setImage] = useState<File | null>(null);
 	const currentEvent = folder;
 	const [createObjectURL, setCreateObjectURL] = useState<string>("");

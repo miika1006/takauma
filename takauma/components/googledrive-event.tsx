@@ -3,15 +3,15 @@ import { TFunction } from "next-i18next";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
-interface GoogleDriveUploadProps {
+interface GoogleDriveEventProps {
 	t: TFunction;
 	folders: drive_v3.Schema$File[];
 }
 
-export default function GoogleDriveUpload({
+export default function GoogleDriveEvent({
 	t,
 	folders,
-}: GoogleDriveUploadProps) {
+}: GoogleDriveEventProps) {
 	const [currentEvent, setCurrentEvent] = useState<drive_v3.Schema$File | null>(
 		null
 	);

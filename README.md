@@ -1,23 +1,53 @@
 # Takauma
 
-Sovellus jossa voi luoda tapahtuman ja jakaa linkin, jonka kautta kuka tahansa voi ladata kuvia tapahtuman alle. Tästä muodostuu takauma jostakin hetkestä. Kuvat tallentuvat käyttäjän oman pilvipalvelun tallennustilaan esim. google driveen.
+Sovellus jossa voi luoda tapahtuman ja jakaa linkin, jonka kautta kuka tahansa voi ladata kuvia tapahtumalle. Tästä muodostuu takauma jostakin hetkestä. Kuvat tallentuvat käyttäjän oman pilvipalvelun tallennustilaan google driveen.
 
-### TODO
+## Google Drivesta ja käyttöoikeuksista
+
+Sovelluksessa käyttäjä kirjautuu sisään sovellukseen googletunnuksilla ja sallii sovellukselle oikeuden lukea käyttäjän sähköpostiosoitteen, joka esitetään sivulla infotietona. Käyttäjä myös sallii sovellukselle pääsyn käyttäjän omaan Google Driveen. Kuvat ladataan Google Driveen kansioihin, jossa luotu kansio on tapahtuma sovelluksessa.
+
+Sovellus näkee tai pääsee käsittelemään ainoastaan kansioita ja tiedostoja, joita sovelluksella on luotu. Sovelluksella ei ole oikeutta mihinkään muihin kuviin tai tiedostoihin.
+
+Kirjautunut käyttäjä sitten luo uuden tapahtuman, jossa oikeasti luodaan uusi kansion Google Driveen annetulla tapahtuman nimellä.
+
+#### Google palvelutunnus (service account)
+
+Sovelluksessa kuka tahansa linkin saanut voi kirjautumatta ladata kuvia käyttäjän Google Driveen. Tästä tulee haaste googlen käyttöoikeuksien kanssa. Miten saadaan kuvat ladattua ja millä tunnuksella. Kirjautunut käyttäjä voi ladata kuvia kansioon, jollon ne tulevat kansioon käyttäjän luomina.
+
+Mutta entä tilanne, jossa joku tuntematon käyttäjä kirjautumatta haluaa ladata kuvia?
+
+Tätä varten sovellukselle on luotu palvelutunnus (service account) googlelle. Sovelluksen luomille kansioille jaetaan käyttöoikeus tälle palvelutunnukselle, jotta sen avulla sovellus voi ladata uusia tiedostoja kansioihin. Palvelutunnus ei pysty näkemään tai käsittelemään mitään muita tiedostoja kuin jaetuista kansioista.
+
+Jos sovellus olisi yrityskäytössä voitaisi virittää palvelutunnus siten, että se toimii jonkin käyttäjätunnuksen puolesta, jolloin tätä jakoa ei tarvitsisi tehdä. Tätä ei kuitenkaan voi tehdä tällaisessa julkisessa käytössä.
+
+Käyttäjä siis luo tapahtumia, jotka ovat kansioita. Käyttäjä on niiden kansioiden omistaja. Kansioon jaetaan muokkausoikeus palvelutunnukselle. Käyttäjä sitten jakaa tapahtuman (kansio drivessä) ja luo jakolinkin kuvien lataamiseen.
+
+Linkin saajat avaavat sovelluksen ja lataavat kuvia, kuvat luodaan palvelutunnuksella, joten palvelutunnus on niiden kuvien omistaja.
+
+Google ei salli tiedostojen omistuksen siirtämistä eri @domain osoitteella olevien käyttäjien välillä. Eli ei pystytä siirtämään ladatun kuvan omistusta palvelutunnukselta käyttäjälle, joka kansion omistaa.
+
+Jakolinkin luonnissa lisäksi jaetaan kansio julkiseksi internetiin. Sovellus siis muuttaa tässäkin Google Drive kansion jako-oikeuksia. Huomiona siis, että kaikki linkin tietäjät pääsevät näkemään kuvat. Tämä on täsmälleen sama tapa, kuin jos Google Drivestä suoraan jakaa kansioon linkin. Osoite on sellainen, jota ei pysty arvaamaan.
+
+Kun kansio on jaettu internetiin, kuvia voi myös selata sovelluksessa täysikokoisina kuvina "kuvagalleriana". Tapahtumasta voi myöskin jakaa Google Drive kansion linkin suoraan, jolloin linkin saaja voi avata vaihtoehtoisesti Drive sovelluksella kansion.
+
+### TODO versio 0.1.0
 
 - [x] Nextjs pohja
-- [ ] Etusivunäkymä, jossa info sovelluksesta ja kirjautuminen
-- [ ] Kirjautuminen google tunnuksella
-- [ ] Google drive yhdistäminen sovellukseen
-- [ ] Google drive kansion luonti tai olemassaolevan käyttö
-- [ ] Google drive kuvan/kuvien lähetys kansioon
+- [x] Etusivunäkymä, jossa info sovelluksesta ja kirjautuminen
+- [x] Kirjautuminen google tunnuksella
+- [x] Google drive yhdistäminen sovellukseen
+- [x] Google drive kansion luonti tai olemassaolevan käyttö
+- [x] Google drive kuvan/kuvien lähetys kansioon
 - [ ] Tapahtumien listausnäkymä
 - [ ] Tapahtuman avaus
 - [ ] Tapahtuman luontinäkymä
-- [ ] Jaettavan linkin luonti ja jako whatsappiin
-- [ ] Tapahtuman muokkausnäkymä
-- [ ] Tapahtumanäkymä
-- [ ] Kuvien listaus tapahtumaan
-- [ ] Kuvien lähetys tapahtumaan ja lataus google driveen
+- [ ] Jaettavan linkin luonti
+- [ ] Google drive linkin luonti
+- [ ] linkkien Jako whatsappiin tai mihin tahansa
+- [x] Tapahtuman muokkausnäkymä
+- [x] Tapahtumanäkymä
+- [x] Kuvien listaus tapahtumaan
+- [x] Kuvien lähetys tapahtumaan ja lataus google driveen
 - [ ] Kuvalistauksen reaaliaikainen päivitys kaikille
 
 # Nextjs dokumentaatio

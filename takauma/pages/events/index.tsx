@@ -7,7 +7,7 @@ import { GetServerSideProps, GetStaticProps } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { PageProps } from "../../common/types";
-import GoogleDriveUpload from "../../components/googledriveupload";
+import GoogleDriveEvent from "../../components/googledrive-event";
 import { GetGoogleDriveFolders } from "../../lib/googledrive";
 import { drive_v3 } from "googleapis";
 
@@ -33,7 +33,7 @@ export default function Page({ locale, folders }: PageProps & EventPageProps) {
 	return (
 		<Layout t={t} locale={locale}>
 			<h1>{t("eventstitle")}</h1>
-			<GoogleDriveUpload t={t} folders={folders} />
+			<GoogleDriveEvent t={t} folders={folders} />
 		</Layout>
 	);
 }

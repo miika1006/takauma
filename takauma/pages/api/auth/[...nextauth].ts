@@ -140,7 +140,7 @@ export default NextAuth({
 
 	// Enable debug messages in the console if you are having problems
 	//debug: false,
-	debug: process.env.NODE_ENV === "development",
+	debug: true, //process.env.NODE_ENV === "development",
 });
 
 /**

@@ -26,10 +26,6 @@ The link receivers open the application and upload some photos, the photos are c
 
 Google does not permit transfer of ownership of files between users at different @domains. With this app, it is not possible to transfer ownership of the uploaded photo from the service account to the user who owns the folder.
 
-Jakolinkin luonnissa lisäksi jaetaan kansio julkiseksi internetiin. Sovellus siis muuttaa tässäkin Google Drive kansion jako-oikeuksia. Huomiona siis, että kaikki linkin tietäjät pääsevät näkemään kuvat. Tämä on täsmälleen sama tapa, kuin jos Google Drivestä suoraan jakaa kansioon linkin. Osoite on sellainen, jota ei pysty arvaamaan.
-
 When creating a share link, you also share the folder publicly on the Internet. the app changes the sharing permissions on the Google Drive folder. Note, everyone with the link will be able to see the photos. This is exactly same as if you share a link directly to a folder from Google Drive. The address is not easily guessable.
-
-Kun kansio on jaettu internetiin, kuvia voi myös selata sovelluksessa täysikokoisina kuvina "kuvagalleriana". Tapahtumasta voi myöskin jakaa Google Drive kansion linkin suoraan, jolloin linkin saaja voi avata vaihtoehtoisesti Drive sovelluksella kansion.
 
 Once a folder is shared on the Internet, photos can also be browsed in the app as full-size photos as an "image gallery". You can also share a link to the Google Drive folder directly, allowing the recipient of the link to open the folder alternatively with the Drive app.

@@ -31,5 +31,6 @@
 	"eventnotfoundinfo": "Tapahtumaa ei ole jaettu tai se on poistettu.",
 	"sharealink": "Jaa linkki",
 	"delete": "Poista",
-	"opensharelinkinfo": "Avaa linkki ja aloita lataamaan kuvia"
+	"opensharelinkinfo": "Avaa linkki ja aloita lataamaan kuvia",
+	"betainfo": "Sovellus on kesken. Käyttöä ei suositella vielä."
 }

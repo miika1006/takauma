@@ -10,10 +10,13 @@ interface LayoutProps {
 
 export default function Layout({ children, t, locale }: LayoutProps) {
 	return (
-		<div className={styles.main}>
-			<Header t={t} locale={locale} />
-			<main>{children}</main>
-			<Footer t={t} />
-		</div>
+		<>
+			<div className={styles.beta}>{t("betainfo")}</div>
+			<div className={styles.main}>
+				<Header t={t} locale={locale} />
+				<main>{children}</main>
+				<Footer t={t} />
+			</div>
+		</>
 	);
 }

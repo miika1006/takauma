@@ -1,7 +1,7 @@
 import {
 	GetGoogleDriveFiles,
 	UploadGoogleDriveFile,
-} from "./../../lib/googledrive";
+} from "../../../lib/googledrive";
 
 import formidable from "formidable";
 import fs from "fs";

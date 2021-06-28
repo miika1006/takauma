@@ -11,15 +11,16 @@ export default NextAuth({
 		Providers.Google({
 			clientId: process.env.GOOGLE_ID,
 			clientSecret: process.env.GOOGLE_SECRET,
-			//https://www.googleapis.com/auth/userinfo.profile
 			//access users email address
 			//and View and manage Google Drive files and folders that you have opened or created with this app
 			scope:
 				"https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/drive.file",
-			authorizationUrl:
-				process.env.NODE_ENV == "development"
-					? "https://accounts.google.com/o/oauth2/v2/auth?prompt=consent&access_type=offline&response_type=code"
-					: undefined,
+			...(process.env.NODE_ENV === "development"
+				? {
+						authorizationUrl:
+							"https://accounts.google.com/o/oauth2/v2/auth?prompt=consent&access_type=offline&response_type=code",
+				  }
+				: {}),
 		}),
 	],
 	// Database optional. MySQL, Maria DB, Postgres and MongoDB are supported.
@@ -140,7 +141,7 @@ export default NextAuth({
 
 	// Enable debug messages in the console if you are having problems
 	//debug: false,
-	debug: true, //process.env.NODE_ENV === "development",
+	debug: process.env.NODE_ENV === "development",
 });
 
 /**

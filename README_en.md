@@ -1,8 +1,8 @@
-# Takauma
+# Takauma (Flashback)
 
-A web application where you can create an event and then create shareable link that anyone can use to upload photos for the event. This forms a backlash of some moment in time. Photos are stored in the user's own cloud service on google drive.
+A web application where you can create an event and then create shareable link that anyone can use to upload photos for the event. This forms a flashback of some moment in time. Photos are stored in the user's own cloud service on google drive.
 
-## Google Drivesta ja käyttöoikeuksista
+## About Google Drive and permissions
 
 User signs in to the app with google credentials and allows the app permission to read users email, which is displayed in the app as information. User also allows the app permission to use users Google Drive. Photos are uploaded to users Google Drive in folders where the event is a folder.
 
@@ -10,87 +10,28 @@ The app sees and has access only folders and files created with the application.
 
 Signed user then creates new event, and where a folder is actually created to Google Drive by given event name.
 
-#### Google palvelutunnus (service account)
+#### Google service account
 
 Sovelluksessa kuka tahansa linkin saanut voi kirjautumatta ladata kuvia käyttäjän Google Driveen. Tästä tulee haaste googlen käyttöoikeuksien kanssa. Miten saadaan kuvat ladattua ja millä tunnuksella. Kirjautunut käyttäjä voi ladata kuvia kansioon, jollon ne tulevat kansioon käyttäjän luomina.
 
-Mutta entä tilanne, jossa joku tuntematon käyttäjä kirjautumatta haluaa ladata kuvia?
+In the app, anyone who receives the link can upload photos to Google Drive without signing in. This behaviour is a challenge with google permissions. How to upload photos to users Google Drive. A signed-in user can upload photos to a folder so that they appear to the folder created by the user.
 
-Tätä varten sovellukselle on luotu palvelutunnus (service account) googlelle. Sovelluksen luomille kansioille jaetaan käyttöoikeus tälle palvelutunnukselle, jotta sen avulla sovellus voi ladata uusia tiedostoja kansioihin. Palvelutunnus ei pysty näkemään tai käsittelemään mitään muita tiedostoja kuin jaetuista kansioista.
+But, what about a situation where some unknown user wants to upload photos without signing in.
 
-Jos sovellus olisi yrityskäytössä voitaisi virittää palvelutunnus siten, että se toimii jonkin käyttäjätunnuksen puolesta, jolloin tätä jakoa ei tarvitsisi tehdä. Tätä ei kuitenkaan voi tehdä tällaisessa julkisessa käytössä.
+To do this, a service account has been created for the application to Google. Folders created by the application are given permission to the service account to allow the application to upload new files to the folders. By using the service account the application cannot view, download or edit any files other than inside the shared folders.
 
-Käyttäjä siis luo tapahtumia, jotka ovat kansioita. Käyttäjä on niiden kansioiden omistaja. Kansioon jaetaan muokkausoikeus palvelutunnukselle. Käyttäjä sitten jakaa tapahtuman (kansio drivessä) ja luo jakolinkin kuvien lataamiseen.
+If the application were to be used in some business scenario, the service account could be configured to upload photos on behalf of a user, in which case this sharing would not need to be done. However, this cannot be done in this kind of public usable application for everyone.
 
-Linkin saajat avaavat sovelluksen ja lataavat kuvia, kuvat luodaan palvelutunnuksella, joten palvelutunnus on niiden kuvien omistaja.
+The user creates events that are folders. User is the owner of the folders. The folder is assigned editing rights to the service account. The user then shares the event (folder in Drive) and creates a sharing link to upload the photos.
 
-Google ei salli tiedostojen omistuksen siirtämistä eri @domain osoitteella olevien käyttäjien välillä. Eli ei pystytä siirtämään ladatun kuvan omistusta palvelutunnukselta käyttäjälle, joka kansion omistaa.
+The link receivers open the application and upload some photos, the photos are created with the service account, so the service account is the owner of those photos in Google Drive.
+
+Google does not permit transfer of ownership of files between users at different @domains. With this app, it is not possible to transfer ownership of the uploaded photo from the service account to the user who owns the folder.
 
 Jakolinkin luonnissa lisäksi jaetaan kansio julkiseksi internetiin. Sovellus siis muuttaa tässäkin Google Drive kansion jako-oikeuksia. Huomiona siis, että kaikki linkin tietäjät pääsevät näkemään kuvat. Tämä on täsmälleen sama tapa, kuin jos Google Drivestä suoraan jakaa kansioon linkin. Osoite on sellainen, jota ei pysty arvaamaan.
 
+When creating a share link, you also share the folder publicly on the Internet. the app changes the sharing permissions on the Google Drive folder. Note, everyone with the link will be able to see the photos. This is exactly same as if you share a link directly to a folder from Google Drive. The address is not easily guessable.
+
 Kun kansio on jaettu internetiin, kuvia voi myös selata sovelluksessa täysikokoisina kuvina "kuvagalleriana". Tapahtumasta voi myöskin jakaa Google Drive kansion linkin suoraan, jolloin linkin saaja voi avata vaihtoehtoisesti Drive sovelluksella kansion.
 
-### Versio 0.1.0
-
-Proof of concept / MVP, NextJS opiskelua, Google Drive opiskelua, Node opiskelua.
-
-- [x] Nextjs pohja
-- [x] Etusivunäkymä, jossa info sovelluksesta ja kirjautuminen
-- [x] Kirjautuminen google tunnuksella
-- [x] Google drive yhdistäminen sovellukseen
-- [x] Google drive kansion luonti tai olemassaolevan käyttö
-- [x] Google drive kuvan/kuvien lähetys kansioon
-- [x] Tapahtumien listausnäkymä
-- [x] Tapahtuman valinta
-- [x] Tapahtuman luontinäkymä
-- [x] Jaettavan linkin luonti
-- [ ] Google drive linkin luonti
-- [ ] linkkien Jako whatsappiin tai mihin tahansa
-- [x] Tapahtuman muokkausnäkymä
-- [x] Tapahtumanäkymä
-- [x] Kuvien listaus tapahtumaan
-- [x] Kuvien lähetys tapahtumaan ja lataus google driveen
-- [ ] Kuvalistauksen reaaliaikainen päivitys kaikille
-
-### Versio 0.2.0
-
-- [ ] Kaiken koodin refraktorointia
-- [ ] Käytettävyyden parannuksia
-- [ ] Komponenttien parannuksia ja hieromista
-
-# Nextjs dokumentaatiota
-
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
-
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
-
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Once a folder is shared on the Internet, photos can also be browsed in the app as full-size photos as an "image gallery". You can also share a link to the Google Drive folder directly, allowing the recipient of the link to open the folder alternatively with the Drive app.

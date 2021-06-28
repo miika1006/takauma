@@ -60,6 +60,16 @@ Proof of concept / MVP, NextJS opiskelua, Google Drive opiskelua, Node opiskelua
 - [ ] Käytettävyyden parannuksia
 - [ ] Komponenttien parannuksia ja hieromista
 
+## Vercel
+
+Sovellus on julkaistu vercelillä.
+
+Erikoisuuksia oli ympäristömuuttujissa. Jos ympäristömuuttujassa on \n (newline) rivivaihtoja. Vercelin web-käyttöliittymästä lisätessä, pitää korvata rivivaihtomerkit oikeilla rivinvaihdoilla. Ei esimerkiksi auta laittaa sisältöä " merkkien sisään.
+
+Toinen säätö oli next-i18next kanssa. Vercel ei oletuksena löytänyt käännös json tiedostoja public/locales kansiosta. Korjaus löytyi, että piti lisätä next-i18next.config.js tiedostoon merkintä kansion sijainnista.
+
+> localePath: path.resolve("./public/locales"),
+
 # Nextjs dokumentaatiota
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).

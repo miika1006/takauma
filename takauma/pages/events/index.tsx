@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { getSession, useSession } from "next-auth/client";
-import Layout from "../components/layout";
-import AccessDenied from "../components/access-denied";
+import Layout from "../../components/layout";
+import AccessDenied from "../../components/access-denied";
 import { Session } from "next-auth";
 import { GetServerSideProps, GetStaticProps } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { PageProps } from "../common/types";
-import GoogleDriveUpload from "../components/googledriveupload";
-import { GetGoogleDriveFolders } from "../lib/googledrive";
+import { PageProps } from "../../common/types";
+import GoogleDriveUpload from "../../components/googledriveupload";
+import { GetGoogleDriveFolders } from "../../lib/googledrive";
 import { drive_v3 } from "googleapis";
 
 export interface EventPageProps {

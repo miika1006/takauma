@@ -20,5 +20,15 @@
 	"author": "Author",
 	"apprelatedcontact": "Contacts related to this application",
 	"eventstitle": "Events",
-	"accessdenied": "Access denied"
+	"accessdenied": "Access denied",
+	"selectimage": "Select image",
+	"upload": "Upload",
+	"event": "Event",
+	"createnewevent": "Create new event",
+	"save": "Save",
+	"select": "Select",
+	"eventnotfound": "Woops, Could not find the event?",
+	"eventnotfoundinfo": "Event is not shared or it is removed.",
+	"sharealink": "Share link",
+	"delete": "Delete"
 }

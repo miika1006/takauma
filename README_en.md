@@ -1,16 +1,14 @@
-> [English](https://)
-
 # Takauma
 
-Websovellus jossa voi luoda tapahtuman ja jakaa linkin, jonka kautta kuka tahansa voi ladata kuvia tapahtumalle. Tästä muodostuu takauma jostakin hetkestä. Kuvat tallentuvat käyttäjän oman pilvipalvelun tallennustilaan google driveen.
+A web application where you can create an event and then create shareable link that anyone can use to upload photos for the event. This forms a backlash of some moment in time. Photos are stored in the user's own cloud service on google drive.
 
 ## Google Drivesta ja käyttöoikeuksista
 
-Sovelluksessa käyttäjä kirjautuu sisään sovellukseen googletunnuksilla ja sallii sovellukselle oikeuden lukea käyttäjän sähköpostiosoitteen, joka esitetään sivulla infotietona. Käyttäjä myös sallii sovellukselle pääsyn käyttäjän omaan Google Driveen. Kuvat ladataan Google Driveen kansioihin, jossa luotu kansio on tapahtuma sovelluksessa.
+User signs in to the app with google credentials and allows the app permission to read users email, which is displayed in the app as information. User also allows the app permission to use users Google Drive. Photos are uploaded to users Google Drive in folders where the event is a folder.
 
-Sovellus näkee tai pääsee käsittelemään ainoastaan kansioita ja tiedostoja, joita sovelluksella on luotu. Sovelluksella ei ole oikeutta mihinkään muihin kuviin tai tiedostoihin.
+The app sees and has access only folders and files created with the application. The app has no access to any other photos or files.
 
-Kirjautunut käyttäjä sitten luo uuden tapahtuman, jossa oikeasti luodaan uusi kansion Google Driveen annetulla tapahtuman nimellä.
+Signed user then creates new event, and where a folder is actually created to Google Drive by given event name.
 
 #### Google palvelutunnus (service account)
 

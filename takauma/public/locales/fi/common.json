@@ -20,5 +20,15 @@
 	"author": "Tekijä",
 	"apprelatedcontact": "Sovellukseen liittyvät yhteydenotot",
 	"eventstitle": "Tapahtumat",
-	"accessdenied": "Pääsy estetty"
+	"accessdenied": "Pääsy estetty",
+	"selectimage": "Valitse kuva",
+	"upload": "Lähetä",
+	"event": "Tapahtuma",
+	"createnewevent": "Luo uusi tapahtuma",
+	"save": "Tallenna",
+	"select": "Valitse",
+	"eventnotfound": "Oho, tapahtumaa ei löytynyt?",
+	"eventnotfoundinfo": "Tapahtumaa ei ole jaettu tai se on poistettu.",
+	"sharealink": "Jaa linkki",
+	"delete": "Poista"
 }

@@ -1,4 +1,5 @@
-import NextAuth from "next-auth";
+import { JWT } from "next-auth/jwt";
+import NextAuth, { Session, User } from "next-auth";
 import Providers from "next-auth/providers";
 
 // For more information on each option (and a full list of options) go to
@@ -11,12 +12,14 @@ export default NextAuth({
 			clientId: process.env.GOOGLE_ID,
 			clientSecret: process.env.GOOGLE_SECRET,
 			//https://www.googleapis.com/auth/userinfo.profile
+			//access users email address
+			//and View and manage Google Drive files and folders that you have opened or created with this app
 			scope:
 				"https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/drive.file",
 			authorizationUrl:
 				process.env.NODE_ENV == "development"
 					? "https://accounts.google.com/o/oauth2/v2/auth?prompt=consent&access_type=offline&response_type=code"
-					: "",
+					: undefined,
 		}),
 	],
 	// Database optional. MySQL, Maria DB, Postgres and MongoDB are supported.
@@ -53,8 +56,9 @@ export default NextAuth({
 	jwt: {
 		// A secret to use for key generation (you should set this explicitly)
 		// secret: 'INp8IvdIyeMcoGAgFGoA61DdBglwwSqnXJZkgz8PSnw',
+		secret: process.env.SECRET,
 		// Set to true to use encryption (default: false)
-		// encryption: true,
+		encryption: true,
 		// You can define your own encode/decode functions for signing and encryption
 		// if you want to override the default behaviour.
 		// encode: async ({ secret, token, maxAge }) => {},
@@ -78,6 +82,52 @@ export default NextAuth({
 	// when an action is performed.
 	// https://next-auth.js.org/configuration/callbacks
 	callbacks: {
+		/*async signIn(user, account, profile) {
+			console.log("signIn:", user, account, profile);
+
+			return true;
+		},
+		async jwt(token, user, account, profile, isNewUser) {
+			console.log("Jwt in:", token, user, account, profile, isNewUser);
+			// Add access_token to the token right after signin
+			if (account?.accessToken) {
+				token.accessToken = account.accessToken;
+			}
+			return token;
+		},*/
+		async jwt(token, user, account, profile, isNewUser) {
+			// Initial sign in
+			if (account && user) {
+				return {
+					...token,
+					accessToken: account.accessToken,
+					accessTokenExpires: Date.now() + (account.expires_in ?? 0) * 1000,
+					refreshToken: account.refresh_token,
+					user,
+				};
+			}
+
+			// Return previous token if the access token has not expired yet
+			if (Date.now() < (token.accessTokenExpires as number)) {
+				return token;
+			}
+			//clear error if any
+			token.error = "";
+			// Access token has expired, try to update it
+			return refreshAccessToken(token as tokenWithRefresh);
+		},
+		async session(session, userOrToken) {
+			if (userOrToken) {
+				session.user = userOrToken.user
+					? (userOrToken.user as User)
+					: (userOrToken as JWT);
+				session.accessToken = userOrToken.accessToken;
+				session.error = userOrToken.error;
+			}
+
+			return session;
+		},
+
 		// async signIn(user, account, profile) { return true },
 		// async redirect(url, baseUrl) { return baseUrl },
 		// async session(session, user) { return session },
@@ -89,5 +139,64 @@ export default NextAuth({
 	events: {},
 
 	// Enable debug messages in the console if you are having problems
-	debug: false,
+	//debug: false,
+	debug: process.env.NODE_ENV === "development",
 });
+
+/**
+ * Extended type with tokens
+ */
+type tokenWithRefresh = {
+	refreshToken: string;
+	accessToken: string;
+	accessTokenExpires: number;
+} & (User | JWT);
+/**
+ * Takes a token, and returns a new token with updated
+ * `accessToken` and `accessTokenExpires`. If an error occurs,
+ * returns the old token and an error property
+ * Method from
+ *  https://next-auth.js.org/tutorials/refresh-token-rotation
+ *  Source: https://github.com/lawrencecchen/next-auth-refresh-tokens/blob/main/pages/api/auth/%5B...nextauth%5D.js
+ *
+ */
+async function refreshAccessToken(token: tokenWithRefresh) {
+	try {
+		console.log("refreshing access token", token);
+		const searchParams = new URLSearchParams();
+		searchParams.append("client_id", process.env.GOOGLE_ID ?? "");
+		searchParams.append("client_secret", process.env.GOOGLE_SECRET ?? "");
+		searchParams.append("grant_type", "refresh_token");
+		searchParams.append("refresh_token", token.refreshToken);
+
+		const url =
+			"https://oauth2.googleapis.com/token?" + searchParams.toString();
+
+		const response = await fetch(url, {
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
+			},
+			method: "POST",
+		});
+
+		const refreshedTokens = await response.json();
+		console.log("refreshedTokens", refreshedTokens);
+		if (!response.ok) {
+			throw refreshedTokens;
+		}
+
+		return {
+			...token,
+			accessToken: refreshedTokens.access_token,
+			accessTokenExpires: Date.now() + refreshedTokens.expires_in * 1000,
+			refreshToken: refreshedTokens.refresh_token ?? token.refreshToken, // Fall back to old refresh token
+		};
+	} catch (error) {
+		console.log("refreshAccessToken error", error);
+
+		return {
+			...token,
+			error: "RefreshAccessTokenError",
+		};
+	}
+}

@@ -1,14 +1,20 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { getSession, useSession } from "next-auth/client";
-import Layout from "../components/layout";
-import AccessDenied from "../components/access-denied";
+import Layout from "../../components/layout";
+import AccessDenied from "../../components/access-denied";
 import { Session } from "next-auth";
 import { GetServerSideProps, GetStaticProps } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { PageProps } from "../common/types";
+import { PageProps } from "../../common/types";
+import GoogleDriveEvent from "../../components/googledrive-event";
+import { GetGoogleDriveFolders } from "../../lib/googledrive";
+import { drive_v3 } from "googleapis";
 
-export default function Page({ locale }: PageProps) {
+export interface EventPageProps {
+	folders: drive_v3.Schema$File[];
+}
+export default function Page({ locale, folders }: PageProps & EventPageProps) {
 	const { t } = useTranslation("common");
 	const [session, loading] = useSession();
 
@@ -23,11 +29,11 @@ export default function Page({ locale }: PageProps) {
 			</Layout>
 		);
 	}
-
 	// If session exists, display content
 	return (
 		<Layout t={t} locale={locale}>
 			<h1>{t("eventstitle")}</h1>
+			<GoogleDriveEvent t={t} folders={folders} />
 		</Layout>
 	);
 }
@@ -37,11 +43,20 @@ export default function Page({ locale }: PageProps) {
 export const getServerSideProps: GetServerSideProps<{
 	session: Session | null;
 }> = async (context) => {
+	const session = await getSession(context);
+
 	return {
 		props: {
-			session: await getSession(context),
+			session: session,
 			...(await serverSideTranslations(context.locale as string, ["common"])),
 			locale: context.locale as string,
+
+			folders: session
+				? await GetGoogleDriveFolders(
+						session?.accessToken as string,
+						session?.refreshToken as string
+				  )
+				: [],
 		},
 	};
 };

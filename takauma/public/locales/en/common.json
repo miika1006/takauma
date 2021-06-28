@@ -26,5 +26,9 @@
 	"event": "Event",
 	"createnewevent": "Create new event",
 	"save": "Save",
-	"select": "Select"
+	"select": "Select",
+	"eventnotfound": "Woops, Could not find the event?",
+	"eventnotfoundinfo": "Event is not shared or it is removed.",
+	"sharealink": "Share link",
+	"delete": "Delete"
 }

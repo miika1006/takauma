@@ -26,5 +26,9 @@
 	"event": "Tapahtuma",
 	"createnewevent": "Luo uusi tapahtuma",
 	"save": "Tallenna",
-	"select": "Valitse"
+	"select": "Valitse",
+	"eventnotfound": "Oho, tapahtumaa ei löytynyt?",
+	"eventnotfoundinfo": "Tapahtumaa ei ole jaettu tai se on poistettu.",
+	"sharealink": "Jaa linkki",
+	"delete": "Poista"
 }

@@ -23,7 +23,7 @@ export default function Privacy({ t }: PrivacyProps) {
 				tietoja jaeta eteenpäin.
 			</p>
 			<p>
-				<i>Päivitetty: 19.6.2021</i>
+				<i>Päivitetty: 29.6.2021</i>
 			</p>
 
 			<h2>Mitä tietoja käsitellään</h2>
@@ -57,16 +57,20 @@ export default function Privacy({ t }: PrivacyProps) {
 			</ul>
 			<h3>Lapset</h3>
 			<p>
-				Sovellus ei kerää tietoja eikä jaa niitä eteenpäin. Kuvat tallentuvat
-				omaan pilvipalveluusi sellaisenaan ja ovat käytössä vain sinulla ja
-				linkin saaneilla, niin kauan kun linkin jako on voimassa.
+				Sovellus ei kerää tietoja kuvista eikä jaa niitä eteenpäin. Kuvat
+				tallentuvat omaan pilvipalveluusi sellaisenaan ja ovat käytössä vain
+				sinulla ja linkin saaneilla, niin kauan kun linkin jako on voimassa.
 			</p>
 			<h3>Seuranta</h3>
 			<p>
 				Sovellus laskee käyttömääriä, kuinka paljon sivulla on kävijöitä ja
 				kuinka paljon toimintoja käytetään. Tietoja ei yhdistetä kirjautuneeseen
-				käyttäjään. Laskennassa ei käytetä mitään analytiikkakirjastoa tai
-				sovellusta. Käyttömäärät lasketaan suoraan sovelluksessa itsessään.
+				käyttäjään.
+			</p>
+			<p>
+				Sovellus on asennettu vercel (vercel.com) palvelun avulla, johon on
+				asetettu analytiikan keräys päälle. Analytiikalla seurataan kävijämäärää
+				ja sovelluksen suorituskykyä.
 			</p>
 			<h2>Miten tietoja käsitellään</h2>
 			<p>

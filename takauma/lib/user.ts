@@ -6,3 +6,6 @@ export const IsUserBanned = (email: string | null | undefined) => {
 	}
 	return true;
 };
+export const BanUser = (email: string) => {
+	//TODO: Add email to banned list?
+};

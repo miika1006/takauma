@@ -296,7 +296,7 @@ export const ShareGoogleDriveFolderToServiceAccount = async (
  * @param folderId
  * @returns
  */
-export const UnShareGoogleDriveFolderFromAnyone = async (
+export const UnShareGoogleDriveFolderFromAnyoneUsingServiceAccount = async (
 	accessToken: string,
 	refreshToken: string,
 	folderId: string
@@ -307,7 +307,7 @@ export const UnShareGoogleDriveFolderFromAnyone = async (
 			"UnShareGoogleDriveFolderFromAnyone removing share from anyone"
 		);
 
-		const drive = CreateGoogleDriveInstance(accessToken, refreshToken);
+		const drive = CreateGoogleDriveInstance(accessToken, refreshToken, true);
 
 		console.log(
 			"UnShareGoogleDriveFolderFromAnyone Getting folder by folderid"
@@ -381,7 +381,7 @@ export const UnShareGoogleDriveFolderFromAnyone = async (
  * @param folderId
  * @returns folder (file= id,name,shared) or null if some error
  */
-export const ShareGoogleDriveFolderToAnyone = async (
+export const ShareGoogleDriveFolderToAnyoneUsingServiceAccount = async (
 	accessToken: string,
 	refreshToken: string,
 	folderId: string
@@ -392,7 +392,7 @@ export const ShareGoogleDriveFolderToAnyone = async (
 		console.log(
 			"ShareGoogleDriveFolderToAnyone Sharing folder to anyone in Google Drive"
 		);
-		const drive = CreateGoogleDriveInstance(accessToken, refreshToken);
+		const drive = CreateGoogleDriveInstance(accessToken, refreshToken, true);
 
 		const res = await drive.files.get({
 			fileId: folderId,

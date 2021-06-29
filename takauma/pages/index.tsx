@@ -4,15 +4,23 @@ import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSideProps } from "next";
 import { Session } from "next-auth";
-import { getSession, signIn } from "next-auth/client";
+import { getSession, signIn, signout } from "next-auth/client";
 import { PageProps } from "../common/types";
 import styles from "../styles/Home.module.css";
 import { Parallax, ParallaxProvider } from "react-scroll-parallax";
+import { IsUserBanned } from "../lib/user";
+import { useEffect } from "react";
 
-export default function Page({ locale }: PageProps) {
+export default function Page({ locale, shouldSingOut }: PageProps) {
 	const { t } = useTranslation("common");
 	const applicationDescription = t("appdescription");
 
+	useEffect(() => {
+		if (shouldSingOut) {
+			console.log("Signing out");
+			signout();
+		}
+	});
 	return (
 		<ParallaxProvider>
 			<Layout t={t} locale={locale}>
@@ -96,9 +104,11 @@ export default function Page({ locale }: PageProps) {
 export const getServerSideProps: GetServerSideProps<{
 	session: Session | null;
 }> = async (context) => {
+	const session = await getSession(context);
 	return {
 		props: {
-			session: await getSession(context),
+			session,
+			shouldSingOut: session ? IsUserBanned(session.user?.email) : false,
 			locale: context.locale as string,
 			...(await serverSideTranslations(context.locale as string, ["common"])),
 		},

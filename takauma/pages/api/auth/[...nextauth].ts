@@ -1,3 +1,4 @@
+import { IsUserBanned } from "./../../../lib/user";
 import { JWT } from "next-auth/jwt";
 import NextAuth, { Session, User } from "next-auth";
 import Providers from "next-auth/providers";
@@ -83,12 +84,20 @@ export default NextAuth({
 	// when an action is performed.
 	// https://next-auth.js.org/configuration/callbacks
 	callbacks: {
-		/*async signIn(user, account, profile) {
-			console.log("signIn:", user, account, profile);
-
-			return true;
+		async signIn(user, account, profile) {
+			console.log(
+				"signIn: user: ",
+				user.email,
+				"verified_email: ",
+				profile.verified_email
+			);
+			//Only allow verified email?
+			const isVerifiedEmail = profile.verified_email as boolean;
+			//Check ban list
+			const isBanned = IsUserBanned(user.email);
+			return isVerifiedEmail && isBanned === false;
 		},
-		async jwt(token, user, account, profile, isNewUser) {
+		/*async jwt(token, user, account, profile, isNewUser) {
 			console.log("Jwt in:", token, user, account, profile, isNewUser);
 			// Add access_token to the token right after signin
 			if (account?.accessToken) {
@@ -97,6 +106,8 @@ export default NextAuth({
 			return token;
 		},*/
 		async jwt(token, user, account, profile, isNewUser) {
+			console.log("async jwt email", token.email);
+
 			// Initial sign in
 			if (account && user) {
 				return {
@@ -112,12 +123,22 @@ export default NextAuth({
 			if (Date.now() < (token.accessTokenExpires as number)) {
 				return token;
 			}
+
 			//clear error if any
 			token.error = "";
+
+			if (IsUserBanned(token.email)) {
+				console.log(
+					"user is banned, skipping refresh and return original token"
+				);
+				token.error = "Banned";
+				return token;
+			}
 			// Access token has expired, try to update it
 			return refreshAccessToken(token as tokenWithRefresh);
 		},
 		async session(session, userOrToken) {
+			console.log("async session email", userOrToken.email);
 			if (userOrToken) {
 				session.user = userOrToken.user
 					? (userOrToken.user as User)
@@ -164,6 +185,7 @@ type tokenWithRefresh = {
 async function refreshAccessToken(token: tokenWithRefresh) {
 	try {
 		console.log("refreshing access token", token);
+
 		const searchParams = new URLSearchParams();
 		searchParams.append("client_id", process.env.GOOGLE_ID ?? "");
 		searchParams.append("client_secret", process.env.GOOGLE_SECRET ?? "");

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getSession, useSession } from "next-auth/client";
+import { getSession, signout, useSession } from "next-auth/client";
 import Layout from "../../components/layout";
 import AccessDenied from "../../components/access-denied";
 import { Session } from "next-auth";
@@ -10,11 +10,16 @@ import { PageProps } from "../../common/types";
 import GoogleDriveEvent from "../../components/googledrive-event";
 import { GetGoogleDriveFolders } from "../../lib/googledrive";
 import { drive_v3 } from "googleapis";
+import { IsUserBanned } from "../../lib/user";
 
 export interface EventPageProps {
 	folders: drive_v3.Schema$File[];
 }
-export default function Page({ locale, folders }: PageProps & EventPageProps) {
+export default function Page({
+	locale,
+	folders,
+	shouldSingOut,
+}: PageProps & EventPageProps) {
 	const { t } = useTranslation("common");
 	const [session, loading] = useSession();
 
@@ -29,6 +34,13 @@ export default function Page({ locale, folders }: PageProps & EventPageProps) {
 			</Layout>
 		);
 	}
+
+	useEffect(() => {
+		if (shouldSingOut) {
+			console.log("Signing out");
+			signout();
+		}
+	});
 	// If session exists, display content
 	return (
 		<Layout t={t} locale={locale}>
@@ -50,7 +62,7 @@ export const getServerSideProps: GetServerSideProps<{
 			session: session,
 			...(await serverSideTranslations(context.locale as string, ["common"])),
 			locale: context.locale as string,
-
+			shouldSingOut: session ? IsUserBanned(session.user?.email) : false,
 			folders: session
 				? await GetGoogleDriveFolders(
 						session?.accessToken as string,

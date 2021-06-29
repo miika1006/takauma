@@ -171,9 +171,10 @@ export const DeleteGoogleDriveFolder = async (
 				deleteSAResult.status
 			);
 		}
+		return true;
 	} catch (error) {
 		console.log("DeleteGoogleDriveFolder error", error);
-		return null;
+		return false;
 	}
 };
 /**

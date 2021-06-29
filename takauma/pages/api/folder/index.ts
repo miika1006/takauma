@@ -55,13 +55,13 @@ export default async function protectedHandler(
 				const request = req.body as DeleteData;
 				console.log("deleting folder by folderid: '" + request.folderId + "'");
 
-				await DeleteGoogleDriveFolder(
+				const deleteResult = await DeleteGoogleDriveFolder(
 					session.accessToken as string,
 					session.refreshToken as string,
 					request.folderId
 				);
 
-				return res.status(200).send("");
+				return res.status(deleteResult ? 200 : 409).send("");
 			} catch (error) {
 				res.status(400).send(error);
 			}

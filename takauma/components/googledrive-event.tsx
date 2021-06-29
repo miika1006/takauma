@@ -46,7 +46,14 @@ export default function GoogleDriveEvent({
 			if (createEventName === "") return;
 			//Try not to create multiple events with same name
 			//TODO: Notify user
-			if (driveFolders.some((f) => f.name === createEventName)) return;
+			if (
+				driveFolders.some(
+					(f) =>
+						f.name?.toLowerCase().trim() ===
+						createEventName.toLowerCase().trim()
+				)
+			)
+				return;
 
 			const response = await fetch("/api/folder", {
 				headers: {
@@ -61,7 +68,10 @@ export default function GoogleDriveEvent({
 			setCreateEventName("");
 
 			//Add to folder list if it does not exist with same id already
-			if (driveFolders.some((f) => f.id !== response.id)) {
+			const exists = driveFolders.find((f) => f.id === response.id);
+			if (exists) {
+				console.log("event exists, ignoring");
+			} else {
 				setDriveFolders((current) => [...current, response]);
 			}
 			setCurrentEvent(response);
@@ -137,9 +147,16 @@ export default function GoogleDriveEvent({
 					folderId: folder.id,
 				}),
 			});
-			setDriveFolders((currentFolders) =>
-				currentFolders.filter((f) => f.id != folder.id)
-			);
+			if (response.ok) {
+				setDriveFolders((currentFolders) =>
+					currentFolders.filter((f) => f.id != folder.id)
+				);
+			} else {
+				//TODO: Show toast "Failed to delete, folder may contain photos from multiple users"
+				console.error(
+					"Failed to delete, folder may contain photos from multiple users"
+				);
+			}
 			console.log("onDelete response", response);
 		} catch (error) {
 			//TODO: Throw toast

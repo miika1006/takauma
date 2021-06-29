@@ -151,6 +151,7 @@ export const DeleteGoogleDriveFolder = async (
 				"DeleteGoogleDriveFolder Deleting folder Status",
 				deleteResult.status
 			);
+			if (deleteResult.status != 204) insufficient = true;
 		} catch (error) {
 			console.log("DeleteGoogleDriveFolder Deleting folder error", error);
 			insufficient = true;

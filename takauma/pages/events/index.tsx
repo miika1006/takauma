@@ -23,6 +23,13 @@ export default function Page({
 	const { t } = useTranslation("common");
 	const [session, loading] = useSession();
 
+	useEffect(() => {
+		if (shouldSingOut) {
+			console.log("Signing out");
+			signout();
+		}
+	});
+
 	// When rendering client side don't display anything until loading is complete
 	if (typeof window !== "undefined" && loading) return null;
 
@@ -35,12 +42,6 @@ export default function Page({
 		);
 	}
 
-	useEffect(() => {
-		if (shouldSingOut) {
-			console.log("Signing out");
-			signout();
-		}
-	});
 	// If session exists, display content
 	return (
 		<Layout t={t} locale={locale}>

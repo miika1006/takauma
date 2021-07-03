@@ -10,7 +10,7 @@ import { PageProps } from "../../common/types";
 import GoogleDriveEvent from "../../components/googledrive-event";
 import { GetGoogleDriveFolders } from "../../lib/googledrive";
 import { drive_v3 } from "googleapis";
-import { IsUserBanned } from "../../lib/user";
+import { dynamo } from "../../lib/dynamo-db";
 
 export interface EventPageProps {
 	folders: drive_v3.Schema$File[];
@@ -57,19 +57,15 @@ export const getServerSideProps: GetServerSideProps<{
 	session: Session | null;
 }> = async (context) => {
 	const session = await getSession(context);
-
 	return {
 		props: {
 			session: session,
 			...(await serverSideTranslations(context.locale as string, ["common"])),
 			locale: context.locale as string,
-			shouldSingOut: session ? IsUserBanned(session.user?.email) : false,
-			folders: session
-				? await GetGoogleDriveFolders(
-						session?.accessToken as string,
-						session?.refreshToken as string
-				  )
-				: [],
+			shouldSingOut: session
+				? await dynamo.isBanned(session.user?.email)
+				: false,
+			folders: session ? await GetGoogleDriveFolders(session?.accessToken) : [],
 		},
 	};
 };

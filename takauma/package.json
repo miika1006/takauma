@@ -9,6 +9,8 @@
 		"lint": "next lint"
 	},
 	"dependencies": {
+		"@next-auth/dynamodb-adapter": "^0.4.2",
+		"aws-sdk": "^2.938.0",
 		"formidable": "1.2.2",
 		"googleapis": "^77.0.0",
 		"next": "11.0.0",

@@ -89,10 +89,10 @@
   resolved "https://registry.yarnpkg.com/@hapi/hoek/-/hoek-9.2.0.tgz#f3933a44e365864f4dad5db94158106d511e8131"
   integrity sha512-sqKVVVOe5ivCaXDWivIJYVSaEgdQK9ul7a4Kity5Iw7u9+wBAPbX1RMSnLLmp7O4Vzj0WOWwMAJsTL00xwaNug==
 
-"@next-auth/dynamodb-adapter@^0.4.2":
-  version "0.4.2"
-  resolved "https://registry.yarnpkg.com/@next-auth/dynamodb-adapter/-/dynamodb-adapter-0.4.2.tgz#9e56a10dadb57471e000dd8d9a34021a83b80744"
-  integrity sha512-LOE8y/vC/z/hf1YP/kehhNTpdceertSV0fLNHB2rvFwLnprYm0SgAiaRSyOLWitb0WgYAn3BTmhBrHKc+6Xciw==
+"@next-auth/dynamodb-adapter@^0.3.1-canary.207":
+  version "0.3.1-canary.207"
+  resolved "https://registry.yarnpkg.com/@next-auth/dynamodb-adapter/-/dynamodb-adapter-0.3.1-canary.207.tgz#7521370352e578f0cc84cd54a05bd25600e5b670"
+  integrity sha512-PkhxE4UDe8Ok/p7mlxzGIiD3/ZTVxFM2uIgTcJyYKWdzl5k89sd+iGNxlvgexzLzdtMVMiOXXtNyTc0w64WZCQ==
 
 "@next-auth/prisma-legacy-adapter@0.0.1-canary.127":
   version "0.0.1-canary.127"

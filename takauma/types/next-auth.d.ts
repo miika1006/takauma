@@ -4,17 +4,10 @@ import { Session, User, DefaultUser } from "next-auth";
 /** Example on how to extend the built-in session types */
 declare module "next-auth" {
 	interface Session {
-		//extends Record<string, unknown>, DefaultSession {
 		accessToken: string;
-		error: string;
 	}
-	/*interface JWT extends Record<string, unknown>, DefaultJWT {
-		accessToken: string;
-		error: string;
-	}*/
 	interface User {
 		accessToken: string;
-		error: string;
 	}
 	interface Profile {
 		verified_email: boolean;
@@ -25,7 +18,7 @@ declare module "next-auth/jwt" {
 	interface JWT {
 		accessToken: string;
 		refreshToken: string;
-		error: string;
+		//error: string;
 		accessTokenExpires: number;
 	}
 }

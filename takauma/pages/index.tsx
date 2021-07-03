@@ -8,8 +8,8 @@ import { getSession, signIn, signout } from "next-auth/client";
 import { PageProps } from "../common/types";
 import styles from "../styles/Home.module.css";
 import { Parallax, ParallaxProvider } from "react-scroll-parallax";
-import { IsUserBanned } from "../lib/user";
 import { useEffect } from "react";
+import { dynamo } from "../lib/dynamo-db";
 
 export default function Page({ locale, shouldSingOut }: PageProps) {
 	const { t } = useTranslation("common");
@@ -105,10 +105,13 @@ export const getServerSideProps: GetServerSideProps<{
 	session: Session | null;
 }> = async (context) => {
 	const session = await getSession(context);
+
 	return {
 		props: {
 			session,
-			shouldSingOut: session ? IsUserBanned(session.user?.email) : false,
+			shouldSingOut: session
+				? await dynamo.isBanned(session.user?.email)
+				: false,
 			locale: context.locale as string,
 			...(await serverSideTranslations(context.locale as string, ["common"])),
 		},

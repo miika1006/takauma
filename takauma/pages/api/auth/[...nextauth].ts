@@ -1,7 +1,15 @@
-import { IsUserBanned } from "./../../../lib/user";
 import { JWT } from "next-auth/jwt";
 import NextAuth, { Session, User } from "next-auth";
 import Providers from "next-auth/providers";
+import AWS from "aws-sdk";
+import { DynamoDBAdapter } from "@next-auth/dynamodb-adapter";
+import { dynamo } from "../../../lib/dynamo-db";
+
+AWS.config.update({
+	accessKeyId: process.env.APP_AWS_ACCESS_KEY,
+	secretAccessKey: process.env.APP_AWS_SECRET_KEY,
+	region: process.env.APP_AWS_REGION,
+});
 
 // For more information on each option (and a full list of options) go to
 // https://next-auth.js.org/configuration/options
@@ -31,12 +39,13 @@ export default NextAuth({
 	// * You must install an appropriate node_module for your database
 	// * The Email provider requires a database (OAuth providers do not)
 	//database: process.env.DATABASE_URL,
-
+	adapter: DynamoDBAdapter(new AWS.DynamoDB.DocumentClient(), {
+		tableName: process.env.APP_AWS_NEXT_AUTH_TABLE_NAME,
+	}),
 	// The secret should be set to a reasonably long random string.
 	// It is used to sign cookies and to sign and encrypt JSON Web Tokens, unless
 	// a separate secret is defined explicitly for encrypting the JWT.
 	secret: process.env.SECRET,
-
 	session: {
 		// Use JSON Web Tokens for session instead of database sessions.
 		// This option can be used with or without a database for users/accounts.
@@ -44,12 +53,12 @@ export default NextAuth({
 		jwt: true,
 
 		// Seconds - How long until an idle session expires and is no longer valid.
-		// maxAge: 30 * 24 * 60 * 60, // 30 days
+		maxAge: 30 * 24 * 60 * 60, // 30 days
 
 		// Seconds - Throttle how frequently to write to database to extend a session.
 		// Use it to limit write operations. Set to 0 to always update the database.
 		// Note: This option is ignored if using JSON Web Tokens
-		// updateAge: 24 * 60 * 60, // 24 hours
+		updateAge: 24 * 60 * 60, // 24 hours
 	},
 
 	// JSON Web tokens are only used for sessions if the `jwt: true` session
@@ -57,7 +66,6 @@ export default NextAuth({
 	// https://next-auth.js.org/configuration/options#jwt
 	jwt: {
 		// A secret to use for key generation (you should set this explicitly)
-		// secret: 'INp8IvdIyeMcoGAgFGoA61DdBglwwSqnXJZkgz8PSnw',
 		secret: process.env.SECRET,
 		// Set to true to use encryption (default: false)
 		encryption: true,
@@ -91,22 +99,12 @@ export default NextAuth({
 				"verified_email: ",
 				profile.verified_email
 			);
-			//Only allow verified email?
-			const isVerifiedEmail = profile.verified_email as boolean;
-			//Check ban list
-			const isBanned = IsUserBanned(user.email);
-			return isVerifiedEmail && isBanned === false;
+
+			return (await dynamo.isBanned(user.email)) === false;
 		},
-		/*async jwt(token, user, account, profile, isNewUser) {
-			console.log("Jwt in:", token, user, account, profile, isNewUser);
-			// Add access_token to the token right after signin
-			if (account?.accessToken) {
-				token.accessToken = account.accessToken;
-			}
-			return token;
-		},*/
+
 		async jwt(token, user, account, profile, isNewUser) {
-			console.log("async jwt email", token.email);
+			console.log("jwt check", token.email);
 
 			// Initial sign in
 			if (account && user) {
@@ -114,37 +112,43 @@ export default NextAuth({
 					...token,
 					accessToken: account.accessToken,
 					accessTokenExpires: Date.now() + (account.expires_in ?? 0) * 1000,
-					refreshToken: account.refresh_token,
-					user,
+					refreshToken: account.refresh_token ?? "",
+				};
+			}
+
+			if (await dynamo.isBanned(token.email)) {
+				console.log(
+					"jwt check",
+					"user is banned, expires now and skipping refresh"
+				);
+				return {
+					...token,
+					accessTokenExpires: Date.now(),
 				};
 			}
 
 			// Return previous token if the access token has not expired yet
-			if (Date.now() < (token.accessTokenExpires as number)) {
+			if (Date.now() < token.accessTokenExpires) {
 				return token;
 			}
 
-			//clear error if any
-			token.error = "";
-
-			if (IsUserBanned(token.email)) {
-				console.log(
-					"user is banned, skipping refresh and return original token"
-				);
-				token.error = "Banned";
-				return token;
-			}
 			// Access token has expired, try to update it
-			return refreshAccessToken(token as tokenWithRefresh);
+			return await refreshAccessToken(token);
 		},
 		async session(session, userOrToken) {
-			console.log("async session email", userOrToken.email);
+			console.log(
+				"session check",
+				"email",
+				userOrToken.email,
+				"expires",
+				session.expires
+			);
 			if (userOrToken) {
 				session.user = userOrToken.user
 					? (userOrToken.user as User)
 					: (userOrToken as JWT);
+
 				session.accessToken = userOrToken.accessToken;
-				session.error = userOrToken.error;
 			}
 
 			return session;
@@ -158,21 +162,24 @@ export default NextAuth({
 
 	// Events are useful for logging
 	// https://next-auth.js.org/configuration/events
-	events: {},
+	events: {
+		async signIn({ user, account, isNewUser }) {
+			console.log("User signed in", user.email, "IsNewUser", isNewUser);
+
+			if (user.email && isNewUser) {
+				dynamo.saveUser({
+					UserEmail: user.email,
+					IsBanned: false,
+				});
+			}
+		},
+	},
 
 	// Enable debug messages in the console if you are having problems
-	//debug: false,
-	debug: process.env.NODE_ENV === "development",
+	debug: false,
+	//debug: process.env.NODE_ENV === "development",
 });
 
-/**
- * Extended type with tokens
- */
-type tokenWithRefresh = {
-	refreshToken: string;
-	accessToken: string;
-	accessTokenExpires: number;
-} & (User | JWT);
 /**
  * Takes a token, and returns a new token with updated
  * `accessToken` and `accessTokenExpires`. If an error occurs,
@@ -182,9 +189,10 @@ type tokenWithRefresh = {
  *  Source: https://github.com/lawrencecchen/next-auth-refresh-tokens/blob/main/pages/api/auth/%5B...nextauth%5D.js
  *
  */
-async function refreshAccessToken(token: tokenWithRefresh) {
+
+async function refreshAccessToken(token: JWT): Promise<JWT> {
 	try {
-		console.log("refreshing access token", token);
+		console.log("jwt check", "refreshing access token", token);
 
 		const searchParams = new URLSearchParams();
 		searchParams.append("client_id", process.env.GOOGLE_ID ?? "");
@@ -203,7 +211,7 @@ async function refreshAccessToken(token: tokenWithRefresh) {
 		});
 
 		const refreshedTokens = await response.json();
-		console.log("refreshedTokens", refreshedTokens);
+		console.log("jwt check", "refreshedTokens", refreshedTokens);
 		if (!response.ok) {
 			throw refreshedTokens;
 		}
@@ -215,11 +223,10 @@ async function refreshAccessToken(token: tokenWithRefresh) {
 			refreshToken: refreshedTokens.refresh_token ?? token.refreshToken, // Fall back to old refresh token
 		};
 	} catch (error) {
-		console.log("refreshAccessToken error", error);
+		console.error("jwt check", "refreshAccessToken error", error);
 
 		return {
 			...token,
-			error: "RefreshAccessTokenError",
 		};
 	}
 }

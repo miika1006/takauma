@@ -41,4 +41,5 @@ function App(props: AppProps) {
 function Comp({ Component, pageProps }: AppProps) {
 	return <Component {...pageProps} />;
 }
+
 export default App;

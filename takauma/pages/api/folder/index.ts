@@ -31,15 +31,13 @@ export default async function protectedHandler(
 				if (pathSafeEventName == "") throw new Error("eventName is required");
 
 				const result = await GetOrCreateGoogleDriveFolderByFolderName(
-					session.accessToken as string,
-					session.refreshToken as string,
+					session.accessToken,
 					pathSafeEventName
 				);
 				//Immediatelly share folder to service account
 				//so that uploading photos later is possible without login
 				await ShareGoogleDriveFolderToServiceAccount(
-					session.accessToken as string,
-					session.refreshToken as string,
+					session.accessToken,
 					result?.id ?? ""
 				);
 				return res.status(201).send({
@@ -56,8 +54,7 @@ export default async function protectedHandler(
 				console.log("deleting folder by folderid: '" + request.folderId + "'");
 
 				const deleteResult = await DeleteGoogleDriveFolder(
-					session.accessToken as string,
-					session.refreshToken as string,
+					session.accessToken,
 					request.folderId
 				);
 

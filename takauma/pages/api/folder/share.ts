@@ -29,8 +29,7 @@ export default async function protectedHandler(
 					console.log("sharing folder '" + request.folderId + "'");
 					const result =
 						await ShareGoogleDriveFolderToAnyoneUsingServiceAccount(
-							session.accessToken as string,
-							session.refreshToken as string,
+							session.accessToken,
 							request.folderId
 						);
 					return res.status(200).send({
@@ -43,8 +42,7 @@ export default async function protectedHandler(
 					console.log("removing share from folder '" + request.folderId + "'");
 					const result =
 						await UnShareGoogleDriveFolderFromAnyoneUsingServiceAccount(
-							session.accessToken as string,
-							session.refreshToken as string,
+							session.accessToken,
 							request.folderId
 						);
 					return res.status(200).send({

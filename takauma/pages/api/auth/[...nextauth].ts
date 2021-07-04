@@ -192,7 +192,7 @@ export default NextAuth({
 
 async function refreshAccessToken(token: JWT): Promise<JWT> {
 	try {
-		console.log("jwt check", "refreshing access token", token);
+		console.log("jwt check", "refreshing access token for", token.email);
 
 		const searchParams = new URLSearchParams();
 		searchParams.append("client_id", process.env.GOOGLE_ID ?? "");
@@ -211,7 +211,11 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
 		});
 
 		const refreshedTokens = await response.json();
-		console.log("jwt check", "refreshedTokens", refreshedTokens);
+		console.log(
+			"jwt check",
+			"refreshedTokens new accesstoken",
+			refreshedTokens.access_token
+		);
 		if (!response.ok) {
 			throw refreshedTokens;
 		}

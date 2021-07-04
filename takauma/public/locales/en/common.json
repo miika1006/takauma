@@ -31,6 +31,5 @@
 	"eventnotfoundinfo": "Event is not shared or it is removed.",
 	"sharealink": "Share link",
 	"delete": "Delete",
-	"opensharelinkinfo": "Open link and start to upload photos",
-	"betainfo": "This application is work in progress. Using it is not recommended yet."
+	"opensharelinkinfo": "Open link and start to upload photos"
 }

@@ -136,13 +136,7 @@ export default NextAuth({
 			return await refreshAccessToken(token);
 		},
 		async session(session, userOrToken) {
-			console.log(
-				"session check",
-				"email",
-				userOrToken.email,
-				"expires",
-				session.expires
-			);
+			console.log("session check", userOrToken.email);
 			if (userOrToken) {
 				session.user = userOrToken.user
 					? (userOrToken.user as User)

@@ -6,7 +6,7 @@ import { GetServerSideProps } from "next";
 import { Session } from "next-auth";
 import { getSession, signIn, signout } from "next-auth/client";
 import { PageProps } from "../common/types";
-import styles from "../styles/Home.module.css";
+import styles from "../styles/index.module.css";
 import { Parallax, ParallaxProvider } from "react-scroll-parallax";
 import { useEffect } from "react";
 import { dynamo } from "../lib/dynamo-db";

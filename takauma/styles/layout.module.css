@@ -5,16 +5,20 @@
 	flex-direction: column;
 	min-height: 100vh;
 }
+.main > header {
+	height: 7em;
+}
 .main > header,
 .main > main {
 	width: 100%;
 	max-width: 1024px;
-	padding: 0.6rem 1rem;
-	padding-top: 0px;
 }
 .main > footer {
 	width: 100%;
 }
 .main > main {
 	flex-grow: 4;
+}
+.padded {
+	padding: 0 0.5rem;
 }

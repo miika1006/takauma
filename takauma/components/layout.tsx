@@ -6,16 +6,19 @@ interface LayoutProps {
 	children: React.ReactNode;
 	t: TFunction;
 	locale: string;
+	padded?: boolean;
 }
 
-export default function Layout({ children, t, locale }: LayoutProps) {
+export default function Layout({ children, t, locale, padded }: LayoutProps) {
 	return (
-		<>
-			<div className={styles.main}>
-				<Header t={t} locale={locale} />
-				<main>{children}</main>
-				<Footer t={t} />
-			</div>
-		</>
+		<div className={styles.main}>
+			<Header t={t} locale={locale} />
+			<main>
+				<div className={padded === true ? " " + styles.padded : ""}>
+					{children}
+				</div>
+			</main>
+			<Footer t={t} />
+		</div>
 	);
 }

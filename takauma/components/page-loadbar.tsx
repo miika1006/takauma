@@ -12,17 +12,20 @@ export default function PageLoadBar() {
 	const [loading, setLoading] = useState(false);
 	const [loadposition, setLoadposition] = useState<number>(0);
 	let loadTimeoutID: NodeJS.Timeout | null = null;
-
+	const loaderProgress = 5;
+	const stopTowaitForEndAt = 90;
 	const startTimeoutLoader = (position: number) => {
+		//Stop to wait for 100%
+		if (position > stopTowaitForEndAt) return;
+
 		loadTimeoutID = setTimeout(() => {
-			//Stop at 90%, because when endLoader is called, it sets final position to 100%
-			setLoadposition(position > 90 ? 90 : position);
-			startTimeoutLoader(position + 10);
+			setLoadposition(position);
+			startTimeoutLoader(position + loaderProgress);
 		}, 100);
 	};
 	const showLoader = () => {
 		setLoading(true);
-		startTimeoutLoader(5);
+		startTimeoutLoader(loaderProgress);
 	};
 	const endLoader = () => {
 		if (loadTimeoutID) clearTimeout(loadTimeoutID);

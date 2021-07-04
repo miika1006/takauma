@@ -1,3 +1,4 @@
+import { GetGoogleDriveFolders } from "./../../../lib/googledrive";
 import {
 	GetOrCreateGoogleDriveFolderByFolderName,
 	ShareGoogleDriveFolderToServiceAccount,
@@ -21,8 +22,28 @@ export default async function protectedHandler(
 	const session = await getSession({ req });
 
 	if (session) {
+		//Get list of folders
+		if (req.method === "GET") {
+			try {
+				console.log("api loading folders");
+
+				const result = await GetGoogleDriveFolders(session.accessToken);
+
+				return res.status(200).send(
+					result?.map((item) => {
+						return {
+							id: item.id,
+							name: item.name,
+							shared: item.shared,
+						};
+					}) ?? []
+				);
+			} catch (error) {
+				res.status(400).send(error);
+			}
+		}
 		//Create new folder
-		if (req.method === "POST") {
+		else if (req.method === "POST") {
 			try {
 				const request = req.body as CreateData;
 				console.log("creating new folder '" + request.name + "'");

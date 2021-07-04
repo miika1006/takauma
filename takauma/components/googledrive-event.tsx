@@ -1,7 +1,9 @@
 import { drive_v3 } from "googleapis";
 import { TFunction } from "next-i18next";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { createRef, useEffect, useState } from "react";
+import useLoadingIndicator from "../common/hooks/loading-indicator";
+import Loading from "../components/loading";
 
 interface GoogleDriveEventProps {
 	t: TFunction;
@@ -12,6 +14,7 @@ export default function GoogleDriveEvent({
 	t,
 	folders,
 }: GoogleDriveEventProps) {
+	const [loading, setLoading] = useLoadingIndicator(true);
 	const [currentEvent, setCurrentEvent] = useState<drive_v3.Schema$File | null>(
 		null
 	);
@@ -23,6 +26,10 @@ export default function GoogleDriveEvent({
 	const router = useRouter();
 
 	useEffect(() => {
+		loadFolders();
+	}, []);
+
+	useEffect(() => {
 		if (currentEvent) {
 			setShared(currentEvent.shared ?? false);
 			setShareUrl(
@@ -31,6 +38,33 @@ export default function GoogleDriveEvent({
 		}
 	}, [currentEvent, router.pathname]);
 
+	/**
+	 * Load list of folders from api
+	 */
+	const loadFolders = async () => {
+		try {
+			setLoading(true);
+			const response = await fetch("/api/folder", {
+				headers: {
+					"Content-Type": "application/json",
+					Accept: "application/json",
+				},
+				method: "GET",
+			}).then((r) => r.json());
+
+			console.log("loadFolders: response", response);
+
+			const folders = response as drive_v3.Schema$File[];
+
+			if (folders) setDriveFolders(folders);
+			else console.error("loadFolders: Failed to cast response to files");
+		} catch (error) {
+			//TODO: Throw toast
+			console.error("loadFolders: Failed to load folders");
+		} finally {
+			setLoading(false);
+		}
+	};
 	/**
 	 * Creating new event
 	 * Create new event with given createEventName value
@@ -173,6 +207,7 @@ export default function GoogleDriveEvent({
 	};
 	return (
 		<>
+			{loading && <Loading />}
 			{driveFolders.map((folder) => (
 				<div key={folder.id}>
 					{folder.name}

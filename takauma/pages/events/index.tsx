@@ -13,11 +13,11 @@ import { drive_v3 } from "googleapis";
 import { dynamo } from "../../lib/dynamo-db";
 
 export interface EventPageProps {
-	folders: drive_v3.Schema$File[];
+	//folders: drive_v3.Schema$File[];
 }
 export default function Page({
 	locale,
-	folders,
+	//	folders,
 	shouldSingOut,
 }: PageProps & EventPageProps) {
 	const { t } = useTranslation("common");
@@ -44,9 +44,9 @@ export default function Page({
 
 	// If session exists, display content
 	return (
-		<Layout t={t} locale={locale}>
+		<Layout t={t} locale={locale} padded>
 			<h1>{t("eventstitle")}</h1>
-			<GoogleDriveEvent t={t} folders={folders} />
+			<GoogleDriveEvent t={t} folders={[]} />
 		</Layout>
 	);
 }
@@ -65,7 +65,7 @@ export const getServerSideProps: GetServerSideProps<{
 			shouldSingOut: session
 				? await dynamo.isBanned(session.user?.email)
 				: false,
-			folders: session ? await GetGoogleDriveFolders(session?.accessToken) : [],
+			//folders: session ? await GetGoogleDriveFolders(session?.accessToken) : [],
 		},
 	};
 };

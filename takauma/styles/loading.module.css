@@ -1,42 +1,62 @@
 .container {
 	position: relative;
-	padding-top: 1em;
-	width: 2em;
-	padding-bottom: 0.5em;
+	width: 20px;
+	height: 15px;
+	margin-bottom: 15px;
 	display: inline-block;
 }
 .container div {
-	height: 0.5em;
-	width: 0.5em;
 	border-radius: 50%;
 	display: inline-block;
-	background: #59a38a;
-	animation: bounce 1s infinite ease-in-out;
+	position: absolute;
+	left: 50%;
+	background: rgb(195 239 225);
+	animation: swirl 1.4s infinite linear;
 }
 .container .ball1 {
 	animation-delay: 0s;
 }
 .container .ball2 {
-	animation-delay: 0.1s;
+	animation-delay: 0.15s;
 }
 .container .ball3 {
-	animation-delay: 0.2s;
-}
-.container .ball4 {
 	animation-delay: 0.3s;
 }
+.container .ball4 {
+	animation-delay: 0.45s;
+}
+.container .ball5 {
+	animation-delay: 0.6s;
+}
+.container .ball6 {
+	animation-delay: 0.75s;
+}
+.container .ball7 {
+	animation-delay: 0.9s;
+}
+.container .ball8 {
+	animation-delay: 1.05s;
+}
 
-@keyframes bounce {
-	0%,
-	20% {
-		transform: translate(0, 0);
+@keyframes swirl {
+	0% {
+		transform: rotate(60deg) translateX(0px);
+		width: 1px;
+		height: 1px;
 	}
 	50% {
-		transform: translate(0, -1em);
-		background: #00ff95;
+		transform: rotate(360deg) translateX(10px);
+		width: 7px;
+		height: 7px;
+		background: rgb(121, 146, 138);
 	}
-	80%,
+	51% {
+		background: rgb(133, 209, 185);
+	}
 	100% {
-		transform: translate(0, 0);
+		transform: rotate(460deg) translateX(2px);
+		width: 1px;
+		height: 1px;
+		background: rgb(133, 209, 185);
 	}
 }

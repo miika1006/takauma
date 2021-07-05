@@ -78,6 +78,8 @@ export default function GoogleDriveEvent({
 		event.preventDefault();
 		try {
 			if (createEventName === "") return;
+
+			setLoading(true);
 			//Try not to create multiple events with same name
 			//TODO: Notify user
 			if (
@@ -112,6 +114,8 @@ export default function GoogleDriveEvent({
 		} catch (error) {
 			//TODO: Throw toast
 			console.error(error);
+		} finally {
+			setLoading(false);
 		}
 	};
 
@@ -139,6 +143,8 @@ export default function GoogleDriveEvent({
 		setShared(newSharedState);
 		try {
 			if (currentEvent == null || currentEvent.id === "") return;
+
+			setLoading(true);
 			const response = await fetch("/api/folder/share", {
 				headers: {
 					"Content-Type": "application/json",
@@ -156,6 +162,8 @@ export default function GoogleDriveEvent({
 			//TODO: Throw toast
 			console.error(error);
 			setShared(!newSharedState);
+		} finally {
+			setLoading(false);
 		}
 	};
 
@@ -171,6 +179,7 @@ export default function GoogleDriveEvent({
 	 */
 	const deleteEvent = (folder: drive_v3.Schema$File) => async () => {
 		try {
+			setLoading(true);
 			const response = await fetch("/api/folder", {
 				headers: {
 					"Content-Type": "application/json",
@@ -195,6 +204,8 @@ export default function GoogleDriveEvent({
 		} catch (error) {
 			//TODO: Throw toast
 			console.error(error);
+		} finally {
+			setLoading(false);
 		}
 	};
 	/**

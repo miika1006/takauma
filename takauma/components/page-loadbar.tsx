@@ -47,6 +47,7 @@ export default function PageLoadBar() {
 			router.events.off(routerEvents.Complete, endLoader);
 			router.events.off(routerEvents.Error, endLoader);
 		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	return (

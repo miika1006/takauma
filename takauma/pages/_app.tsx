@@ -2,7 +2,10 @@ import { Provider } from "next-auth/client";
 import { appWithTranslation, SSRConfig } from "next-i18next";
 import type { AppProps } from "next/app";
 import React from "react";
+import { ToastContainer } from "react-toastify";
 import PageLoadBar from "../components/page-loadbar";
+
+import "react-toastify/dist/ReactToastify.css";
 import "../styles/globals.css";
 //This is because i18next has custom type for app props that is not exported
 //This is taken from next-i18next code by copy & paste
@@ -44,6 +47,7 @@ function Comp({ Component, pageProps }: AppProps) {
 	return (
 		<>
 			<PageLoadBar />
+			<ToastContainer closeOnClick={false} />
 			<Component {...pageProps} />
 		</>
 	);

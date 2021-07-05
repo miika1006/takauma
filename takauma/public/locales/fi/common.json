@@ -31,5 +31,10 @@
 	"eventnotfoundinfo": "Tapahtumaa ei ole jaettu tai se on poistettu.",
 	"sharealink": "Jaa linkki",
 	"delete": "Poista",
-	"opensharelinkinfo": "Avaa linkki ja aloita lataamaan kuvia"
+	"opensharelinkinfo": "Avaa linkki ja aloita lataamaan kuvia",
+	"woops": "Hupsista",
+	"errordetails": "Virheen tiedot",
+	"somethingwentwrong": "Jokin meni pieleen",
+	"foldermaycontain": "Kansio voi sisältää kuvia",
+	"eventexists": "Saman niminen tapahtuma on jo olemassa"
 }

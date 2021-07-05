@@ -31,5 +31,10 @@
 	"eventnotfoundinfo": "Event is not shared or it is removed.",
 	"sharealink": "Share link",
 	"delete": "Delete",
-	"opensharelinkinfo": "Open link and start to upload photos"
+	"opensharelinkinfo": "Open link and start to upload photos",
+	"woops": "Woops",
+	"errordetails": "Error details",
+	"somethingwentwrong": "Something went wrong",
+	"foldermaycontain": "Folder may contain photos",
+	"eventexists": "Event exists with same name"
 }

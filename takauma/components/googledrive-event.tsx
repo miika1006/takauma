@@ -1,9 +1,10 @@
 import { drive_v3 } from "googleapis";
 import { TFunction } from "next-i18next";
 import { useRouter } from "next/router";
-import { createRef, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import useLoadingIndicator from "../common/hooks/loading-indicator";
 import Loading from "../components/loading";
+import { showErrorToast, showWarningToast } from "../components/toast";
 
 interface GoogleDriveEventProps {
 	t: TFunction;
@@ -26,10 +27,6 @@ export default function GoogleDriveEvent({
 	const router = useRouter();
 
 	useEffect(() => {
-		loadFolders();
-	}, []);
-
-	useEffect(() => {
 		if (currentEvent) {
 			setShared(currentEvent.shared ?? false);
 			setShareUrl(
@@ -38,33 +35,43 @@ export default function GoogleDriveEvent({
 		}
 	}, [currentEvent, router.pathname]);
 
-	/**
-	 * Load list of folders from api
-	 */
-	const loadFolders = async () => {
-		try {
-			setLoading(true);
-			const response = await fetch("/api/folder", {
-				headers: {
-					"Content-Type": "application/json",
-					Accept: "application/json",
-				},
-				method: "GET",
-			}).then((r) => r.json());
+	useEffect(() => {
+		/**
+		 * Load list of folders from api
+		 */
+		const loadFolders = async () => {
+			try {
+				setLoading(true);
+				const response = await fetch("/api/folder", {
+					headers: {
+						"Content-Type": "application/json",
+						Accept: "application/json",
+					},
+					method: "GET",
+				});
 
-			console.log("loadFolders: response", response);
+				if (!response.ok) {
+					const msg = response.statusText + " " + (await response.text());
+					showErrorToast(t, msg);
+					console.error("loadFolders error", msg);
+				} else {
+					const folders = (await response.json()) as drive_v3.Schema$File[];
+					if (folders) setDriveFolders(folders);
+					else console.error("loadFolders: Failed to cast response to files");
+				}
 
-			const folders = response as drive_v3.Schema$File[];
+				console.log("loadFolders: response", response);
+			} catch (error) {
+				console.error("loadFolders error", error);
+				showErrorToast(t, error.message);
+			} finally {
+				setLoading(false);
+			}
+		};
 
-			if (folders) setDriveFolders(folders);
-			else console.error("loadFolders: Failed to cast response to files");
-		} catch (error) {
-			//TODO: Throw toast
-			console.error("loadFolders: Failed to load folders");
-		} finally {
-			setLoading(false);
-		}
-	};
+		loadFolders();
+	}, [setLoading, t]);
+
 	/**
 	 * Creating new event
 	 * Create new event with given createEventName value
@@ -80,16 +87,17 @@ export default function GoogleDriveEvent({
 			if (createEventName === "") return;
 
 			setLoading(true);
-			//Try not to create multiple events with same name
-			//TODO: Notify user
+
 			if (
 				driveFolders.some(
 					(f) =>
 						f.name?.toLowerCase().trim() ===
 						createEventName.toLowerCase().trim()
 				)
-			)
+			) {
+				showWarningToast(t, t("eventexists"));
 				return;
+			}
 
 			const response = await fetch("/api/folder", {
 				headers: {
@@ -98,22 +106,28 @@ export default function GoogleDriveEvent({
 				},
 				method: "POST",
 				body: JSON.stringify({ name: createEventName }),
-			}).then((r) => r.json());
+			});
 
-			console.log("createEvent response", response);
-			setCreateEventName("");
-
-			//Add to folder list if it does not exist with same id already
-			const exists = driveFolders.find((f) => f.id === response.id);
-			if (exists) {
-				console.log("event exists, ignoring");
+			if (!response.ok) {
+				const msg = response.statusText + " " + (await response.text());
+				showErrorToast(t, msg);
+				console.error("createEvent error", msg);
 			} else {
-				setDriveFolders((current) => [...current, response]);
+				setCreateEventName("");
+				const folder = await response.json();
+				//Add to folder list if it does not exist with same id already
+				const exists = driveFolders.find((f) => f.id === folder.id);
+				if (exists) {
+					console.log("event exists, ignoring");
+				} else {
+					setDriveFolders((current) => [...current, folder]);
+				}
+				setCurrentEvent(folder);
 			}
-			setCurrentEvent(response);
+			console.log("createEvent response", response);
 		} catch (error) {
-			//TODO: Throw toast
-			console.error(error);
+			console.error("createEvent error", error);
+			showErrorToast(t, error.message);
 		} finally {
 			setLoading(false);
 		}
@@ -131,11 +145,6 @@ export default function GoogleDriveEvent({
 	 *	7. A user now can view images without auth
 	 *	8. A user now can upload new image without auth
 	 *	   Image is received on serverside and uploaded to given folderId using service account with shared rights to folder
-	 *
-	 *	TODO: Handle exceptions
-	 *	- Folder is not found by folderid, show error/info on sharelink
-	 *	- Folder is unshared
-	 *	  Remove share from service account?
 	 * @param event
 	 */
 	const onShare = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -155,12 +164,19 @@ export default function GoogleDriveEvent({
 					folderId: currentEvent.id,
 					share: newSharedState,
 				}),
-			}).then((r) => r.json());
+			});
+
+			if (!response.ok) {
+				setShared(false);
+				const msg = response.statusText + " " + (await response.text());
+				showErrorToast(t, msg);
+				console.error("onShare error", msg);
+			}
 
 			console.log("onShare response", response);
 		} catch (error) {
-			//TODO: Throw toast
-			console.error(error);
+			console.error("onShare error", error);
+			showErrorToast(t, error.message);
 			setShared(!newSharedState);
 		} finally {
 			setLoading(false);
@@ -190,20 +206,31 @@ export default function GoogleDriveEvent({
 					folderId: folder.id,
 				}),
 			});
+
 			if (response.ok) {
+				if (currentEvent?.id === folder.id) {
+					setCurrentEvent(null);
+				}
 				setDriveFolders((currentFolders) =>
 					currentFolders.filter((f) => f.id != folder.id)
 				);
 			} else {
-				//TODO: Show toast "Failed to delete, folder may contain photos from multiple users"
+				const errormsg =
+					response.status +
+					" " +
+					response.statusText +
+					" " +
+					(await response.text());
+				showErrorToast(t, errormsg, t("foldermaycontain"));
 				console.error(
-					"Failed to delete, folder may contain photos from multiple users"
+					"onDelete error",
+					`${t("foldermaycontain")} [${errormsg}]`
 				);
 			}
 			console.log("onDelete response", response);
 		} catch (error) {
-			//TODO: Throw toast
-			console.error(error);
+			console.error("onDelete error", error);
+			showErrorToast(t, error.message);
 		} finally {
 			setLoading(false);
 		}
@@ -254,9 +281,11 @@ export default function GoogleDriveEvent({
 
 			<br />
 			<br />
-			<a href={shareUrl} target="_blank" rel="noopener noreferrer">
-				{t("opensharelinkinfo")}
-			</a>
+			{shared && (
+				<a href={shareUrl} target="_blank" rel="noopener noreferrer">
+					{t("opensharelinkinfo")}
+				</a>
+			)}
 		</>
 	);
 }

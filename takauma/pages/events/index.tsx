@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { getSession, signout, useSession } from "next-auth/client";
 import Layout from "../../components/layout";
 import AccessDenied from "../../components/access-denied";
@@ -8,16 +8,11 @@ import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { PageProps } from "../../common/types";
 import GoogleDriveEvent from "../../components/googledrive-event";
-import { GetGoogleDriveFolders } from "../../lib/googledrive";
-import { drive_v3 } from "googleapis";
 import { dynamo } from "../../lib/dynamo-db";
 
-export interface EventPageProps {
-	//folders: drive_v3.Schema$File[];
-}
+export interface EventPageProps {}
 export default function Page({
 	locale,
-	//	folders,
 	shouldSingOut,
 }: PageProps & EventPageProps) {
 	const { t } = useTranslation("common");

@@ -3,7 +3,6 @@ import { TFunction } from "next-i18next";
 import { useState } from "react";
 import GoogleDriveEventFolders from "./googledrive-event-folders";
 import GoogleDriveEventForm from "./googledrive-event-form";
-
 interface GoogleDriveEventProps {
 	t: TFunction;
 }

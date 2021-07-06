@@ -1,0 +1,35 @@
+.events {
+	border: solid 1px #dedede;
+	border-radius: 0.5em;
+}
+.event {
+	position: relative;
+	padding: 0.5em;
+	border-bottom: solid 1px #dedede;
+	cursor: pointer;
+}
+.event:hover {
+	background: #f2fbf3;
+}
+.event h3 {
+	margin: 0 0 0.4em;
+}
+.controls {
+	position: absolute;
+	right: 0.5em;
+	top: 0.5em;
+}
+.controls button {
+	margin-right: 0.1em;
+}
+.controls button:last-child {
+	margin: 0;
+}
+.active,
+.active:hover,
+.event:active {
+	background: #e9f7f2;
+}
+.events .event:last-child {
+	border: none;
+}

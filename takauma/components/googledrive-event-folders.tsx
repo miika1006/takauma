@@ -6,6 +6,7 @@ import Loading from "../components/loading";
 import { showErrorToast } from "../components/toast";
 import GoogleDriveEventShare from "./googledrive-event-share";
 import GoogleDriveEventDelete from "./googledrive-event-delete";
+import styles from "../styles/googledrive-event-folders.module.css";
 interface GoogleDriveEventFoldersProps {
 	t: TFunction;
 	current: drive_v3.Schema$File | null;
@@ -65,27 +66,43 @@ export default function GoogleDriveEventFolders({
 	}, [refresh, setLoading, t]);
 
 	return (
-		<>
+		<div className={styles.events}>
 			{folders.map((folder) => (
-				<div key={folder.id}>
-					{folder.name}
-					{folder.name !== current?.name && (
-						<button onClick={() => select(folder)}>{t("select")}</button>
-					)}
-					<GoogleDriveEventDelete
-						t={t}
-						folder={folder}
-						current={current}
-						remove={remove}
-						select={select}
-					/>
-					<br />
+				<div
+					key={folder.id}
+					className={
+						styles.event +
+						(folder.id === current?.id ? ` ${styles.active}` : "")
+					}
+					onClick={
+						folder.name !== current?.name ? () => select(folder) : undefined
+					}
+				>
+					<h3>{folder.name}</h3>
+
+					<div className={styles.controls}>
+						{folder.name !== current?.name && (
+							<button onClick={() => select(folder)}>{t("select")}</button>
+						)}
+						<GoogleDriveEventDelete
+							t={t}
+							folder={folder}
+							current={current}
+							remove={remove}
+							select={select}
+						/>
+					</div>
+
 					{current?.id === folder.id && (
 						<GoogleDriveEventShare t={t} current={current} update={update} />
 					)}
 				</div>
 			))}
-			{loading && <Loading />}
-		</>
+			{loading && (
+				<div className={styles.event}>
+					<Loading />
+				</div>
+			)}
+		</div>
 	);
 }

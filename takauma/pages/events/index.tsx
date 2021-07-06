@@ -46,7 +46,7 @@ export default function Page({
 	return (
 		<Layout t={t} locale={locale} padded>
 			<h1>{t("eventstitle")}</h1>
-			<GoogleDriveEvent t={t} folders={[]} />
+			<GoogleDriveEvent t={t} />
 		</Layout>
 	);
 }

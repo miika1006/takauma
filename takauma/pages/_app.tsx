@@ -1,7 +1,7 @@
-import { Provider } from "next-auth/client";
+import { Provider, signIn, useSession } from "next-auth/client";
 import { appWithTranslation, SSRConfig } from "next-i18next";
 import type { AppProps } from "next/app";
-import React from "react";
+import React, { useEffect } from "react";
 import { ToastContainer } from "react-toastify";
 import PageLoadBar from "../components/page-loadbar";
 
@@ -44,6 +44,12 @@ function App(props: AppProps) {
 	);
 }
 function Comp({ Component, pageProps }: AppProps) {
+	const [session] = useSession();
+	useEffect(() => {
+		if (session?.error === "RefreshAccessTokenError") {
+			signIn("google"); // Force sign in
+		}
+	}, [session]);
 	return (
 		<>
 			<PageLoadBar />

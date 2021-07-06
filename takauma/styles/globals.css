@@ -13,26 +13,10 @@ a {
 	color: inherit;
 }
 a:hover {
-	color: #c6fe44;
+	color: #b1d165;
 	transition: 500ms ease;
 }
 
 * {
 	box-sizing: border-box;
-}
-
-.grid {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	flex-wrap: wrap;
-	max-width: 800px;
-	margin-top: 3rem;
-}
-
-@media (max-width: 600px) {
-	.grid {
-		width: 100%;
-		flex-direction: column;
-	}
 }

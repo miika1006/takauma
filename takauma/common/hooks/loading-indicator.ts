@@ -7,12 +7,13 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
  * @returns [loading, setLoading]
  */
 const useLoadingIndicator = (
-	isInitiallyLoading: boolean = false
+	isInitiallyLoading: boolean = false,
+	timeout: number = 400
 ): [loading: boolean, setLoading: Dispatch<SetStateAction<boolean>>] => {
-	let loadingTimeoutId: NodeJS.Timeout | null = null;
 	const [loading, setLoading] = useState<boolean>(isInitiallyLoading);
 	const [loadingIndicator, setLoadingIndicator] =
 		useState<boolean>(isInitiallyLoading);
+	let loadingTimeoutId: NodeJS.Timeout | null = null;
 
 	const clearCurrentLoadingTimeout = () => {
 		if (loadingTimeoutId) {
@@ -23,9 +24,8 @@ const useLoadingIndicator = (
 	const showLoadingAfterATimeout = () => {
 		loadingTimeoutId = setTimeout(() => {
 			setLoadingIndicator(true);
-		}, 200);
+		}, timeout);
 	};
-
 	useEffect(() => {
 		clearCurrentLoadingTimeout();
 
@@ -35,6 +35,7 @@ const useLoadingIndicator = (
 		return () => {
 			clearCurrentLoadingTimeout();
 		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [loading]);
 
 	return [loadingIndicator, setLoading];

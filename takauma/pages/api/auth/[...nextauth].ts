@@ -104,15 +104,13 @@ export default NextAuth({
 		},
 
 		async jwt(token, user, account, profile, isNewUser) {
-			console.log("jwt check", token.email, token);
-			console.log("jwt", token);
+			console.log("jwt check", token.email);
 			// Initial sign in
 			if (account && user) {
 				return {
 					...token,
 					accessToken: account.accessToken,
-					//accessTokenExpires: Date.now() + (account.expires_in ?? 0) * 1000,
-					accessTokenExpires: 0, //TEST
+					accessTokenExpires: Date.now() + (account.expires_in ?? 0) * 1000,
 					refreshToken: account.refresh_token ?? "",
 				};
 			}
@@ -138,12 +136,12 @@ export default NextAuth({
 		},
 		async session(session, userOrToken) {
 			console.log("session check", userOrToken.email);
-			console.log(userOrToken, session);
 			if (userOrToken) {
 				session.user = userOrToken.user
 					? (userOrToken.user as User)
 					: (userOrToken as JWT);
 				session.accessToken = userOrToken.accessToken;
+				session.error = userOrToken.error;
 			}
 
 			return session;
@@ -226,6 +224,7 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
 
 		return {
 			...token,
+			error: "RefreshAccessTokenError",
 		};
 	}
 }

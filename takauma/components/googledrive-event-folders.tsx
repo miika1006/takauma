@@ -65,7 +65,7 @@ export default function GoogleDriveEventFolders({
 		loadFolders();
 	}, [refresh, setLoading, t]);
 
-	return (
+	return folders.length === 0 ? null : (
 		<div className={styles.events}>
 			{folders.map((folder) => (
 				<div

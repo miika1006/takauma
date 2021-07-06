@@ -36,5 +36,6 @@
 	"errordetails": "Error details",
 	"somethingwentwrong": "Something went wrong",
 	"foldermaycontain": "Folder may contain photos",
-	"eventexists": "Event exists with same name"
+	"eventexists": "Event exists with same name",
+	"inputnameofevent": "Input eventname and save."
 }

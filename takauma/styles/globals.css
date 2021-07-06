@@ -55,3 +55,18 @@ input[type="text"] {
 	line-height: 0.8em;
 	padding: 0.3em;
 }
+h1 {
+	font-size: 1.5em;
+	font-family: "Saira Condensed", sans-serif;
+}
+h2 {
+	font-size: 1.2em;
+	font-family: "Saira Condensed", sans-serif;
+}
+h3,
+h4,
+h5,
+h6 {
+	font-size: 1em;
+	font-family: "Saira Condensed", sans-serif;
+}

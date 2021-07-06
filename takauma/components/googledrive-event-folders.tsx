@@ -78,19 +78,21 @@ export default function GoogleDriveEventFolders({
 						folder.name !== current?.name ? () => select(folder) : undefined
 					}
 				>
-					<h3>{folder.name}</h3>
+					<div className={styles.eventhead}>
+						<h2>{folder.name}</h2>
 
-					<div className={styles.controls}>
-						{folder.name !== current?.name && (
-							<button onClick={() => select(folder)}>{t("select")}</button>
-						)}
-						<GoogleDriveEventDelete
-							t={t}
-							folder={folder}
-							current={current}
-							remove={remove}
-							select={select}
-						/>
+						<div className={styles.controls}>
+							{folder.name !== current?.name && (
+								<button onClick={() => select(folder)}>{t("select")}</button>
+							)}
+							<GoogleDriveEventDelete
+								t={t}
+								folder={folder}
+								current={current}
+								remove={remove}
+								select={select}
+							/>
+						</div>
 					</div>
 
 					{current?.id === folder.id && (

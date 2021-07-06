@@ -1,6 +1,7 @@
 .events {
 	border: solid 1px #dedede;
 	border-radius: 0.5em;
+	line-height: 1.5em;
 }
 .event {
 	position: relative;
@@ -11,13 +12,16 @@
 .event:hover {
 	background: #f2fbf3;
 }
-.event h3 {
-	margin: 0 0 0.4em;
+.event h2 {
+	margin: 0.1em 0 0.2em;
+	flex-grow: 1;
+}
+
+.eventhead {
+	display: flex;
 }
 .controls {
-	position: absolute;
-	right: 0.5em;
-	top: 0.5em;
+	white-space: nowrap;
 }
 .controls button {
 	margin-right: 0.1em;
@@ -29,6 +33,10 @@
 .active:hover,
 .event:active {
 	background: #e9f7f2;
+}
+.active h2 {
+	margin-top: 0;
+	margin-bottom: 0.6em;
 }
 .events .event:last-child {
 	border: none;

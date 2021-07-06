@@ -4,6 +4,7 @@ import { useState } from "react";
 import useLoadingIndicator from "../common/hooks/loading-indicator";
 import { showErrorToast, showWarningToast } from "../components/toast";
 import Loading from "../components/loading";
+import styles from "../styles/googledrive-event-form.module.css";
 
 interface GoogleDriveEventFormProps {
 	t: TFunction;
@@ -19,7 +20,6 @@ export default function GoogleDriveEventForm({
 	folders,
 }: GoogleDriveEventFormProps) {
 	const [loading, setLoading] = useLoadingIndicator(false, 1);
-
 	const [createEventName, setCreateEventName] = useState<string>("");
 
 	/**
@@ -83,8 +83,8 @@ export default function GoogleDriveEventForm({
 		}
 	};
 	return (
-		<form onSubmit={createEvent}>
-			<h4>{t("createnewevent")}</h4>
+		<form onSubmit={createEvent} className={styles.eventform}>
+			<h2>{t("createnewevent")}</h2>
 			<input
 				type="text"
 				value={createEventName}

@@ -17,7 +17,7 @@ export default function Page({ locale, folder }: PageProps & EventPageProps) {
 	const { t } = useTranslation("common");
 	//
 	return (
-		<Layout t={t} locale={locale}>
+		<Layout t={t} locale={locale} padded>
 			{folder && folder.shared ? (
 				<>
 					<h1>{folder.name}</h1>

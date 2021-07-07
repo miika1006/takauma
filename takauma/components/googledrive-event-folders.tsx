@@ -26,7 +26,7 @@ export default function GoogleDriveEventFolders({
 	current,
 	folders,
 }: GoogleDriveEventFoldersProps) {
-	const [loading, setLoading] = useLoadingIndicator(true);
+	const [loading, setLoading] = useLoadingIndicator(true, 1);
 
 	useEffect(() => {
 		/**

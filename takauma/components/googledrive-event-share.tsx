@@ -109,8 +109,8 @@ export default function GoogleDriveEventShare({
 					url: shareUrl,
 				});
 			} catch (error) {
-				console.warn("Share to mobile failed", error);
-				showWarningToast(t, t("sharefailed"));
+				console.warn("Share to mobile", error);
+				//showWarningToast(t, t("sharefailed"));
 			}
 		}
 	};
@@ -159,9 +159,6 @@ export default function GoogleDriveEventShare({
 						readOnly
 					/>
 
-					<button onClick={copySharelinkToClipboard}>
-						{copysuccess ? t("copysuccesss") : t("copytoclipboard")}
-					</button>
 					<div className={styles.shareoptionsmobile}>
 						<button onClick={shareToMobile}>{t("sharelink")}</button>
 						<a
@@ -174,6 +171,9 @@ export default function GoogleDriveEventShare({
 						</a>
 					</div>
 					<div className={styles.shareoptionsdesktop}>
+						<button onClick={copySharelinkToClipboard}>
+							{copysuccess ? t("copysuccesss") : t("copytoclipboard")}
+						</button>
 						<a
 							href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
 								current?.name ?? ""

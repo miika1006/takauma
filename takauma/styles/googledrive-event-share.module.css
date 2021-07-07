@@ -23,7 +23,7 @@
 .shareoptionsdesktop {
 	display: none;
 }
-@media only screen and (min-width: 1025px) {
+@media only screen and (min-width: 992px) {
 	.shareoptionsdesktop {
 		display: flex;
 		align-items: center;

@@ -37,5 +37,12 @@
 	"somethingwentwrong": "Something went wrong",
 	"foldermaycontain": "Folder may contain photos",
 	"eventexists": "Event exists with same name",
-	"inputnameofevent": "Input eventname and save."
+	"inputnameofevent": "Input eventname and save.",
+	"copytoclipboard": "Copy to clipboard",
+	"couldntcopytoclipboard": "Copying to clipboard failed?",
+	"copysuccesss": "Copied",
+	"sharetowhatsapp": "Share to WhatsApp",
+	"sharelink": "Share link",
+	"sharefailed": "Share failed",
+	"sharebyemail": "Share by email"
 }

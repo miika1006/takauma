@@ -1,0 +1,34 @@
+.share {
+	display: flex;
+	flex-wrap: wrap;
+	line-height: 2em;
+	row-gap: 0.3em;
+}
+.share label,
+.shareoptionsdesktop {
+	flex-basis: 100%;
+}
+.input {
+	flex-grow: 1;
+}
+.shareoptionsmobile a,
+.shareoptionsdesktop a {
+	font-size: 0.8em;
+}
+.shareoptionsmobile {
+	display: flex;
+	flex-basis: 100%;
+	align-items: center;
+}
+.shareoptionsdesktop {
+	display: none;
+}
+@media only screen and (min-width: 1025px) {
+	.shareoptionsdesktop {
+		display: flex;
+		align-items: center;
+	}
+	.shareoptionsmobile {
+		display: none;
+	}
+}

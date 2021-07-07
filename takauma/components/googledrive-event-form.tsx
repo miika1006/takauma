@@ -82,7 +82,11 @@ export default function GoogleDriveEventForm({
 			setLoading(false);
 		}
 	};
-	return (
+	return loading ? (
+		<div className={styles.eventform}>
+			<Loading />
+		</div>
+	) : (
 		<form onSubmit={createEvent} className={styles.eventform}>
 			<h2>{t("createnewevent")}</h2>
 			<input
@@ -92,7 +96,7 @@ export default function GoogleDriveEventForm({
 				placeholder={t("inputnameofevent")}
 				onChange={(e) => setCreateEventName(e.target.value)}
 			/>
-			{loading ? <Loading /> : <button type="submit">{t("save")}</button>}
+			<button type="submit">{t("save")}</button>
 		</form>
 	);
 }

@@ -47,7 +47,9 @@ function Comp({ Component, pageProps }: AppProps) {
 	const [session] = useSession();
 	useEffect(() => {
 		if (session?.error === "RefreshAccessTokenError") {
-			signIn("google"); // Force sign in
+			signIn("google", {
+				callbackUrl: process.env.NEXTAUTH_URL,
+			}); // Force sign in
 		}
 	}, [session]);
 	return (

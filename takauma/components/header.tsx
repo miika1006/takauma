@@ -77,10 +77,12 @@ export default function Header({ t, locale }: HeaderProps) {
 					)}
 					{session?.user && (
 						<>
-							<span
-								style={{ backgroundImage: `url(${session.user.image})` }}
-								className={styles.avatar}
-							/>
+							{session.user.image && (
+								<span
+									style={{ backgroundImage: `url(${session.user.image})` }}
+									className={styles.avatar}
+								/>
+							)}
 							<span className={styles.signedInText + " " + styles.specialtext}>
 								<small>{t("signedinas")}</small>
 								<br />

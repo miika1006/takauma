@@ -34,13 +34,18 @@ export const getServerSideProps: GetServerSideProps<{
 	folder: drive_v3.Schema$File | null | null;
 }> = async (context) => {
 	const { folderid } = context.query;
+
+	console.log("folderid", folderid);
 	return {
 		props: {
 			...(await serverSideTranslations(context.locale as string, ["common"])),
 			locale: context.locale as string,
-			folder: await GetGoogleDriveFolderByIdUsingServiceAccount(
-				folderid as string
-			),
+			folder:
+				folderid && folderid !== "undefined"
+					? await GetGoogleDriveFolderByIdUsingServiceAccount(
+							folderid as string
+					  )
+					: null,
 		},
 	};
 };

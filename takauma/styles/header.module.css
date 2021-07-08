@@ -30,10 +30,8 @@ a.specialtext {
 
 .signedInText,
 .notSignedInText {
-	position: absolute;
 	padding-top: 0.8rem;
-	left: 1rem;
-	right: 6.5rem;
+	float: left;
 	white-space: nowrap;
 	text-overflow: ellipsis;
 	overflow: hidden;
@@ -52,6 +50,7 @@ a.specialtext {
 	float: left;
 	height: 2.8rem;
 	width: 2.8rem;
+	margin-right: 1rem;
 	background-color: white;
 	background-size: cover;
 	background-repeat: no-repeat;

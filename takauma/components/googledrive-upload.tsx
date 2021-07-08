@@ -1,7 +1,11 @@
 import { drive_v3 } from "googleapis";
 import { TFunction } from "next-i18next";
 import { useEffect, useRef, useState } from "react";
+import useLoadingIndicator from "../common/hooks/loading-indicator";
 import styles from "../styles/googledriveupload.module.css";
+import Slider from "./slider";
+import Loading from "../components/loading";
+
 interface GoogleDriveUploadProps {
 	t: TFunction;
 	folder: drive_v3.Schema$File;
@@ -11,6 +15,8 @@ export default function GoogleDriveUpload({
 	t,
 	folder,
 }: GoogleDriveUploadProps) {
+	const [loading, setLoading] = useLoadingIndicator(true, 1);
+
 	const [image, setImage] = useState<File | null>(null);
 	const currentEvent = folder;
 	const [createObjectURL, setCreateObjectURL] = useState<string>("");
@@ -21,6 +27,7 @@ export default function GoogleDriveUpload({
 		const getFiles = async (eventName: string) => {
 			try {
 				if (eventName === "") return;
+				setLoading(true);
 				const response = await fetch(`/api/file/${folder.id}`, {
 					headers: {
 						"Content-Type": "application/json",
@@ -33,11 +40,13 @@ export default function GoogleDriveUpload({
 			} catch (error) {
 				//TODO: Throw toast
 				console.error(error);
+			} finally {
+				setLoading(false);
 			}
 		};
 
 		getFiles(currentEvent?.name ?? "");
-	}, [currentEvent, folder.id]);
+	}, [currentEvent, folder.id, setLoading]);
 
 	const setToPagePreview = (event: React.ChangeEvent<HTMLInputElement>) => {
 		if (event.target.files && event.target.files[0]) {
@@ -72,18 +81,22 @@ export default function GoogleDriveUpload({
 
 	return (
 		<>
-			{driveFiles.map((file) => (
-				<img
-					key={`thumb-${file.id}`}
-					className={styles.thumbnail}
-					alt={`image ${file.id ?? ""}`}
-					/*src={`https://www.googleapis.com/drive/v3/files/${
-							file.id ?? ""
-						}/export?mimeType=${file.mimeType}`}*/
-					//src={file.webContentLink ?? ""}
-					src={file.thumbnailLink ?? ""}
-				/>
-			))}
+			{driveFiles ? <Slider t={t} items={driveFiles} /> : <Loading />}
+
+			{/* <div className={styles.thumbnails}>
+				{driveFiles.map((file) => (
+					<img
+						key={`thumb-${file.id}`}
+						className={styles.thumbnail}
+						alt={`image ${file.id ?? ""}`}
+						//src={`https://www.googleapis.com/drive/v3/files/${
+						//	file.id ?? ""
+						//}/export?mimeType=${file.mimeType}`}
+						//src={file.webContentLink ?? ""}
+						src={file.thumbnailLink ?? ""}
+					/>
+				))}
+			</div> */}
 			{currentEvent && (
 				<form onSubmit={upload}>
 					<h4>{t("selectimage")}</h4>

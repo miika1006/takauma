@@ -39,6 +39,11 @@ export default async function handler(
 							name: item?.name,
 							webContentLink: item?.webContentLink,
 							thumbnailLink: item?.thumbnailLink,
+							imageMediaMetadata: {
+								width: item?.imageMediaMetadata?.width,
+								height: item?.imageMediaMetadata?.height,
+								rotation: item?.imageMediaMetadata?.rotation,
+							},
 						};
 					}) ?? []
 				);
@@ -77,6 +82,11 @@ export default async function handler(
 								name: result?.name,
 								webContentLink: result?.webContentLink,
 								thumbnailLink: result?.thumbnailLink,
+								imageMediaMetadata: {
+									width: result?.imageMediaMetadata?.width,
+									height: result?.imageMediaMetadata?.height,
+									rotation: result?.imageMediaMetadata?.rotation,
+								},
 							});
 						});
 					}

@@ -44,5 +44,12 @@
 	"sharetowhatsapp": "Jaa WhatsAppiin",
 	"sharelink": "Jaa linkki",
 	"sharefailed": "Jako epäonnistui",
-	"sharebyemail": "Jaa sähköpostilla"
+	"sharebyemail": "Jaa sähköpostilla",
+	"close": "Sulje",
+	"share": "Jaa",
+	"fullscreen": "Koko ruutu",
+	"zoom": "Zoom",
+	"previous": "Edellinen",
+	"next": "Seuraava",
+	"downloadoriginal": "Lataa alkuperäinen"
 }

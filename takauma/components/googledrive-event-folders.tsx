@@ -65,46 +65,56 @@ export default function GoogleDriveEventFolders({
 		loadFolders();
 	}, [refresh, setLoading, t]);
 
-	return folders.length === 0 ? null : (
-		<div className={styles.events}>
-			{folders.map((folder) => (
-				<div
-					key={folder.id}
-					className={
-						styles.event +
-						(folder.id === current?.id ? ` ${styles.active}` : "")
-					}
-					onClick={
-						folder.name !== current?.name ? () => select(folder) : undefined
-					}
-				>
-					<div className={styles.eventhead}>
-						<h2>{folder.name}</h2>
+	return (
+		<>
+			{folders.length === 0 ? null : (
+				<div className={styles.events}>
+					{folders.map((folder) => (
+						<div
+							key={folder.id}
+							className={
+								styles.event +
+								(folder.id === current?.id ? ` ${styles.active}` : "")
+							}
+							onClick={
+								folder.name !== current?.name ? () => select(folder) : undefined
+							}
+						>
+							<div className={styles.eventhead}>
+								<h2>{folder.name}</h2>
 
-						<div className={styles.controls}>
-							{folder.name !== current?.name && (
-								<button onClick={() => select(folder)}>{t("select")}</button>
+								<div className={styles.controls}>
+									{folder.name !== current?.name && (
+										<button onClick={() => select(folder)}>
+											{t("select")}
+										</button>
+									)}
+									<GoogleDriveEventDelete
+										t={t}
+										folder={folder}
+										current={current}
+										remove={remove}
+										select={select}
+									/>
+								</div>
+							</div>
+
+							{current?.id === folder.id && (
+								<GoogleDriveEventShare
+									t={t}
+									current={current}
+									update={update}
+								/>
 							)}
-							<GoogleDriveEventDelete
-								t={t}
-								folder={folder}
-								current={current}
-								remove={remove}
-								select={select}
-							/>
 						</div>
-					</div>
-
-					{current?.id === folder.id && (
-						<GoogleDriveEventShare t={t} current={current} update={update} />
-					)}
+					))}
 				</div>
-			))}
+			)}
 			{loading && (
 				<div className={styles.event}>
 					<Loading />
 				</div>
 			)}
-		</div>
+		</>
 	);
 }

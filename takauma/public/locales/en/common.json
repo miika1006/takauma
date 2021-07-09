@@ -44,5 +44,12 @@
 	"sharetowhatsapp": "Share to WhatsApp",
 	"sharelink": "Share link",
 	"sharefailed": "Share failed",
-	"sharebyemail": "Share by email"
+	"sharebyemail": "Share by email",
+	"close": "Close",
+	"share": "Share",
+	"fullscreen": "Fullscreen",
+	"zoom": "Zoom",
+	"previous": "Previous",
+	"next": "Next",
+	"downloadoriginal": "Download original"
 }

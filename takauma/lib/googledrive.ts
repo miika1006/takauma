@@ -462,7 +462,8 @@ export const GetGoogleDriveFilesByFolderIdUsingServiceAccount = async (
 			q:
 				"mimeType!='application/vnd.google-apps.folder' and trashed=false" +
 				` and '${folderId}' in parents`,
-			fields: "nextPageToken, files(id, name,thumbnailLink,webContentLink)",
+			fields:
+				"nextPageToken, files(id, name,thumbnailLink,webContentLink,imageMediaMetadata)",
 			orderBy: "createdTime",
 			pageSize: 1000,
 			supportsAllDrives: true,
@@ -865,7 +866,7 @@ const UploadFileToDrive = async (
 
 		const queryfiles = await drive.files.get({
 			fileId: res.data.id,
-			fields: "id,name,thumbnailLink,webContentLink",
+			fields: "id,name,thumbnailLink,webContentLink,imageMediaMetadata",
 			supportsAllDrives: true,
 		});
 

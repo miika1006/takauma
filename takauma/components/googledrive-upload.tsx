@@ -3,7 +3,7 @@ import { TFunction } from "next-i18next";
 import { useEffect, useRef, useState } from "react";
 import useLoadingIndicator from "../common/hooks/loading-indicator";
 import styles from "../styles/googledriveupload.module.css";
-import Slider from "./slider";
+import Slider, { SliderItem } from "./slider";
 import Loading from "../components/loading";
 
 interface GoogleDriveUploadProps {
@@ -81,7 +81,25 @@ export default function GoogleDriveUpload({
 
 	return (
 		<>
-			{driveFiles ? <Slider t={t} items={driveFiles} /> : <Loading />}
+			{driveFiles ? (
+				<Slider
+					t={t}
+					items={driveFiles.map((f) => {
+						const item: SliderItem = {
+							id: f.id,
+							thumbnailLink: f.thumbnailLink,
+							webContentLink: f.webContentLink,
+							imageMediaMetadata: {
+								width: f.imageMediaMetadata?.width ?? 0,
+								height: f.imageMediaMetadata?.height ?? 0,
+							},
+						};
+						return item;
+					})}
+				/>
+			) : (
+				<Loading />
+			)}
 
 			{/* <div className={styles.thumbnails}>
 				{driveFiles.map((file) => (

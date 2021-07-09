@@ -2,3 +2,16 @@
 	background: #333;
 	padding-top: 1em;
 }
+.thumb {
+	width: 100px;
+	height: 100px;
+	display: inline-block;
+	vertical-align: top;
+	margin: 0.5em;
+}
+.thumb img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	box-shadow: 1px 1px 3px #525252;
+}

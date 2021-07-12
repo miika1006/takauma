@@ -1,8 +1,9 @@
 import Link from "next/link";
 import Head from "next/head";
-import { getSession, signIn, signOut, useSession } from "next-auth/client";
+import { signIn, signOut, useSession } from "next-auth/client";
 import styles from "../styles/header.module.css";
 import { TFunction } from "next-i18next";
+import { useRouter } from "next/router";
 
 // The approach used in this component shows how to built a sign in and sign out
 // component that works on pages which support both client and server side
@@ -14,7 +15,13 @@ interface HeaderProps {
 }
 
 export default function Header({ t, locale }: HeaderProps) {
+	const router = useRouter();
+	console.log("router:", router);
+
+	//TODO: Hide sing in header if route is event and make headerbar smaller
+	//if(router.route === "/events/[folderid]")
 	const [session, loading] = useSession();
+
 	return (
 		<header>
 			<Head>

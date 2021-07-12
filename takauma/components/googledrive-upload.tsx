@@ -5,6 +5,8 @@ import useLoadingIndicator from "../common/hooks/loading-indicator";
 import styles from "../styles/googledriveupload.module.css";
 import Slider, { SliderItem } from "./slider";
 import Loading from "../components/loading";
+import GoogleDriveUploadForm from "./googledrive-upload-form";
+import GoogleDriveUploadFiles from "./googledrive-upload-files";
 
 interface GoogleDriveUploadProps {
 	t: TFunction;
@@ -15,120 +17,21 @@ export default function GoogleDriveUpload({
 	t,
 	folder,
 }: GoogleDriveUploadProps) {
-	const [loading, setLoading] = useLoadingIndicator(true, 1);
-
-	const [image, setImage] = useState<File | null>(null);
-	const currentEvent = folder;
-	const [createObjectURL, setCreateObjectURL] = useState<string>("");
-	const fileInputRef = useRef<HTMLInputElement>(null);
 	const [driveFiles, setDriveFiles] = useState<drive_v3.Schema$File[]>([]);
-
-	useEffect(() => {
-		const getFiles = async (eventName: string) => {
-			try {
-				if (eventName === "") return;
-				setLoading(true);
-				const response = await fetch(`/api/file/${folder.id}`, {
-					headers: {
-						"Content-Type": "application/json",
-						Accept: "application/json",
-					},
-					method: "GET",
-				}).then((r) => r.json());
-				console.log("getFiles response", response);
-				setDriveFiles(response);
-			} catch (error) {
-				//TODO: Throw toast
-				console.error(error);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		getFiles(currentEvent?.name ?? "");
-	}, [currentEvent, folder.id, setLoading]);
-
-	const setToPagePreview = (event: React.ChangeEvent<HTMLInputElement>) => {
-		if (event.target.files && event.target.files[0]) {
-			const imagefile = event.target.files[0];
-			setImage(imagefile);
-			setCreateObjectURL(URL.createObjectURL(imagefile));
-		}
-	};
-
-	const upload = async (event: React.FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
-		try {
-			if (image == null) return;
-			if (currentEvent === null || currentEvent.name === "") return;
-			const body = new FormData();
-			body.append("file", image);
-			body.append("eventName", currentEvent.name ?? "");
-			const response = await fetch(`/api/file/${folder.id}`, {
-				method: "POST",
-				body,
-			}).then((r) => r.json());
-			setImage(null);
-			console.log("upload response", response);
-			setDriveFiles((current) => [...current, response]);
-			setCreateObjectURL("");
-			if (fileInputRef?.current) fileInputRef.current.value = "";
-		} catch (error) {
-			//TODO: Throw toast
-			console.error(error);
-		}
-	};
 
 	return (
 		<>
-			{driveFiles ? (
-				<Slider
-					t={t}
-					items={driveFiles.map((f) => {
-						const item: SliderItem = {
-							id: f.id,
-							thumbnailLink: f.thumbnailLink,
-							webContentLink: f.webContentLink,
-							imageMediaMetadata: {
-								width: f.imageMediaMetadata?.width ?? 0,
-								height: f.imageMediaMetadata?.height ?? 0,
-							},
-						};
-						return item;
-					})}
-				/>
-			) : (
-				<Loading />
-			)}
-
-			{/* <div className={styles.thumbnails}>
-				{driveFiles.map((file) => (
-					<img
-						key={`thumb-${file.id}`}
-						className={styles.thumbnail}
-						alt={`image ${file.id ?? ""}`}
-						//src={`https://www.googleapis.com/drive/v3/files/${
-						//	file.id ?? ""
-						//}/export?mimeType=${file.mimeType}`}
-						//src={file.webContentLink ?? ""}
-						src={file.thumbnailLink ?? ""}
-					/>
-				))}
-			</div> */}
-			{currentEvent && (
-				<form onSubmit={upload}>
-					<h4>{t("selectimage")}</h4>
-					{createObjectURL != "" && (
-						<img
-							className={styles.thumbnail}
-							alt="image"
-							src={createObjectURL}
-						/>
-					)}
-					<input type="file" ref={fileInputRef} onChange={setToPagePreview} />
-					<button type="submit">{t("upload")}</button>
-				</form>
-			)}
+			<GoogleDriveUploadFiles
+				t={t}
+				folder={folder}
+				files={driveFiles}
+				refresh={setDriveFiles}
+			/>
+			<GoogleDriveUploadForm
+				t={t}
+				folder={folder}
+				add={(file) => setDriveFiles((currentFiles) => [...currentFiles, file])}
+			/>
 		</>
 	);
 }

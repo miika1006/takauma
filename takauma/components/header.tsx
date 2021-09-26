@@ -18,11 +18,11 @@ export default function Header({ t, locale }: HeaderProps) {
 	const router = useRouter();
 	console.log("router:", router);
 
-	//TODO: Hide sing in header if route is event and make headerbar smaller
-	//if(router.route === "/events/[folderid]")
 	const [session, loading] = useSession();
 
-	return (
+	return router.route === "/events/[folderid]" ? (
+		<div className={styles.headerbar}></div>
+	) : (
 		<header>
 			<Head>
 				<link
@@ -57,99 +57,101 @@ export default function Header({ t, locale }: HeaderProps) {
 			<noscript>
 				<style>{`.nojs-show { opacity: 1; top: 0; }`}</style>
 			</noscript>
-			<div className={styles.signedInStatus}>
-				<p
-					className={`nojs-show ${
-						!session && loading ? styles.loading : styles.loaded
-					}`}
-				>
-					{!session && (
-						<>
-							<span
-								className={styles.notSignedInText + " " + styles.specialtext}
-							>
-								{t("youarenotsigned")}
-							</span>
-							<a
-								href={`/api/auth/signin`}
-								className={styles.buttonPrimary}
-								onClick={(e) => {
-									e.preventDefault();
-									signIn("google"); //Google, because it is only provider
-								}}
-							>
-								{t("googlesignin")}
-							</a>
-						</>
-					)}
-					{session?.user && (
-						<>
-							{session.user.image && (
+			<div className={styles.headerbar}>
+				<div className={styles.signedInStatus}>
+					<p
+						className={`nojs-show ${
+							!session && loading ? styles.loading : styles.loaded
+						}`}
+					>
+						{!session && (
+							<>
 								<span
-									style={{ backgroundImage: `url(${session.user.image})` }}
-									className={styles.avatar}
-								/>
-							)}
-							<span className={styles.signedInText + " " + styles.specialtext}>
-								<small>{t("signedinas")}</small>
-								<br />
-								<strong>{session.user.email || session.user.name}</strong>
-							</span>
-							<a
-								href={`/api/auth/signout`}
-								className={styles.button + " " + styles.specialtext}
-								onClick={(e) => {
-									e.preventDefault();
-									signOut();
-								}}
-							>
-								{t("signout")}
-							</a>
-						</>
-					)}
-				</p>
+									className={styles.notSignedInText + " " + styles.specialtext}
+								>
+									{t("youarenotsigned")}
+								</span>
+								<a
+									href={`/api/auth/signin`}
+									className={styles.buttonPrimary}
+									onClick={(e) => {
+										e.preventDefault();
+										signIn("google"); //Google, because it is only provider
+									}}
+								>
+									{t("googlesignin")}
+								</a>
+							</>
+						)}
+						{session?.user && (
+							<>
+								{session.user.image && (
+									<span
+										style={{ backgroundImage: `url(${session.user.image})` }}
+										className={styles.avatar}
+									/>
+								)}
+								<span
+									className={styles.signedInText + " " + styles.specialtext}
+								>
+									<small>{t("signedinas")}</small>
+									<br />
+									<strong>{session.user.email || session.user.name}</strong>
+								</span>
+								<a
+									href={`/api/auth/signout`}
+									className={styles.button + " " + styles.specialtext}
+									onClick={(e) => {
+										e.preventDefault();
+										signOut();
+									}}
+								>
+									{t("signout")}
+								</a>
+							</>
+						)}
+					</p>
+				</div>
+				<nav>
+					<ul className={styles.navItems + " " + styles.specialtext}>
+						{session && (
+							<>
+								<li className={styles.navItem}>
+									<Link href="/">
+										<a>{t("home")}</a>
+									</Link>
+								</li>
+								<li className={styles.navItem}>
+									<Link href="/events">
+										<a>{t("eventstitle")}</a>
+									</Link>
+								</li>
+							</>
+						)}
+						<li className={styles.navItemRight}>
+							<Link href="/" locale={"fi"}>
+								<a
+									className={
+										locale === "fi" ? styles.boldtext : styles.normaltext
+									}
+								>
+									Suomi
+								</a>
+							</Link>
+							&nbsp;|&nbsp;
+							<Link href="/" locale={"en"}>
+								<a
+									className={
+										locale === "en" ? styles.boldtext : styles.normaltext
+									}
+								>
+									English
+								</a>
+							</Link>
+						</li>
+					</ul>
+				</nav>
 			</div>
-			<nav>
-				<ul className={styles.navItems + " " + styles.specialtext}>
-					{session && (
-						<>
-							<li className={styles.navItem}>
-								<Link href="/">
-									<a>{t("home")}</a>
-								</Link>
-							</li>
-							<li className={styles.navItem}>
-								<Link href="/events">
-									<a>{t("eventstitle")}</a>
-								</Link>
-							</li>
-						</>
-					)}
-					<li className={styles.navItemRight}>
-						<Link href="/" locale={"fi"}>
-							<a
-								className={
-									locale === "fi" ? styles.boldtext : styles.normaltext
-								}
-							>
-								Suomi
-							</a>
-						</Link>
-						&nbsp;|&nbsp;
-						<Link href="/" locale={"en"}>
-							<a
-								className={
-									locale === "en" ? styles.boldtext : styles.normaltext
-								}
-							>
-								English
-							</a>
-						</Link>
-					</li>
-				</ul>
-			</nav>
-
-			<div className={styles.headerbar}></div>
 		</header>
 	);
 }

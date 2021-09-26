@@ -15,7 +15,6 @@ export interface EventPageProps {
 }
 export default function Page({ locale, folder }: PageProps & EventPageProps) {
 	const { t } = useTranslation("common");
-	//
 	return (
 		<Layout t={t} locale={locale} padded centered>
 			{folder && folder.shared ? (

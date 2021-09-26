@@ -70,7 +70,10 @@ export default function GoogleDriveEventDelete({
 			console.log("onDelete response", response);
 		} catch (error) {
 			console.error("onDelete error", error);
-			showErrorToast(t, error.message);
+			showErrorToast(
+				t,
+				error instanceof Error ? error.message : "delete error"
+			);
 		} finally {
 			setLoading(false);
 		}

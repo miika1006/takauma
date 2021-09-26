@@ -96,7 +96,10 @@ export default function GoogleDriveUploadForm({
 			console.log("upload response", response);
 		} catch (error) {
 			console.error("upload error", error);
-			showErrorToast(t, error.message);
+			showErrorToast(
+				t,
+				error instanceof Error ? error.message : "upload error"
+			);
 		}
 	};
 	return (

@@ -83,7 +83,7 @@ export default function GoogleDriveEventShare({
 			console.log("onShare response", response);
 		} catch (error) {
 			console.error("onShare error", error);
-			showErrorToast(t, error.message);
+			showErrorToast(t, error instanceof Error ? error.message : "share error");
 			setShared(!newSharedState);
 		} finally {
 			setLoading(false);

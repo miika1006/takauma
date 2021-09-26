@@ -56,7 +56,10 @@ export default function GoogleDriveEventFolders({
 				console.log("loadFolders: response", response);
 			} catch (error) {
 				console.error("loadFolders error", error);
-				showErrorToast(t, error.message);
+				showErrorToast(
+					t,
+					error instanceof Error ? error.message : "load folders error"
+				);
 			} finally {
 				setLoading(false);
 			}

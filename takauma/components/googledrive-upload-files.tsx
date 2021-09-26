@@ -48,7 +48,10 @@ export default function GoogleDriveUploadFiles({
 				console.log("getFiles response", response);
 			} catch (error) {
 				console.error("getFiles error", error);
-				showErrorToast(t, error.message);
+				showErrorToast(
+					t,
+					error instanceof Error ? error.message : "get files error"
+				);
 			} finally {
 				setLoading(false);
 			}

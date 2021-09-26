@@ -77,7 +77,10 @@ export default function GoogleDriveEventForm({
 			console.log("createEvent response", response);
 		} catch (error) {
 			console.error("createEvent error", error);
-			showErrorToast(t, error.message);
+			showErrorToast(
+				t,
+				error instanceof Error ? error.message : "create event error"
+			);
 		} finally {
 			setLoading(false);
 		}

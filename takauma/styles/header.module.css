@@ -28,8 +28,7 @@ a.specialtext {
 	opacity: 0;
 }
 
-.signedInText,
-.notSignedInText {
+.signedInText {
 	padding-top: 0.8rem;
 	float: left;
 	white-space: nowrap;
@@ -124,11 +123,19 @@ a.specialtext {
 	position: absolute;
 	top: 0;
 	left: 0;
-	z-index: -1;
+	z-index: 0;
 	width: 100%;
-	background: rgb(121 146 138);
 }
-
+.headerbar_dark,
+.headerbar_dark * {
+	color: #333333 !important;
+}
+.centered {
+	max-width: 1024px;
+	margin-left: auto;
+	margin-right: auto;
+	position: static;
+}
 @media (min-width: 400px) {
 	.buttonPrimary {
 		margin-right: -0.4rem;

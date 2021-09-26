@@ -34,7 +34,11 @@
 	left: 0;
 	z-index: -1;
 	height: 100vh;
+	width: 100%;
 	overflow-y: hidden;
+}
+.coverimage div {
+	width: 100%;
 }
 .coverimage img {
 	min-height: 100vh;
@@ -53,8 +57,13 @@
 .frontcontent {
 	font-family: "Saira Condensed", sans-serif;
 	font-size: 1.1em;
-	background: #fefff8;
 	padding: 0.6rem 1rem;
+	background-color: #fefff8;
+}
+.frontcontent article {
+	margin-left: auto;
+	margin-right: auto;
+	max-width: 1024px;
 }
 .frontcontent h1,
 .frontcontent h2 {

@@ -9,7 +9,7 @@ import Terms from "../components/terms";
 export default function Page({ locale }: PageProps) {
 	const { t } = useTranslation("common");
 	return (
-		<Layout t={t} locale={locale} padded>
+		<Layout t={t} locale={locale} padded centered>
 			<Terms t={t} />
 
 			{/* 

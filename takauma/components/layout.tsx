@@ -7,14 +7,27 @@ interface LayoutProps {
 	t: TFunction;
 	locale: string;
 	padded?: boolean;
+	centered?: boolean;
 }
 
-export default function Layout({ children, t, locale, padded }: LayoutProps) {
+export default function Layout({
+	children,
+	t,
+	locale,
+	padded,
+	centered,
+}: LayoutProps) {
 	return (
 		<div className={styles.main}>
 			<Header t={t} locale={locale} />
 			<main>
-				<div className={padded === true ? " " + styles.padded : ""}>
+				<div
+					className={
+						(padded === true ? styles.padded : "") +
+						" " +
+						(centered === true ? styles.centered : "")
+					}
+				>
 					{children}
 				</div>
 			</main>

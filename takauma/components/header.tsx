@@ -57,7 +57,15 @@ export default function Header({ t, locale }: HeaderProps) {
 			<noscript>
 				<style>{`.nojs-show { opacity: 1; top: 0; }`}</style>
 			</noscript>
-			<div className={styles.headerbar}>
+			<div
+				className={
+					styles.headerbar +
+					" " +
+					styles.centered +
+					" " +
+					(router.route !== "/" ? styles.headerbar_dark : "")
+				}
+			>
 				<div className={styles.signedInStatus}>
 					<p
 						className={`nojs-show ${
@@ -66,11 +74,6 @@ export default function Header({ t, locale }: HeaderProps) {
 					>
 						{!session && (
 							<>
-								<span
-									className={styles.notSignedInText + " " + styles.specialtext}
-								>
-									{t("youarenotsigned")}
-								</span>
 								<a
 									href={`/api/auth/signin`}
 									className={styles.buttonPrimary}

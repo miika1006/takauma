@@ -39,7 +39,7 @@ export default function Page({
 
 	// If session exists, display content
 	return (
-		<Layout t={t} locale={locale} padded>
+		<Layout t={t} locale={locale} padded centered>
 			<h1>{t("eventstitle")}</h1>
 			<GoogleDriveEvent t={t} />
 		</Layout>

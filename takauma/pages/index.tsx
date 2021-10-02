@@ -56,21 +56,15 @@ export default function Page({ locale, shouldSingOut }: PageProps) {
 				</div>
 				<div className={styles.frontcontent}>
 					<article>
-						<h1>Mistä on kyse?</h1>
-						<p>
-							Web-sovellus, jolla voi luoda tapahtumia, jakaa tapahtumaan linkin
-							ja kaikki linkin saaneet voivat ladata ja selata kuvia
-							tapahtumaan.
-						</p>
-						<p>
-							Kuvat tallentuvat sinun Google Driveen kansioon tapahtuman
-							nimellä.
-						</p>
-						<p>Taltioi ja jaa hetket yhdessä monesta eri kamerasta.</p>
+						<h1>{t("what_is_this")}</h1>
+						<p>{t("what_is_this_desc_0")}</p>
+						<p>{t("what_is_this_desc_1")}</p>
+						<p></p>
+						<p>{t("what_is_this_desc_2")}</p>
 					</article>
 
 					<article>
-						<h1>Näin pääset alkuun</h1>
+						<h1>{t("getting started")}</h1>
 						<ol>
 							<li>
 								<a
@@ -83,16 +77,13 @@ export default function Page({ locale, shouldSingOut }: PageProps) {
 									{t("googlesignin")}
 								</a>
 							</li>
-							<li>
-								Salli sovelluksen lukea sähköpostiosoitteesi ja pääsy
-								tallentamaan kuvia google driveen. <br />
-								Pääsy on ainoastaan sovelluksen luomiin kuviin.
-							</li>
-							<li>Luo uusi tapahtuma.</li>
-							<li>Jaa linkki.</li>
-							<li>Lataa kuvia.</li>
+							<li>{t("getting_started_allow_app_to")}</li>
+							<li>{t("create_new_event")}</li>
+							<li>{t("share_link")}</li>
+							<li>{t("upload_photos")}</li>
 						</ol>
-						<p>Linkin saaneet näkevät kaikki ladatut kuvat.</p>
+						<p>{t("everyone_with_the_link_can")}</p>
+						<p>{t("how_to_delete")}</p>
 					</article>
 				</div>
 			</Layout>

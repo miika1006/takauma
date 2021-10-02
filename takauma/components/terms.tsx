@@ -7,13 +7,6 @@ interface TermsProps {
 }
 
 export default function Terms({ t }: TermsProps) {
-	const onMailClick = (el: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-		const name = el.currentTarget.dataset.name;
-		const domain = el.currentTarget.dataset.domain;
-		const tld = el.currentTarget.dataset.tld;
-		window.location.href = `mailto:${name}@${domain}.${tld}`;
-		return false;
-	};
 	return (
 		<article>
 			<h1>{t("termsofservice")}</h1>

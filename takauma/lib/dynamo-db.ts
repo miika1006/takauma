@@ -9,6 +9,8 @@ const client = new aws.DynamoDB.DocumentClient({
 export interface AppUser {
 	UserEmail: string;
 	IsBanned: boolean;
+	accessToken: string;
+	refreshToken: string;
 }
 export interface Dynamo {
 	saveUser: (user: AppUser) => Promise<AppUser | null>;
@@ -28,7 +30,7 @@ export const dynamo: Dynamo = {
 			})
 			.promise();
 		if (result?.$response?.error) {
-			console.log("DynamoDb.getUserByEmail error", result.$response.error);
+			console.log("DynamoDb.getUser error", result.$response.error);
 		}
 		const { Item } = result;
 		return Item ? (Item as AppUser) : null;
@@ -45,7 +47,7 @@ export const dynamo: Dynamo = {
 			})
 			.promise();
 		if (result?.$response?.error) {
-			console.log("DynamoDb.getUserByEmail error", result.$response.error);
+			console.log("DynamoDb.isBanned error", result.$response.error);
 		}
 		const { Item } = result;
 		return Item ? (Item as AppUser).IsBanned : false;
@@ -66,7 +68,7 @@ export const dynamo: Dynamo = {
 			})
 			.promise();
 		if (result?.$response?.error) {
-			console.log("DynamoDb.banUser error", result.$response.error);
+			console.log("DynamoDb.setbanUser error", result.$response.error);
 			return false;
 		}
 		return true;

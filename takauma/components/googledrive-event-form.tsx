@@ -26,7 +26,7 @@ export default function GoogleDriveEventForm({
 	 * Creating new event
 	 * Create new event with given createEventName value
 	 * 1. Call Api to create event
-	 * 2. Server creates new folder to Google Drive and shares it to service account
+	 * 2. Server creates new folder to Google Drive
 	 * 3. Returns result
 	 * @param event
 	 * @returns

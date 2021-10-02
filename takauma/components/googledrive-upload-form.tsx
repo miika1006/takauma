@@ -7,10 +7,12 @@ import { showErrorToast } from "../components/toast";
 import styles from "../styles/googledriveupload-form.module.css";
 import Loading from "./loading";
 import { v4 as uuidv4 } from "uuid";
+import { FromEmailAndFolderTooBase64 } from "../lib/event";
 
 interface GoogleDriveUploadFormProps {
 	t: TFunction;
 	folder: drive_v3.Schema$File;
+	email: string;
 	add: (file: drive_v3.Schema$File) => void;
 }
 
@@ -23,6 +25,7 @@ interface ImageSelect {
 export default function GoogleDriveUploadForm({
 	t,
 	folder,
+	email,
 	add,
 }: GoogleDriveUploadFormProps) {
 	const [loading, setLoading] = useLoadingIndicator(false, 1);
@@ -77,10 +80,11 @@ export default function GoogleDriveUploadForm({
 	};
 	const uploadImage = async (imageselect: ImageSelect) => {
 		try {
+			const event = FromEmailAndFolderTooBase64(email, folder.id as string);
 			const body = new FormData();
 			body.append("file", imageselect.image);
 			body.append("eventName", folder.name ?? "");
-			const response = await fetch(`/api/file/${folder.id}`, {
+			const response = await fetch(`/api/file/${event}`, {
 				method: "POST",
 				body,
 			});

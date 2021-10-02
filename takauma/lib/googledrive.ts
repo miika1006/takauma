@@ -10,117 +10,22 @@ import { v4 as uuidv4 } from "uuid";
  */
 const CreateGoogleDriveInstance = (
 	accessToken: string,
-	useServiceAccount?: boolean
+	refreshToken: string
 ) => {
 	const clientId = process.env.GOOGLE_ID;
 	const clientSecret = process.env.GOOGLE_SECRET;
 
-	if (useServiceAccount === true) {
-		//Authenticating using service account credentials
-		const auth = new google.auth.GoogleAuth({
-			credentials: {
-				client_email: process.env.SERVICE_ACCOUNT,
-				private_key: process.env.SERVICE_ACCOUNT_KEY,
-			},
-			//See, edit, create, and delete all of your Google Drive files
-			//This is a service account, so naturally it can edit all of its files
-			//Using this scope because app needs to load folders shared to this service account
-			scopes: ["https://www.googleapis.com/auth/drive"],
-		});
+	//Authenticating by current user
+	const auth = new google.auth.OAuth2({
+		clientId,
+		clientSecret,
+	});
+	auth.setCredentials({
+		access_token: accessToken,
+		refresh_token: refreshToken,
+	});
 
-		return google.drive({ auth, version: "v3" });
-	} else {
-		//Authenticating by current user
-		const auth = new google.auth.OAuth2({
-			clientId,
-			clientSecret,
-		});
-		auth.setCredentials({
-			access_token: accessToken,
-			//	refresh_token: refreshToken,
-		});
-
-		return google.drive({ auth, version: "v3" });
-	}
-};
-/**
- * Stop sharing folder from service account
- * => This will not work if folder contains any file created by service account
- * @param accessToken
- * @param folderId
- * @returns
- */
-export const UnShareGoogleDriveFolderFromServiceAccount = async (
-	accessToken: string,
-	folderId: string
-): Promise<drive_v3.Schema$File | null> => {
-	try {
-		if (folderId == "") return null;
-		console.log(
-			"UnShareGoogleDriveFolderFromServiceAccount removing share to service account"
-		);
-
-		const drive = CreateGoogleDriveInstance(accessToken);
-
-		console.log(
-			"UnShareGoogleDriveFolderFromServiceAccount Getting folder by folderid"
-		);
-
-		const res = await drive.files.get({
-			fileId: folderId,
-			fields: "id,name,permissions,trashed",
-			supportsAllDrives: true,
-		});
-
-		console.log(
-			"UnShareGoogleDriveFolderFromServiceAccount Get folder Status:",
-			res.status
-		);
-
-		if (res.status != 200 || res?.data === null) {
-			console.log("Could not get folder", res);
-			throw new Error("Could not get folder");
-		}
-
-		const folder = res.data;
-
-		console.log(
-			"UnShareGoogleDriveFolderFromServiceAccount found folder, now clearing permission"
-		);
-
-		const serviceAccountPermission = folder.permissions?.find(
-			(s) => s.emailAddress === process.env.SERVICE_ACCOUNT
-		);
-
-		if (serviceAccountPermission) {
-			console.log(
-				"UnShareGoogleDriveFolderFromServiceAccount Deleting permission for serviceaccount"
-			);
-
-			const permissionres = await drive.permissions.delete({
-				fileId: folderId,
-				permissionId: serviceAccountPermission.id as string,
-			});
-			console.log(
-				"UnShareGoogleDriveFolderFromServiceAccount Delete permission Status:",
-				permissionres.status
-			);
-			folder.permissions = folder.permissions?.filter(
-				(f) => f.emailAddress !== process.env.SERVICE_ACCOUNT
-			);
-		} else {
-			console.log(
-				"UnShareGoogleDriveFolderFromServiceAccount could not find existing permission for serviceaccount? ignoring."
-			);
-		}
-		return {
-			...folder,
-			shared: folder.permissions?.some((s) => s.type === "anyone") ?? false,
-		};
-	} catch (error) {
-		console.log("UnShareGoogleDriveFolderFromServiceAccount error", error);
-		return null;
-	}
+	return google.drive({ auth, version: "v3" });
 };
 /**
  * Delete folder in Google Drive
@@ -130,11 +35,12 @@ export const UnShareGoogleDriveFolderFromServiceAccount = async (
  */
 export const DeleteGoogleDriveFolder = async (
 	accessToken: string,
+	refreshToken: string,
 	folderId: string
 ) => {
 	try {
 		if (folderId == "") return null;
-		const drive = CreateGoogleDriveInstance(accessToken);
+		const drive = CreateGoogleDriveInstance(accessToken, refreshToken);
 
 		console.log("DeleteGoogleDriveFolder Deleting folder");
 		let insufficient = false;
@@ -152,146 +58,22 @@ export const DeleteGoogleDriveFolder = async (
 			insufficient = true;
 		}
 
-		if (insufficient) {
-			console.log(
-				"DeleteGoogleDriveFolder Insufficient permissions, now trying with service account"
-			);
-			//insufficient permissions, try with service account
-			const saDrive = CreateGoogleDriveInstance("", true);
-
-			const deleteSAResult = await saDrive.files.delete({
-				fileId: folderId,
-			});
-			console.log(
-				"DeleteGoogleDriveFolder Deleting folder with service account Status",
-				deleteSAResult.status
-			);
-		}
 		return true;
 	} catch (error) {
 		console.log("DeleteGoogleDriveFolder error", error);
 		return false;
 	}
 };
-/**
- * Share folder to serviceaccount
- * making it possible to upload photos without login
- * @param accessToken
- * @param folderId
- * @returns
- */
-export const ShareGoogleDriveFolderToServiceAccount = async (
-	accessToken: string,
-	folderId: string
-): Promise<drive_v3.Schema$File | null> => {
-	try {
-		if (folderId == "") return null;
 
-		/*
-		1. Get folder by id
-		   throw error if not found
-		2. Check folder current permissions
-		   if already shared, then do nothing
-		3. Update permissions to share folder to service account
-		*/
-
-		console.log(
-			"ShareGoogleDriveFolderToServiceAccount Sharing folder to service account in Google Drive"
-		);
-		const drive = CreateGoogleDriveInstance(accessToken);
-
-		const res = await drive.files.get({
-			fileId: folderId,
-			fields: "id,name,permissions,trashed",
-			supportsAllDrives: true,
-		});
-
-		if (res.status != 200 || res?.data === null) {
-			console.log("Could not find folder", res);
-			throw new Error("Could not get folder");
-		}
-
-		const folder = res.data;
-
-		console.log(
-			"ShareGoogleDriveFolderToServiceAccount found folder:",
-			folder.id,
-			folder.name
-		);
-
-		if (folder.trashed) {
-			console.log(
-				"ShareGoogleDriveFolderToServiceAccount folder is trashed, ignore? (doing nothing)"
-			);
-		}
-
-		const exitingServicePermission = folder.permissions?.find(
-			(s) => s.emailAddress === process.env.SERVICE_ACCOUNT
-		);
-
-		if (!exitingServicePermission) {
-			console.log(
-				"ShareGoogleDriveFolderToServiceAccount creating share to service account"
-			);
-
-			const permissionres = await drive.permissions.create({
-				fileId: folderId,
-				fields: "id",
-				requestBody: {
-					type: "user",
-					role: "writer", //Allow service account to write new photos in behalf of other users
-					emailAddress: process.env.SERVICE_ACCOUNT,
-				},
-			});
-			folder.permissions?.push(permissionres.data);
-			console.log(
-				"ShareGoogleDriveFolderToServiceAccount creating share to service account Status: ",
-				permissionres.status
-			);
-		} else {
-			//Check permission data
-			if (
-				exitingServicePermission.type != "user" &&
-				exitingServicePermission.role != "writer"
-			) {
-				console.log(
-					"ShareGoogleDriveFolderToServiceAccount permission found but is invalid, updating back to original"
-				);
-				const permissionres = await drive.permissions.update({
-					fileId: folderId,
-					permissionId: exitingServicePermission.id as string,
-					fields: "id",
-					requestBody: {
-						type: "user",
-						role: "writer", //Allow service account to write new photos in behalf of other users
-						emailAddress: process.env.SERVICE_ACCOUNT,
-					},
-				});
-				folder.permissions?.push(permissionres.data);
-			} else {
-				console.log(
-					"ShareGoogleDriveFolderToServiceAccount permission exists, doing nothing"
-				);
-			}
-		}
-
-		return {
-			...folder,
-			shared: folder.permissions?.some((s) => s.type === "anyone") ?? false,
-		};
-	} catch (error) {
-		console.log("ShareGoogleDriveFolderToServiceAccount error", error);
-		return null;
-	}
-};
 /**
  * Stop sharing folder from the world
  * @param accessToken
  * @param folderId
  * @returns
  */
-export const UnShareGoogleDriveFolderFromAnyoneUsingServiceAccount = async (
+export const UnShareGoogleDriveFolderFromAnyone = async (
 	accessToken: string,
+	refreshToken: string,
 	folderId: string
 ): Promise<drive_v3.Schema$File | null> => {
 	try {
@@ -300,7 +82,7 @@ export const UnShareGoogleDriveFolderFromAnyoneUsingServiceAccount = async (
 			"UnShareGoogleDriveFolderFromAnyone removing share from anyone"
 		);
 
-		const drive = CreateGoogleDriveInstance(accessToken, true);
+		const drive = CreateGoogleDriveInstance(accessToken, refreshToken);
 
 		console.log(
 			"UnShareGoogleDriveFolderFromAnyone Getting folder by folderid"
@@ -370,11 +152,13 @@ export const UnShareGoogleDriveFolderFromAnyoneUsingServiceAccount = async (
  * 3. Create permission to folder to anyone
  *
  * @param accessToken
+ * @param refreshToken
  * @param folderId
  * @returns folder (file= id,name,shared) or null if some error
  */
-export const ShareGoogleDriveFolderToAnyoneUsingServiceAccount = async (
+export const ShareGoogleDriveFolderToAnyone = async (
 	accessToken: string,
+	refreshToken: string,
 	folderId: string
 ): Promise<drive_v3.Schema$File | null> => {
 	try {
@@ -383,7 +167,7 @@ export const ShareGoogleDriveFolderToAnyoneUsingServiceAccount = async (
 		console.log(
 			"ShareGoogleDriveFolderToAnyone Sharing folder to anyone in Google Drive"
 		);
-		const drive = CreateGoogleDriveInstance(accessToken, true);
+		const drive = CreateGoogleDriveInstance(accessToken, refreshToken);
 
 		const res = await drive.files.get({
 			fileId: folderId,
@@ -446,18 +230,20 @@ export const ShareGoogleDriveFolderToAnyoneUsingServiceAccount = async (
 	}
 };
 /**
- * Get folder by id using service account
+ * Get files in folder by folderid
+ * @param accessToken
+ * @param refreshToken
  * @param folderId
  * @returns list of files
  */
-export const GetGoogleDriveFilesByFolderIdUsingServiceAccount = async (
+export const GetGoogleDriveFilesByFolderId = async (
+	accessToken: string,
+	refreshToken: string,
 	folderId: string
 ) => {
 	try {
-		console.log(
-			"Getting files by folderId, using service account from Google Drive"
-		);
-		const drive = CreateGoogleDriveInstance("", true);
+		console.log("Getting files by folderId from Google Drive");
+		const drive = CreateGoogleDriveInstance(accessToken, refreshToken);
 		const res = await drive.files.list({
 			q:
 				"mimeType!='application/vnd.google-apps.folder' and trashed=false" +
@@ -470,35 +256,32 @@ export const GetGoogleDriveFilesByFolderIdUsingServiceAccount = async (
 			includeItemsFromAllDrives: true,
 		});
 
-		console.log(
-			"GetGoogleDriveFilesByFolderIdUsingServiceAccount Status:",
-			res.status
-		);
+		console.log("GetGoogleDriveFilesByFolderId Status:", res.status);
 		return res.data.files ?? [];
 	} catch (error) {
-		console.log(
-			"GetGoogleDriveFilesByFolderIdUsingServiceAccount error",
-			error
-		);
+		console.log("GetGoogleDriveFilesByFolderId error", error);
 		return [];
 	}
 };
 /**
  * Query files in Google Drive
  * @param accessToken
+ * @param refreshToken
  * @param folder if set, then get only files inside this folder
  * @returns list of files (id,name), empty array if error
  */
 export const GetGoogleDriveFiles = async (
 	accessToken: string,
-	folder?: string
+	refreshToken: string,
+	folderName?: string
 ) => {
 	try {
 		console.log("Getting files from Google Drive");
-		const drive = CreateGoogleDriveInstance(accessToken);
+		const drive = CreateGoogleDriveInstance(accessToken, refreshToken);
 		const folderByName = await GetGoogleDriveFolderByName(
 			accessToken,
-			folder ?? ""
+			refreshToken,
+			folderName ?? ""
 		);
 		const res = await drive.files.list({
 			q:
@@ -524,16 +307,18 @@ export const GetGoogleDriveFiles = async (
 /**
  * Query folders from Google Drive
  * @param accessToken
+ * @param refreshToken
  * @param folder
  * @returns list of folders (id,name), empty array if none or error
  */
 export const GetGoogleDriveFolders = async (
 	accessToken: string,
+	refreshToken: string,
 	folder?: string
 ) => {
 	try {
 		console.log("Getting folders from Google Drive");
-		const drive = CreateGoogleDriveInstance(accessToken);
+		const drive = CreateGoogleDriveInstance(accessToken, refreshToken);
 		const res = await drive.files.list({
 			q:
 				"mimeType='application/vnd.google-apps.folder' and trashed=false" +
@@ -567,13 +352,14 @@ export const GetGoogleDriveFolders = async (
  */
 export const GetGoogleDriveFolderByName = async (
 	accessToken: string,
+	refreshToken: string,
 	folder: string
 ): Promise<drive_v3.Schema$File | null> => {
 	try {
 		if (folder == "") return null;
 
 		console.log("Getting folder by foldername from Google Drive");
-		const drive = CreateGoogleDriveInstance(accessToken);
+		const drive = CreateGoogleDriveInstance(accessToken, refreshToken);
 		const res = await drive.files.list({
 			q:
 				"mimeType='application/vnd.google-apps.folder' and trashed=false and name='" +
@@ -599,23 +385,15 @@ export const GetGoogleDriveFolderByName = async (
 };
 /**
  * Get folder by id from Google Drive
- * @param folderId
- * @returns folder (id,name) = File, null if error or not found
- */
-export const GetGoogleDriveFolderByIdUsingServiceAccount = async (
-	folderId: string
-) => await GetGoogleDriveFolderById("", folderId, true);
-/**
- * Get folder by id from Google Drive
  * @param accessToken
+ * @param refreshToken
  * @param folderId
- * @param useServiceAccount
  * @returns folder (id,name) = File, null if error or not found
  */
 export const GetGoogleDriveFolderById = async (
 	accessToken: string,
-	folderId: string,
-	useServiceAccount?: boolean
+	refreshToken: string,
+	folderId: string
 ): Promise<drive_v3.Schema$File | null> => {
 	try {
 		if (folderId == "") return null;
@@ -623,7 +401,7 @@ export const GetGoogleDriveFolderById = async (
 		console.log(
 			"GetGoogleDriveFolderById Getting folder by id from Google Drive"
 		);
-		const drive = CreateGoogleDriveInstance(accessToken, useServiceAccount);
+		const drive = CreateGoogleDriveInstance(accessToken, refreshToken);
 		const res = await drive.files.get({
 			fileId: folderId,
 			fields: "id,name,trashed,permissions",
@@ -669,12 +447,14 @@ export const GetGoogleDriveFolderById = async (
  */
 export const GetOrCreateGoogleDriveFolderByFolderName = async (
 	accessToken: string,
+	refreshToken: string,
 	folderName: string
 ): Promise<drive_v3.Schema$File | null> => {
 	try {
-		const drive = CreateGoogleDriveInstance(accessToken);
+		const drive = CreateGoogleDriveInstance(accessToken, refreshToken);
 		const existingFolder = await GetGoogleDriveFolderByName(
 			accessToken,
+			refreshToken,
 			folderName
 		);
 		if (existingFolder) {
@@ -710,67 +490,47 @@ export const GetOrCreateGoogleDriveFolderByFolderName = async (
 		return null;
 	}
 };
-/**
- * Upload a image (file) to folder by id
- * @param folderId
- * @param fromFile
- * @returns
- */
-export const UploadGoogleDriveFileToFolderByIdUsingServiceAccount = async (
-	folderId: string,
-	fromFile: string
-) => {
-	try {
-		const drive = CreateGoogleDriveInstance("", true);
-		return await UploadFileToDrive(drive, folderId, fromFile, true);
-	} catch (error) {
-		console.log(
-			"UploadGoogleDriveFileToFolderByIdUsingServiceAccount error",
-			error
-		);
-		return null;
-	}
-};
 
 /**
  * Upload file to a folder in Google Drive
  * @param accessToken
  * @param folder - folder name
  * @param fromFile - local filepath
- * @param useServiceAccount - Are we using service account or user session account
  * @returns file (id,name) of uploaded file, null if error
  */
 export const UploadGoogleDriveFile = async (
 	accessToken: string,
-	folder: string,
-	fromFile: string,
-	useServiceAccount?: boolean
+	refreshToken: string,
+	folderId: string,
+	fromFile: string
 ) => {
 	try {
-		const drive = CreateGoogleDriveInstance(accessToken, useServiceAccount);
-		const folderResult = await GetOrCreateGoogleDriveFolderByFolderName(
+		const drive = CreateGoogleDriveInstance(accessToken, refreshToken);
+		/*	const folderResult = await GetOrCreateGoogleDriveFolderByFolderName(
 			accessToken,
+			refreshToken,
 			folder
 		);
 		if (folderResult == null) throw Error("failed to get folder");
-
-		return await UploadFileToDrive(
-			drive,
-			folderResult.id as string,
-			fromFile,
-			false
-		);
+		*/
+		return await UploadFileToDrive(drive, folderId, fromFile);
 	} catch (error) {
 		console.log("UploadGoogleDriveFile error", error);
 		return null;
 	}
 };
 
+/**
+ * Upload a file to drive folder
+ * @param drive
+ * @param folderId
+ * @param fromFile
+ * @returns
+ */
 const UploadFileToDrive = async (
 	drive: drive_v3.Drive,
 	folderId: string,
-	fromFile: string,
-	serviceAccount: boolean
+	fromFile: string
 ) => {
 	const fileFolder = path.dirname(fromFile);
 	const fileExtension = path.extname(fromFile);
@@ -780,7 +540,7 @@ const UploadFileToDrive = async (
 	const fileSize = (await fs.promises.stat(fileFolder)).size;
 	const res = await drive.files.create(
 		{
-			fields: "id,name", //+ (serviceAccount ? ",permissions" : ""),
+			fields: "id,name",
 			requestBody: {
 				// a requestBody element is required if you want to use multipart
 				parents: [folderId],
@@ -792,7 +552,7 @@ const UploadFileToDrive = async (
 			supportsAllDrives: true,
 		},
 		{
-			// Use the `onUploadProgress` event from Axios to track the
+			// Use the `onUploadProgress` event to track the
 			// number of bytes uploaded to this point.
 			onUploadProgress: (evt) => {
 				const progress = (evt.bytesRead / fileSize) * 100;
@@ -803,61 +563,7 @@ const UploadFileToDrive = async (
 			},
 		}
 	);
-	console.log(
-		"Upload file " + fileName + " Status",
-		res.status,
-		"Permissions",
-		res.data.permissions
-	);
-
-	/** 
-	 If using service account,
-	 Changing ownership of file to shared drive owner
-	 */
-
-	/*
-	 GOOGLE DOES NOT ALLOW TO CHANGE OWNERSHIP FROM SERVICE ACCOUNT TO SOME USER
-	 
-	*/
-	if (serviceAccount && res.data?.permissions) {
-		console.log(
-			"Using serviceaccount, changing owner of the file to drive owner"
-		);
-		const userPermission = res.data.permissions.find(
-			(p) => p.emailAddress && p.emailAddress !== process.env.SERVICE_ACCOUNT
-		);
-		const serviceAccountPermission = res.data.permissions.find(
-			(p) => p.emailAddress === process.env.SERVICE_ACCOUNT
-		);
-
-		console.log("service account permissions", serviceAccountPermission);
-		console.log("users permissions", userPermission);
-
-		const permissionres = await drive.permissions.update({
-			fileId: res.data.id!!,
-			permissionId: userPermission?.id!!,
-			transferOwnership: true,
-			fields: "id",
-			requestBody: {
-				//type: "user",
-				role: "owner",
-				//emailAddress: userPermission!!.emailAddress,
-			},
-			supportsAllDrives: true,
-		});
-		//const permissionres = await drive.permissions.create({
-		//	fileId: res.data.id!!,
-		//	transferOwnership: true,
-		//	fields: "id",
-		//	requestBody: {
-		//		type: "user",
-		//		role: "owner",
-		//		emailAddress: userPermission?.emailAddress,
-		//	},
-		//});
-
-		console.log("Change permissions Status:", permissionres);
-	}
+	console.log("Upload file " + fileName + " Status", res.status);
 
 	if (res.data?.id) {
 		//GoogleApi Returns 500 status - Error if creating new file with thumbnaillink and webcontentlink fields

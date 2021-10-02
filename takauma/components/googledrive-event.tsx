@@ -5,9 +5,10 @@ import GoogleDriveEventFolders from "./googledrive-event-folders";
 import GoogleDriveEventForm from "./googledrive-event-form";
 interface GoogleDriveEventProps {
 	t: TFunction;
+	email: string;
 }
 
-export default function GoogleDriveEvent({ t }: GoogleDriveEventProps) {
+export default function GoogleDriveEvent({ t, email }: GoogleDriveEventProps) {
 	const [current, setCurrent] = useState<drive_v3.Schema$File | null>(null);
 	const [driveFolders, setDriveFolders] = useState<drive_v3.Schema$File[]>([]);
 
@@ -33,6 +34,7 @@ export default function GoogleDriveEvent({ t }: GoogleDriveEventProps) {
 				refresh={setDriveFolders}
 				remove={removeFolder}
 				update={update}
+				email={email}
 			/>
 			<GoogleDriveEventForm
 				t={t}

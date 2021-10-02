@@ -31,7 +31,7 @@ export default function Page({
 	// If no session exists, display access denied message
 	if (!session) {
 		return (
-			<Layout t={t} locale={locale}>
+			<Layout t={t} locale={locale} centered>
 				<AccessDenied t={t} />
 			</Layout>
 		);
@@ -41,7 +41,7 @@ export default function Page({
 	return (
 		<Layout t={t} locale={locale} padded centered>
 			<h1>{t("eventstitle")}</h1>
-			<GoogleDriveEvent t={t} />
+			<GoogleDriveEvent t={t} email={session.user?.email ?? ""} />
 		</Layout>
 	);
 }

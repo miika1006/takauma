@@ -24,12 +24,14 @@ export default NextAuth({
 			//and View and manage Google Drive files and folders that you have opened or created with this app
 			scope:
 				"https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/drive.file",
-			...(process.env.NODE_ENV === "development"
+			/*...(process.env.NODE_ENV === "development"
 				? {
 						authorizationUrl:
 							"https://accounts.google.com/o/oauth2/v2/auth?prompt=consent&access_type=offline&response_type=code",
 				  }
-				: {}),
+				: {}),*/
+			authorizationUrl:
+				"https://accounts.google.com/o/oauth2/v2/auth?prompt=consent&access_type=offline&response_type=code",
 		}),
 	],
 	// Database optional. MySQL, Maria DB, Postgres and MongoDB are supported.
@@ -39,9 +41,9 @@ export default NextAuth({
 	// * You must install an appropriate node_module for your database
 	// * The Email provider requires a database (OAuth providers do not)
 	//database: process.env.DATABASE_URL,
-	adapter: DynamoDBAdapter(new AWS.DynamoDB.DocumentClient(), {
+	/*adapter: DynamoDBAdapter(new AWS.DynamoDB.DocumentClient(), {
 		tableName: process.env.APP_AWS_NEXT_AUTH_TABLE_NAME,
-	}),
+	}),*/
 	// The secret should be set to a reasonably long random string.
 	// It is used to sign cookies and to sign and encrypt JSON Web Tokens, unless
 	// a separate secret is defined explicitly for encrypting the JWT.
@@ -136,15 +138,34 @@ export default NextAuth({
 			}
 
 			// Access token has expired, try to update it
-			return await refreshAccessToken(token);
+			const newJwt = await refreshAccessToken(token);
+
+			const email = token.email ?? user?.email ?? newJwt.email ?? "";
+			if (email != "") {
+				console.log("Saving new tokens for user to dynamoDB");
+				dynamo.saveUser({
+					UserEmail: email,
+					IsBanned: false,
+					accessToken: newJwt.accessToken ?? "",
+					refreshToken: newJwt.refreshToken ?? "",
+				});
+			}
+
+			return newJwt;
 		},
 		async session(session, userOrToken) {
-			console.log("session check", userOrToken.email);
+			console.log(
+				"session check",
+				userOrToken.email,
+				"refreshToken",
+				userOrToken.refreshToken
+			);
 			if (userOrToken) {
 				session.user = userOrToken.user
 					? (userOrToken.user as User)
 					: (userOrToken as JWT);
 				session.accessToken = userOrToken.accessToken;
+				session.refreshToken = userOrToken.refreshToken;
 				session.error = userOrToken.error;
 			}
 
@@ -163,10 +184,12 @@ export default NextAuth({
 		async signIn({ user, account, isNewUser }) {
 			console.log("User signed in", user.email, "IsNewUser", isNewUser);
 
-			if (user.email && isNewUser) {
+			if (user.email) {
 				dynamo.saveUser({
 					UserEmail: user.email,
 					IsBanned: false,
+					accessToken: account.accessToken ?? account.access_token ?? "",
+					refreshToken: account.refreshToken ?? account.refresh_token ?? "",
 				});
 			}
 		},

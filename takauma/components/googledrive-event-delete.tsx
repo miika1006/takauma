@@ -25,8 +25,8 @@ export default function GoogleDriveEventDelete({
 	 * Deleting event
 	 * 1. Call api with folderId to delete
 	 * 2. Server deletes Google Drive folder
-	 * 3. If folder contains some files uploaded with service account.
-	 *    Delete will fail.
+	 * 3. If folder contains some files uploaded from somewhere other than this app.
+	 *    Delete could fail.
 	 *    User should go to Google Drive and do cleanup there if needed.
 	 * @returns
 	 */

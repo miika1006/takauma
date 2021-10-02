@@ -15,6 +15,7 @@ interface GoogleDriveEventFoldersProps {
 	refresh: (folders: drive_v3.Schema$File[]) => void;
 	remove: (id: string | null | undefined) => void;
 	update: (folder: drive_v3.Schema$File) => void;
+	email: string;
 }
 
 export default function GoogleDriveEventFolders({
@@ -25,6 +26,7 @@ export default function GoogleDriveEventFolders({
 	update,
 	current,
 	folders,
+	email,
 }: GoogleDriveEventFoldersProps) {
 	const [loading, setLoading] = useLoadingIndicator(true, 1);
 
@@ -107,6 +109,7 @@ export default function GoogleDriveEventFolders({
 									t={t}
 									current={current}
 									update={update}
+									email={email}
 								/>
 							)}
 						</div>

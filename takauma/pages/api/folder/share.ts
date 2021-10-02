@@ -1,6 +1,6 @@
 import {
-	ShareGoogleDriveFolderToAnyoneUsingServiceAccount,
-	UnShareGoogleDriveFolderFromAnyoneUsingServiceAccount,
+	ShareGoogleDriveFolderToAnyone,
+	UnShareGoogleDriveFolderFromAnyone,
 } from "./../../../lib/googledrive";
 
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
@@ -18,7 +18,7 @@ export default async function protectedHandler(
 	const session = await getSession({ req });
 
 	if (session) {
-		//Update share state for serviceaccount on a folder
+		//Update share state for a folder
 		if (req.method === "PUT") {
 			try {
 				//share
@@ -27,11 +27,11 @@ export default async function protectedHandler(
 				if (request.share) {
 					//Share folder to the world so photos will be available without login
 					console.log("sharing folder '" + request.folderId + "'");
-					const result =
-						await ShareGoogleDriveFolderToAnyoneUsingServiceAccount(
-							session.accessToken,
-							request.folderId
-						);
+					const result = await ShareGoogleDriveFolderToAnyone(
+						session.accessToken,
+						session.refreshToken,
+						request.folderId
+					);
 					return res.status(200).send({
 						id: result?.id,
 						name: result?.name,
@@ -40,11 +40,11 @@ export default async function protectedHandler(
 				} else {
 					//Stop sharing folder from anyone
 					console.log("removing share from folder '" + request.folderId + "'");
-					const result =
-						await UnShareGoogleDriveFolderFromAnyoneUsingServiceAccount(
-							session.accessToken,
-							request.folderId
-						);
+					const result = await UnShareGoogleDriveFolderFromAnyone(
+						session.accessToken,
+						session.refreshToken,
+						request.folderId
+					);
 					return res.status(200).send({
 						id: result?.id,
 						name: result?.name,

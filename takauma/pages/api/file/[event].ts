@@ -1,7 +1,6 @@
+import { FromBase64ToEmailAndFolder } from "./../../../lib/event";
 import {
-	GetGoogleDriveFiles,
-	GetGoogleDriveFilesByFolderIdUsingServiceAccount,
-	UploadGoogleDriveFileToFolderByIdUsingServiceAccount,
+	GetGoogleDriveFilesByFolderId,
 	UploadGoogleDriveFile,
 } from "../../../lib/googledrive";
 import formidable from "formidable";
@@ -9,6 +8,7 @@ import fs from "fs";
 import path from "path";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { drive_v3 } from "googleapis";
+import { dynamo } from "../../../lib/dynamo-db";
 
 export const config = {
 	api: {
@@ -20,16 +20,23 @@ export default async function handler(
 	req: NextApiRequest,
 	res: NextApiResponse
 ) {
-	const { folderid } = req.query;
+	const { event } = req.query;
+	const { email, folderid } = FromBase64ToEmailAndFolder(event as string);
 
 	if (folderid) {
+		const user = await dynamo.getUser(email as string);
+		if (user === null || user.IsBanned === true)
+			return res.status(403).send("Forbidden");
+
 		// Query files by eventname (=foldername) Google Drive
 		if (req.method === "GET") {
 			try {
 				/*
-                  Get files by folderId using service account
+                  Get files by folderId
                 */
-				const result = await GetGoogleDriveFilesByFolderIdUsingServiceAccount(
+				const result = await GetGoogleDriveFilesByFolderId(
+					user.accessToken,
+					user.refreshToken,
 					folderid as string
 				);
 				return res.status(200).send(
@@ -68,14 +75,12 @@ export default async function handler(
 									"', now uploading it to google drive"
 							);
 
-							/**
-                              Upload file using service account to folder by id
-                             */
-							const result =
-								await UploadGoogleDriveFileToFolderByIdUsingServiceAccount(
-									folderid as string,
-									filePath
-								);
+							const result = await UploadGoogleDriveFile(
+								user.accessToken,
+								user.refreshToken,
+								folderid as string,
+								filePath
+							);
 							fs.unlinkSync(file.path);
 							resolve({
 								id: result?.id,

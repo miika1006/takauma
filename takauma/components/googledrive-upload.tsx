@@ -11,11 +11,13 @@ import GoogleDriveUploadFiles from "./googledrive-upload-files";
 interface GoogleDriveUploadProps {
 	t: TFunction;
 	folder: drive_v3.Schema$File;
+	email: string;
 }
 
 export default function GoogleDriveUpload({
 	t,
 	folder,
+	email,
 }: GoogleDriveUploadProps) {
 	const [driveFiles, setDriveFiles] = useState<drive_v3.Schema$File[]>([]);
 
@@ -24,12 +26,14 @@ export default function GoogleDriveUpload({
 			<GoogleDriveUploadFiles
 				t={t}
 				folder={folder}
+				email={email}
 				files={driveFiles}
 				refresh={setDriveFiles}
 			/>
 			<GoogleDriveUploadForm
 				t={t}
 				folder={folder}
+				email={email}
 				add={(file) => setDriveFiles((currentFiles) => [...currentFiles, file])}
 			/>
 		</>

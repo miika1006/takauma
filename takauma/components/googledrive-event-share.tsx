@@ -6,17 +6,20 @@ import { showErrorToast, showWarningToast } from "../components/toast";
 import Loading from "../components/loading";
 import { useRouter } from "next/router";
 import styles from "../styles/googledrive-event-share.module.css";
+import { FromEmailAndFolderTooBase64 } from "../lib/event";
 
 interface GoogleDriveEventShareProps {
 	t: TFunction;
 	current: drive_v3.Schema$File | null;
 	update: (folder: drive_v3.Schema$File) => void;
+	email: string;
 }
 
 export default function GoogleDriveEventShare({
 	t,
 	current,
 	update,
+	email,
 }: GoogleDriveEventShareProps) {
 	const [loading, setLoading] = useLoadingIndicator(false, 1);
 	const [copysuccess, setCopySuccess] = useState<boolean>(false);
@@ -29,26 +32,29 @@ export default function GoogleDriveEventShare({
 		if (current) {
 			setShared(current.shared ?? false);
 			setShareUrl(
-				window?.location?.origin + router.pathname + "/" + current?.id
+				window?.location?.origin +
+					router.pathname +
+					"/" +
+					FromEmailAndFolderTooBase64(email, current.id as string)
 			);
 		} else {
 			setShared(false);
 			setShareUrl("");
 		}
-	}, [current, router.pathname]);
+	}, [current, email, router.pathname]);
 
 	/**
 	 *  Sharing and what happens after that?
 	 * 	1. Call api with folderId to share and true|false if sharing
 	 *	2. On server side, share current folder by id to anyone
 	 *	3. Create app sharelink that is accessable without authentication
-	 *	   Link contains information: folderId that is shared and some salt?
+	 *	   Link contains information: folderId that is shared, user email who shared it?
 	 *	4. A user opens the link, link contains parameter(s)
-	 *	5. Server gets parameter(s), extracts folderId from it
-	 *	6. Server loads folder and containing images to page using service account
+	 *	5. Server gets parameter(s), extracts folderId and email from it
+	 *	6. Server loads folder and containing images to page using refresh token saved to user by email
 	 *	7. A user now can view images without auth
 	 *	8. A user now can upload new image without auth
-	 *	   Image is received on serverside and uploaded to given folderId using service account with shared rights to folder
+	 *	   Image is received on serverside and uploaded to given folderId using users refresh token, on behalf of user
 	 * @param event
 	 */
 	const onShare = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -133,8 +139,22 @@ export default function GoogleDriveEventShare({
 		); /* For mobile devices */
 
 		try {
-			/* Copy the text inside the text field */
-			document.execCommand("copy");
+			if (!navigator.clipboard) {
+				/* Copy the text inside the text field */
+				document.execCommand("copy");
+			} else {
+				navigator.clipboard
+					.writeText(shareLinkInputRef.current?.value ?? "")
+					.then(
+						function () {
+							//Success
+						},
+						function (err) {
+							throw new Error(err);
+						}
+					);
+			}
+
 			setCopySuccess(true);
 			setTimeout(() => setCopySuccess(false), 1500);
 		} catch (err) {

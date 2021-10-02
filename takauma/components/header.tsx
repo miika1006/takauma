@@ -16,11 +16,10 @@ interface HeaderProps {
 
 export default function Header({ t, locale }: HeaderProps) {
 	const router = useRouter();
-	console.log("router:", router);
 
 	const [session, loading] = useSession();
-
-	return router.route === "/events/[folderid]" ? (
+	console.log("Route", router.route);
+	return router.route === "/events/[event]" ? (
 		<div className={styles.headerbar}></div>
 	) : (
 		<header>

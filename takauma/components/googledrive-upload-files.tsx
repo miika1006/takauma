@@ -3,6 +3,7 @@ import { TFunction } from "next-i18next";
 import { useEffect, useState } from "react";
 import useLoadingIndicator from "../common/hooks/loading-indicator";
 import Loading from "../components/loading";
+import { FromEmailAndFolderTooBase64 } from "../lib/event";
 
 import styles from "../styles/googledriveupload-files.module.css";
 import Slider, { SliderItem } from "./slider";
@@ -13,6 +14,7 @@ interface GoogleDriveUploadFilesProps {
 	folder: drive_v3.Schema$File;
 	files: drive_v3.Schema$File[];
 	refresh: (folders: drive_v3.Schema$File[]) => void;
+	email: string;
 }
 
 export default function GoogleDriveUploadFiles({
@@ -20,6 +22,7 @@ export default function GoogleDriveUploadFiles({
 	folder,
 	files,
 	refresh,
+	email,
 }: GoogleDriveUploadFilesProps) {
 	const [loading, setLoading] = useLoadingIndicator(true, 1);
 
@@ -28,7 +31,8 @@ export default function GoogleDriveUploadFiles({
 			try {
 				if (eventName === "") return;
 				setLoading(true);
-				const response = await fetch(`/api/file/${folder.id}`, {
+				const event = FromEmailAndFolderTooBase64(email, folder.id as string);
+				const response = await fetch(`/api/file/${event}`, {
 					headers: {
 						"Content-Type": "application/json",
 						Accept: "application/json",
@@ -58,7 +62,7 @@ export default function GoogleDriveUploadFiles({
 		};
 
 		if (folder && folder.name) getFiles(folder.name);
-	}, [folder, folder.name, refresh, setLoading, t]);
+	}, [email, folder, folder.name, refresh, setLoading, t]);
 
 	return (
 		<>

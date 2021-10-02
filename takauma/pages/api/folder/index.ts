@@ -1,7 +1,6 @@
 import { GetGoogleDriveFolders } from "./../../../lib/googledrive";
 import {
 	GetOrCreateGoogleDriveFolderByFolderName,
-	ShareGoogleDriveFolderToServiceAccount,
 	DeleteGoogleDriveFolder,
 } from "../../../lib/googledrive";
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
@@ -27,7 +26,10 @@ export default async function protectedHandler(
 			try {
 				console.log("api loading folders");
 
-				const result = await GetGoogleDriveFolders(session.accessToken);
+				const result = await GetGoogleDriveFolders(
+					session.accessToken,
+					session.refreshToken
+				);
 
 				return res.status(200).send(
 					result?.map((item) => {
@@ -53,14 +55,10 @@ export default async function protectedHandler(
 
 				const result = await GetOrCreateGoogleDriveFolderByFolderName(
 					session.accessToken,
+					session.refreshToken,
 					pathSafeEventName
 				);
-				//Immediatelly share folder to service account
-				//so that uploading photos later is possible without login
-				await ShareGoogleDriveFolderToServiceAccount(
-					session.accessToken,
-					result?.id ?? ""
-				);
+
 				return res.status(201).send({
 					id: result?.id,
 					name: result?.name,
@@ -76,6 +74,7 @@ export default async function protectedHandler(
 
 				const deleteResult = await DeleteGoogleDriveFolder(
 					session.accessToken,
+					session.refreshToken,
 					request.folderId
 				);
 

@@ -10,22 +10,39 @@ import { v4 as uuidv4 } from "uuid";
  */
 const CreateGoogleDriveInstance = (
 	accessToken: string,
-	refreshToken: string
+	refreshToken: string,
+	useServiceAccount?: boolean
 ) => {
 	const clientId = process.env.GOOGLE_ID;
 	const clientSecret = process.env.GOOGLE_SECRET;
 
-	//Authenticating by current user
-	const auth = new google.auth.OAuth2({
-		clientId,
-		clientSecret,
-	});
-	auth.setCredentials({
-		access_token: accessToken,
-		refresh_token: refreshToken,
-	});
+	if (useServiceAccount === true) {
+		//Authenticating using service account credentials
+		const auth = new google.auth.GoogleAuth({
+			credentials: {
+				client_email: process.env.SERVICE_ACCOUNT,
+				private_key: process.env.SERVICE_ACCOUNT_KEY,
+			},
+			//See, edit, create, and delete all of your Google Drive files
+			//This is a service account, so naturally it can edit all of its files
+			//Using this scope because app needs to load folders shared to this service account
+			scopes: ["https://www.googleapis.com/auth/drive"],
+		});
 
-	return google.drive({ auth, version: "v3" });
+		return google.drive({ auth, version: "v3" });
+	} else {
+		//Authenticating by current user
+		const auth = new google.auth.OAuth2({
+			clientId,
+			clientSecret,
+		});
+		auth.setCredentials({
+			access_token: accessToken,
+			refresh_token: refreshToken,
+		});
+
+		return google.drive({ auth, version: "v3" });
+	}
 };
 /**
  * Delete folder in Google Drive
@@ -36,11 +53,16 @@ const CreateGoogleDriveInstance = (
 export const DeleteGoogleDriveFolder = async (
 	accessToken: string,
 	refreshToken: string,
-	folderId: string
+	folderId: string,
+	useServiceAccount?: boolean
 ) => {
 	try {
 		if (folderId == "") return null;
-		const drive = CreateGoogleDriveInstance(accessToken, refreshToken);
+		const drive = CreateGoogleDriveInstance(
+			accessToken,
+			refreshToken,
+			useServiceAccount
+		);
 
 		console.log("DeleteGoogleDriveFolder Deleting folder");
 		let insufficient = false;

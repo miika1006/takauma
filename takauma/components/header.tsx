@@ -18,7 +18,6 @@ export default function Header({ t, locale }: HeaderProps) {
 	const router = useRouter();
 
 	const [session, loading] = useSession();
-	console.log("Route", router.route);
 	return router.route === "/events/[event]" ? (
 		<div className={styles.headerbar}></div>
 	) : (

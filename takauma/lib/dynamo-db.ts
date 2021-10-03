@@ -87,14 +87,4 @@ export const dynamo: Dynamo = {
 		}
 		return user;
 	},
-	/*get: (params: aws.DynamoDB.DocumentClient.GetItemInput) =>
-		client.get(params).promise(),
-	put: (params: aws.DynamoDB.DocumentClient.PutItemInput) =>
-		client.put(params).promise(),
-	query: (params: aws.DynamoDB.DocumentClient.QueryInput) =>
-		client.query(params).promise(),
-	update: (params: aws.DynamoDB.DocumentClient.UpdateItemInput) =>
-		client.update(params).promise(),
-	delete: (params: aws.DynamoDB.DocumentClient.DeleteItemInput) =>
-		client.delete(params).promise(),*/
 };

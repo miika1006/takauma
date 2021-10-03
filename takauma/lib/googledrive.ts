@@ -555,8 +555,7 @@ const UploadFileToDrive = async (
 	fromFile: string
 ) => {
 	const fileFolder = path.dirname(fromFile);
-	const fileExtension = path.extname(fromFile);
-	const fileName = uuidv4() + fileExtension;
+	const fileName = path.basename(fromFile);
 	console.log("Uploading file " + fileName + " to Google drive folder");
 
 	const fileSize = (await fs.promises.stat(fileFolder)).size;

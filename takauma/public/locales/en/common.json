@@ -84,5 +84,11 @@
 	"share_link": "Share link.",
 	"upload_photos": "Upload photos",
 	"everyone_with_the_link_can": "Everyone with the link can see all the photos and can upload new photos until you stop sharing the event.",
-	"how_to_delete": "Photos cannot be deleted with the app. Event creator can delete the photos using Google Drive."
+	"how_to_delete": "Photos cannot be deleted with the app. Event creator can delete the photos using Google Drive.",
+	"image_resize_failed": "Photos are kind of large. App tried to make them a bit smaller and then upload. Something weird happened, while trying to make them smaller. Try again or refresh page and then try.",
+	"selectimages_desc": "You can select multiple photos. After select, the application will make the photos a bit smaller and to make upload faster. Photos will be listed above. Finally click Send when you are ready.",
+	"do_you_need_help": "Do you need help?",
+	"ready_for_send": "photos ready to be sent.",
+	"select_photos_from_your_device": "Select photos from your device",
+	"sending": "Sending"
 }

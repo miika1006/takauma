@@ -84,5 +84,11 @@
 	"share_link": "Jaa linkki.",
 	"upload_photos": "Lataa kuvia.",
 	"everyone_with_the_link_can": "Linkin saaneet näkevät kaikki ladatut kuvat ja voivat ladata uusia kuvia niin kauan kunnes lopetat jaon.",
-	"how_to_delete": "Kuvia ei voi poistaa sovelluksella. Tapahtuman luoja voi poistaa kuvia Google Driven kautta."
+	"how_to_delete": "Kuvia ei voi poistaa sovelluksella. Tapahtuman luoja voi poistaa kuvia Google Driven kautta.",
+	"image_resize_failed": "Kuvat ovat aika isoja, ohjelma koittaa pienentää niitä vähän, ja sitten lähettää. Kuvan pienennyksessä kuitenkin tapahtui jokin häiriö. Yritä uudestaan tai päivitä sivua ja yritä.",
+	"selectimages_desc": "Voit valita useampia kuvia. Valittuasi kuvat, ohjelma pienentää niitä hiukan jotta lataus olisi nopeampi ja listaa ne ylle. Paina sitten Lähetä.",
+	"do_you_need_help": "Tarvitsetko apua?",
+	"ready_for_send": "kuvaa valmiina lähetystä varten.",
+	"select_photos_from_your_device": "Valitse kuvia laitteeltasi",
+	"sending": "Lähetetään"
 }

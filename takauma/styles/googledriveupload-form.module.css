@@ -3,8 +3,70 @@
 	height: 100px;
 	object-fit: cover;
 	margin: 0.5em;
+	border-radius: 4px;
+	opacity: 0.6;
 }
 .uploadform {
 	margin-top: 1em;
 	margin-bottom: 1em;
+}
+.uploadqueue {
+	border-top: solid 5px #efefef;
+	padding-top: 1em;
+	margin-top: 1em;
+}
+.fileuploadselect {
+	border: 1px solid #ccc;
+	display: inline-block;
+	padding: 6px 12px;
+	cursor: pointer;
+}
+
+.uploadform input[type="file"] {
+	display: none;
+}
+
+.uploadform button,
+.uploadform .fileuploadselect {
+	background: white;
+	font-size: 1em;
+	height: 2.6em;
+	line-height: 1em;
+	padding: 0.8em;
+	box-shadow: 0 1px 1px hsl(0deg 0% 0% / 0.075),
+		0 2px 2px hsl(0deg 0% 0% / 0.075);
+}
+
+.uploadform button:hover,
+.uploadform .fileuploadselect:hover {
+	background-color: rgb(241, 241, 241);
+}
+.uploadform button:active,
+.uploadform .fileuploadselect:active {
+	box-shadow: none;
+	background-color: rgb(221, 221, 221);
+}
+.helpdetails {
+	border: 1px solid #aaa;
+	border-radius: 4px;
+	padding: 0.5em 0.5em 0 0.5em;
+	display: block;
+	background: white;
+	margin-top: 2em;
+	margin-bottom: 1em;
+	cursor: pointer;
+}
+.helpdetails h1,
+.helpdetails h2,
+.helpdetails h3,
+.helpdetails h4 {
+	margin-bottom: 0;
+	margin-top: 0.5em;
+}
+.helpdetails summary {
+	font-weight: bold;
+	font-size: 0.8em;
+	line-height: 0.9em;
+	margin: -0.5em -0.5em 0;
+	padding: 0.5em;
 }

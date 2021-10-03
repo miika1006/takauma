@@ -65,7 +65,7 @@ export default function GoogleDriveUploadFiles({
 	}, [email, folder, folder.name, refresh, setLoading, t]);
 
 	return (
-		<>
+		<div className={styles.event}>
 			{files.length === 0 ? null : (
 				<Slider
 					t={t}
@@ -83,11 +83,7 @@ export default function GoogleDriveUploadFiles({
 					})}
 				/>
 			)}
-			{loading && (
-				<div className={styles.event}>
-					<Loading />
-				</div>
-			)}
-		</>
+			{loading && <Loading />}
+		</div>
 	);
 }

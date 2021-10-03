@@ -121,6 +121,12 @@ export default NextAuth({
 				};
 			}
 
+			// Return previous token if the access token has not expired yet
+			if (Date.now() < token.accessTokenExpires) {
+				return token;
+			}
+
+			//If token expired, then check if banned
 			if (await dynamo.isBanned(token.email)) {
 				console.log(
 					"jwt check",
@@ -130,11 +136,6 @@ export default NextAuth({
 					...token,
 					accessTokenExpires: Date.now(),
 				};
-			}
-
-			// Return previous token if the access token has not expired yet
-			if (Date.now() < token.accessTokenExpires) {
-				return token;
 			}
 
 			// Access token has expired, try to update it
@@ -154,12 +155,7 @@ export default NextAuth({
 			return newJwt;
 		},
 		async session(session, userOrToken) {
-			console.log(
-				"session check",
-				userOrToken.email,
-				"refreshToken",
-				userOrToken.refreshToken
-			);
+			console.log("session check", userOrToken.email);
 			if (userOrToken) {
 				session.user = userOrToken.user
 					? (userOrToken.user as User)

@@ -29,6 +29,7 @@ export default function GoogleDriveUploadForm({
 	add,
 }: GoogleDriveUploadFormProps) {
 	const [loading, setLoading] = useLoadingIndicator(false, 1);
+	const [resizing, setResizing] = useState<boolean>(false);
 	const [images, setImages] = useState<ImageSelect[] | null>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -39,7 +40,9 @@ export default function GoogleDriveUploadForm({
 			//First resize images
 			const selectedImageFiles = Array.from(event.target.files ?? []);
 			const resizedImages = [];
-			if (selectedImageFiles.length > 0) setLoading(true);
+			if (selectedImageFiles.length > 0) {
+				setResizing(true);
+			}
 
 			try {
 				for (let x = 0; x < selectedImageFiles.length; x++) {
@@ -57,11 +60,11 @@ export default function GoogleDriveUploadForm({
 					})
 				);
 
-				setLoading(false);
+				setResizing(false);
 			} catch (error) {
 				console.error("resize error", error);
 				showErrorToast(t, t("image_resize_failed"));
-				setLoading(false);
+				setResizing(false);
 			}
 		}
 	};
@@ -173,9 +176,10 @@ export default function GoogleDriveUploadForm({
 					/>
 				))}
 				<br />
-				{images?.length ?? 0} {loading ? t("sending") : t("ready_for_send")}
+				{images?.length ?? 0} {loading ? t("sending") : t("ready_for_send")}{" "}
+				{resizing && t("resizing")}
 			</div>
-			{loading ? (
+			{loading || resizing ? (
 				<div className={styles.uploadform}>
 					<Loading />
 				</div>

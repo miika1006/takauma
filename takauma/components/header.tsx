@@ -18,10 +18,17 @@ export default function Header({ t, locale }: HeaderProps) {
 	const router = useRouter();
 
 	const [session, loading] = useSession();
-	return router.route === "/events/[event]" ? (
-		<div className={styles.headerbar}></div>
-	) : (
-		<header>
+
+	return (
+		<header
+			className={
+				router.route !== "/events/[event]" &&
+				router.route !== "/privacy" &&
+				router.route !== "/terms"
+					? ""
+					: styles.headerminimal
+			}
+		>
 			<Head>
 				<link
 					rel="apple-touch-icon"
@@ -64,73 +71,74 @@ export default function Header({ t, locale }: HeaderProps) {
 					(router.route !== "/" ? styles.headerbar_dark : "")
 				}
 			>
-				<div className={styles.signedInStatus}>
-					<p
-						className={`nojs-show ${
-							!session && loading ? styles.loading : styles.loaded
-						}`}
-					>
-						{!session && (
-							<>
-								<a
-									href={`/api/auth/signin`}
-									className={styles.buttonPrimary}
-									onClick={(e) => {
-										e.preventDefault();
-										signIn("google"); //Google, because it is only provider
-									}}
-								>
-									{t("googlesignin")}
-								</a>
-							</>
-						)}
-						{session?.user && (
-							<>
-								{session.user.image && (
-									<span
-										style={{ backgroundImage: `url(${session.user.image})` }}
-										className={styles.avatar}
-									/>
+				{router.route !== "/events/[event]" &&
+					router.route !== "/privacy" &&
+					router.route !== "/terms" && (
+						<div className={styles.signedInStatus}>
+							<p
+								className={`nojs-show ${
+									!session && loading ? styles.loading : styles.loaded
+								}`}
+							>
+								{!session && (
+									<>
+										<a
+											href={`/api/auth/signin`}
+											className={styles.buttonPrimary}
+											onClick={(e) => {
+												e.preventDefault();
+												signIn("google"); //Google, because it is only provider
+											}}
+										>
+											{t("googlesignin")}
+										</a>
+									</>
 								)}
-								<span
-									className={styles.signedInText + " " + styles.specialtext}
-								>
-									<small>{t("signedinas")}</small>
-									<br />
-									<strong>{session.user.email || session.user.name}</strong>
-								</span>
-								<a
-									href={`/api/auth/signout`}
-									className={styles.button + " " + styles.specialtext}
-									onClick={(e) => {
-										e.preventDefault();
-										signOut();
-									}}
-								>
-									{t("signout")}
-								</a>
-							</>
-						)}
-					</p>
-				</div>
+								{session?.user && (
+									<>
+										<span
+											className={styles.signedInText + " " + styles.specialtext}
+										>
+											<small>{t("signedinas")}</small>
+											<br />
+											<strong>{session.user.email || session.user.name}</strong>
+										</span>
+										<a
+											href={`/api/auth/signout`}
+											className={styles.button + " " + styles.specialtext}
+											onClick={(e) => {
+												e.preventDefault();
+												signOut();
+											}}
+										>
+											{t("signout")}
+										</a>
+									</>
+								)}
+							</p>
+						</div>
+					)}
 				<nav>
 					<ul className={styles.navItems + " " + styles.specialtext}>
-						{session && (
-							<>
+						<>
+							{router.route !== "/" && (
 								<li className={styles.navItem}>
 									<Link href="/">
 										<a>{t("home")}</a>
 									</Link>
 								</li>
+							)}
+							{session && (
 								<li className={styles.navItem}>
 									<Link href="/events">
 										<a>{t("eventstitle")}</a>
 									</Link>
 								</li>
-							</>
-						)}
+							)}
+						</>
+
 						<li className={styles.navItemRight}>
-							<Link href="/" locale={"fi"}>
+							<Link href={router.asPath} locale={"fi"}>
 								<a
 									className={
 										locale === "fi" ? styles.boldtext : styles.normaltext
@@ -140,7 +148,7 @@ export default function Header({ t, locale }: HeaderProps) {
 								</a>
 							</Link>
 							&nbsp;|&nbsp;
-							<Link href="/" locale={"en"}>
+							<Link href={router.asPath} locale={"en"}>
 								<a
 									className={
 										locale === "en" ? styles.boldtext : styles.normaltext

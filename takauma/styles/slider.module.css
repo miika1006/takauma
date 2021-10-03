@@ -14,7 +14,7 @@
 
 	cursor: zoom-in;
 }
-
+/*
 .grid {
 }
 
@@ -62,15 +62,21 @@
 		display: block;
 	}
 }
+*/
 
-/*
 .grid {
 	display: -webkit-box;
 	display: -webkit-flex;
 	display: -ms-flexbox;
 	display: flex;
 }
+
 .griditem {
+	display: block;
+	width: 100%;
+	box-sizing: border-box;
+	padding-right: 1em;
+	margin-bottom: 1em;
 }
 
 .gridcol {
@@ -87,18 +93,14 @@
 	display: none;
 }
 
-
 @media (min-width: 768px) {
 	.gridcoltwo {
 		display: block;
-	} 
-	
+	}
 }
-
 
 @media (min-width: 1080px) {
 	.gridcolthree {
 		display: block;
-	} 
+	}
 }
-*/

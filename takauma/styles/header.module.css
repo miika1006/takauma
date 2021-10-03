@@ -137,6 +137,13 @@ a.specialtext {
 	color: #fff;
 }
 
+ul.navItems {
+	padding-left: 0.5rem;
+	padding-right: 0.5rem;
+}
+header.headerminimal {
+	height: 2em !important;
+}
 @media (min-width: 400px) {
 	.buttonPrimary {
 		margin-right: -0.4rem;

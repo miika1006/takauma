@@ -1,15 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { TFunction } from "next-i18next";
 import "photoswipe/dist/photoswipe.css";
 import "photoswipe/dist/default-skin/default-skin.css";
 import styles from "../styles/slider.module.css";
 import { Gallery, Item } from "react-photoswipe-gallery";
-
-import dynamic from "next/dynamic";
-
-//import { Colcade } from "colcade";
-
-//const Colcade = dynamic(() => import("colcade"), { ssr: false });
 
 interface SliderProps {
 	t: TFunction;
@@ -24,24 +18,35 @@ export interface SliderItem {
 		height?: number;
 	};
 }
+interface Colcade {
+	new (element: string, options: any): Object;
+	option: (options: any) => void;
+	reload: () => void;
+}
 export default function Slider({ t, items }: SliderProps) {
+	const [colcade, setColcade] = useState<Colcade | null>(null);
+
 	useEffect(() => {
 		const loadColcade = async () => {
 			const Colcade: any = await import("colcade").then(
 				(module) => module.default
 			);
-
-			if (window) {
-				// selector string as first argument
-				const colc = new Colcade(`.${styles.grid}`, {
-					columns: `.${styles.gridcol}`,
-					items: `.${styles.griditem}`,
-				});
-			}
+			// selector string as first argument
+			const colc = new Colcade(`.${styles.grid}`, {
+				columns: `.${styles.gridcol}`,
+				items: `.${styles.griditem}`,
+			});
+			setColcade(colc);
 		};
-
 		loadColcade();
 	}, []);
+
+	useEffect(() => {
+		if (colcade && items) {
+			console.log("reloading colcade");
+			colcade.reload();
+		}
+	}, [colcade, items]);
 
 	return items.length > 0 ? (
 		<div className={styles.grid}>

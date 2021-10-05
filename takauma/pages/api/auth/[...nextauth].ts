@@ -188,9 +188,6 @@ export default NextAuth({
 					refreshToken: account.refreshToken ?? account.refresh_token ?? "",
 				});
 			}
-		},
-		redirect({ url, baseUrl }) {
-		    return baseUrl + "/events";
 		}
 	},
 

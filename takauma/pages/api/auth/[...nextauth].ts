@@ -189,6 +189,9 @@ export default NextAuth({
 				});
 			}
 		},
+		redirect({ url, baseUrl }) {
+		    return baseUrl + "/events";
+		}
 	},
 
 	// Enable debug messages in the console if you are having problems

@@ -87,7 +87,7 @@ export default function Header({ t, locale }: HeaderProps) {
 											className={styles.buttonPrimary}
 											onClick={(e) => {
 												e.preventDefault();
-												signIn("google"); //Google, because it is only provider
+												signIn("google", { callbackUrl: window.location.origin + '/events' }; //Google, because it is only provider
 											}}
 										>
 											{t("googlesignin")}

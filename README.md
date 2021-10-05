@@ -6,25 +6,20 @@ Websovellus jossa voi luoda tapahtuman ja jakaa linkin, jonka kautta kuka tahans
 
 ## Google Drivesta ja käyttöoikeuksista
 
-Sovelluksessa käyttäjä kirjautuu sisään sovellukseen googletunnuksilla ja sallii sovellukselle oikeuden lukea käyttäjän sähköpostiosoitteen, joka esitetään sivulla infotietona. Käyttäjä myös sallii sovellukselle pääsyn käyttäjän omaan Google Driveen. Kuvat ladataan Google Driveen kansioihin, jossa luotu kansio on tapahtuma sovelluksessa.
+Sovelluksessa käyttäjä kirjautuu sisään sovellukseen googletunnuksilla ja sallii sovellukselle oikeuden lukea käyttäjän sähköpostiosoitteen, joka esitetään sivulla infotietona ja jota käytetään kuvien lataukseen. Käyttäjä myös sallii sovellukselle pääsyn käyttäjän omaan Google Driveen. Kuvat ladataan Google Driveen kansioihin, jossa luotu kansio on tapahtuma sovelluksessa.
 
 Sovellus näkee tai pääsee käsittelemään ainoastaan kansioita ja tiedostoja, joita sovelluksella on luotu. Sovelluksella ei ole oikeutta mihinkään muihin kuviin tai tiedostoihin.
 
 Kirjautunut käyttäjä sitten luo uuden tapahtuman, jossa oikeasti luodaan uusi kansion Google Driveen annetulla tapahtuman nimellä.
 
-#### Google palvelutunnus (service account)
-
 Sovelluksessa kuka tahansa linkin saanut voi kirjautumatta ladata kuvia käyttäjän Google Driveen. Tästä tulee haaste googlen käyttöoikeuksien kanssa. Miten saadaan kuvat ladattua ja millä tunnuksella. Kirjautunut käyttäjä voi ladata kuvia kansioon, jollon ne tulevat kansioon käyttäjän luomina.
 
 Mutta entä tilanne, jossa joku tuntematon käyttäjä kirjautumatta haluaa ladata kuvia?
 
-Tätä varten sovellukselle on luotu palvelutunnus (service account) googlelle. Sovelluksen luomille kansioille jaetaan käyttöoikeus tälle palvelutunnukselle, jotta sen avulla sovellus voi ladata uusia tiedostoja kansioihin. Palvelutunnus ei pysty näkemään tai käsittelemään mitään muita tiedostoja kuin jaetuista kansioista.
+Tätä varten tallennetaan käyttäjän googlelta saatu refresh-token tietokantaan talteen. Kun joku lataa kuvan sovelluksella, poimitaan refresh-token ja käytetään sitä googlen apikutsuihin autentikoimiseen.
 
-Jos sovellus olisi yrityskäytössä voitaisi virittää palvelutunnus siten, että se toimii jonkin käyttäjätunnuksen puolesta, jolloin tätä jakoa ei tarvitsisi tehdä. Tätä ei kuitenkaan voi tehdä tällaisessa julkisessa käytössä.
-
-Käyttäjä siis luo tapahtumia, jotka ovat kansioita. Käyttäjä on niiden kansioiden omistaja. Kansioon jaetaan muokkausoikeus palvelutunnukselle. Käyttäjä sitten jakaa tapahtuman (kansio drivessä) ja luo jakolinkin kuvien lataamiseen.
-
-Linkin saajat avaavat sovelluksen ja lataavat kuvia, kuvat luodaan palvelutunnuksella, joten palvelutunnus on niiden kuvien omistaja.
+Jos sovellus olisi yrityskäytössä voitaisi virittää palvelutunnus siten, että se toimii jonkin käyttäjätunnuksen puolesta.
+Tähän ei käytetä service tunnusta, kun omistuksen siirtoa ei pysty tekemään julkisessa käytössä. Yrityskäytössä voitaisi toimia jonkin käyttäjän puolesta.
 
 Google ei salli tiedostojen omistuksen siirtämistä eri @domain osoitteella olevien käyttäjien välillä. Eli ei pystytä siirtämään ladatun kuvan omistusta palvelutunnukselta käyttäjälle, joka kansion omistaa.
 
@@ -46,8 +41,8 @@ Proof of concept / MVP, NextJS opiskelua, Google Drive opiskelua, Node opiskelua
 - [x] Tapahtuman valinta
 - [x] Tapahtuman luontinäkymä
 - [x] Jaettavan linkin luonti
-- [ ] Google drive linkin luonti
-- [ ] linkkien Jako whatsappiin tai mihin tahansa
+- [x] Google drive linkin luonti
+- [x] linkkien Jako whatsappiin tai mihin tahansa
 - [x] Tapahtuman muokkausnäkymä
 - [x] Tapahtumanäkymä
 - [x] Kuvien listaus tapahtumaan
@@ -56,9 +51,9 @@ Proof of concept / MVP, NextJS opiskelua, Google Drive opiskelua, Node opiskelua
 
 ### Versio 0.2.0
 
-- [ ] Kaiken koodin refraktorointia
-- [ ] Käytettävyyden parannuksia
-- [ ] Komponenttien parannuksia ja hieromista
+- [x] Kaiken koodin refraktorointia
+- [x] Käytettävyyden parannuksia
+- [x] Komponenttien parannuksia ja hieromista
 
 ## Vercel
 

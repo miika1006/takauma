@@ -71,7 +71,7 @@ export default function Page({ locale, shouldSingOut }: PageProps) {
 									href={`/api/auth/signin`}
 									onClick={(e) => {
 										e.preventDefault();
-										signIn("google"); //Google, because it is only provider
+										signIn("google", { callbackUrl: window.location.origin + '/events' }); //Google, because it is only provider
 									}}
 								>
 									{t("googlesignin")}

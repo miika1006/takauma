@@ -42,10 +42,11 @@ export default function Slider({ t, items }: SliderProps) {
 				})
 			);
 		};
-		if (colcade === null && items.length > 0) loadColcade();
+		if (!isMobile && colcade === null && items.length > 0) loadColcade();
 	}, [items, colcade]);
 
 	useEffect(() => {
+		if (isMobile) return;
 		if (timer.current) window.clearTimeout(timer.current);
 
 		timer.current = window.setTimeout(() => {
@@ -61,51 +62,60 @@ export default function Slider({ t, items }: SliderProps) {
 	}, [colcade, items]);
 
 	return items.length > 0 ? (
-		<div className={styles.grid}>
-			<div className={styles.gridcol + " " + styles.gridcolone}></div>
-			<div className={styles.gridcol + " " + styles.gridcoltwo}></div>
-			<div className={styles.gridcol + " " + styles.gridcolthree}></div>
-			<div className={styles.gridcol + " " + styles.gridcolfour}></div>
-			<Gallery
-				id="photo-gallery"
-				closeButtonCaption={t("close")}
-				shareButtonCaption={t("share")}
-				toggleFullscreenButtonCaption={t("fullscreen")}
-				zoomButtonCaption={t("zoom")}
-				prevButtonCaption={t("previous")}
-				nextButtonCaption={t("next")}
-				options={{
-					shareButtons: [
-						{
-							id: "download",
-							label: t("downloadoriginal"),
-							url: "{{raw_image_url}}",
-							download: true,
-						},
-					],
-				}}
-			>
-				{items.map((item, idx) => (
-					<Item
-						id={item.id ?? ""}
-						key={`photo_${item.id}`}
-						original={item.webContentLink ?? ""}
-						thumbnail={item.thumbnailLink ?? ""}
-						width={item.imageMediaMetadata?.width}
-						height={item.imageMediaMetadata?.height}
-					>
-						{({ ref, open }) => (
-							<img
-								className={styles.griditem}
-								alt={`photo_${idx}_thumb`}
-								ref={ref as React.RefObject<HTMLImageElement>}
-								onClick={open}
-								src={item.thumbnailLink ?? ""}
-							/>
-						)}
-					</Item>
-				))}
-			</Gallery>
-		</div>
+		isMobile ? (
+			<ImageGallery t={t} items={items} />
+		) : (
+			<div className={styles.grid}>
+				<div className={styles.gridcol + " " + styles.gridcolone}></div>
+				<div className={styles.gridcol + " " + styles.gridcoltwo}></div>
+				<div className={styles.gridcol + " " + styles.gridcolthree}></div>
+				<div className={styles.gridcol + " " + styles.gridcolfour}></div>
+				<ImageGallery t={t} items={items} />
+			</div>
+		)
 	) : null;
+}
+export function ImageGallery({ t, items }: SliderProps) {
+	return (
+		<Gallery
+			id="photo-gallery"
+			closeButtonCaption={t("close")}
+			shareButtonCaption={t("share")}
+			toggleFullscreenButtonCaption={t("fullscreen")}
+			zoomButtonCaption={t("zoom")}
+			prevButtonCaption={t("previous")}
+			nextButtonCaption={t("next")}
+			options={{
+				shareButtons: [
+					{
+						id: "download",
+						label: t("downloadoriginal"),
+						url: "{{raw_image_url}}",
+						download: true,
+					},
+				],
+			}}
+		>
+			{items.map((item, idx) => (
+				<Item
+					id={item.id ?? ""}
+					key={`photo_${item.id}`}
+					original={item.webContentLink ?? ""}
+					thumbnail={item.thumbnailLink ?? ""}
+					width={item.imageMediaMetadata?.width}
+					height={item.imageMediaMetadata?.height}
+				>
+					{({ ref, open }) => (
+						<img
+							className={styles.griditem}
+							alt={`photo_${idx}_thumb`}
+							ref={ref as React.RefObject<HTMLImageElement>}
+							onClick={open}
+							src={item.thumbnailLink ?? ""}
+						/>
+					)}
+				</Item>
+			))}
+		</Gallery>
+	);
 }

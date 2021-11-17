@@ -75,7 +75,6 @@
 	display: block;
 	width: 100%;
 	box-sizing: border-box;
-	padding-right: 1em;
 	margin-bottom: 1em;
 }
 
@@ -96,6 +95,10 @@
 @media (min-width: 768px) {
 	.gridcoltwo {
 		display: block;
+	}
+
+	.griditem {
+		padding-right: 1em;
 	}
 }
 

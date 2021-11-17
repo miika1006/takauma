@@ -51,7 +51,7 @@ export default function Slider({ t, items }: SliderProps) {
 		timer.current = window.setTimeout(() => {
 			if (colcade && items && items.length > 0) {
 				console.log("reloading colcade");
-				//colcade.reload();
+				colcade.reload();
 			}
 		}, 2000);
 

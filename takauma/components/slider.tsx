@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { TFunction } from "next-i18next";
 import "photoswipe/dist/photoswipe.css";
 import "photoswipe/dist/default-skin/default-skin.css";
 import styles from "../styles/slider.module.css";
 import { Gallery, Item } from "react-photoswipe-gallery";
+import { isMobile } from "react-device-detect";
 
 interface SliderProps {
 	t: TFunction;
@@ -18,6 +19,7 @@ export interface SliderItem {
 		height?: number;
 	};
 }
+
 interface Colcade {
 	new (element: string, options: any): Object;
 	option: (options: any) => void;
@@ -25,27 +27,37 @@ interface Colcade {
 }
 export default function Slider({ t, items }: SliderProps) {
 	const [colcade, setColcade] = useState<Colcade | null>(null);
-
+	const timer = useRef<number | null>(null);
 	useEffect(() => {
 		const loadColcade = async () => {
 			const Colcade: any = await import("colcade").then(
 				(module) => module.default
 			);
+
 			// selector string as first argument
-			const colc = new Colcade(`.${styles.grid}`, {
-				columns: `.${styles.gridcol}`,
-				items: `.${styles.griditem}`,
-			});
-			setColcade(colc);
+			setColcade(
+				new Colcade(`.${styles.grid}`, {
+					columns: `.${styles.gridcol}`,
+					items: `.${styles.griditem}`,
+				})
+			);
 		};
-		loadColcade();
-	}, []);
+		if (colcade === null && items.length > 0) loadColcade();
+	}, [items, colcade]);
 
 	useEffect(() => {
-		if (colcade && items) {
-			console.log("reloading colcade");
-			colcade.reload();
-		}
+		if (timer.current) window.clearTimeout(timer.current);
+
+		timer.current = window.setTimeout(() => {
+			if (colcade && items && items.length > 0) {
+				console.log("reloading colcade");
+				//colcade.reload();
+			}
+		}, 2000);
+
+		return () => {
+			if (timer.current) window.clearTimeout(timer.current);
+		};
 	}, [colcade, items]);
 
 	return items.length > 0 ? (

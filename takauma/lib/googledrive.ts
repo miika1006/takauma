@@ -524,7 +524,8 @@ export const UploadGoogleDriveFile = async (
 	accessToken: string,
 	refreshToken: string,
 	folderId: string,
-	fromFile: string
+	fromFile: string,
+	fileName: string
 ) => {
 	try {
 		const drive = CreateGoogleDriveInstance(accessToken, refreshToken);
@@ -535,7 +536,7 @@ export const UploadGoogleDriveFile = async (
 		);
 		if (folderResult == null) throw Error("failed to get folder");
 		*/
-		return await UploadFileToDrive(drive, folderId, fromFile);
+		return await UploadFileToDrive(drive, folderId, fromFile, fileName);
 	} catch (error) {
 		console.log("UploadGoogleDriveFile error", error);
 		return null;
@@ -547,18 +548,18 @@ export const UploadGoogleDriveFile = async (
  * @param drive
  * @param folderId
  * @param fromFile
+ * @param fileName
  * @returns
  */
 const UploadFileToDrive = async (
 	drive: drive_v3.Drive,
 	folderId: string,
-	fromFile: string
+	fromFile: string,
+	fileName: string
 ) => {
-	const fileFolder = path.dirname(fromFile);
-	const fileName = path.basename(fromFile);
 	console.log("Uploading file " + fileName + " to Google drive folder");
 
-	const fileSize = (await fs.promises.stat(fileFolder)).size;
+	const fileSize = (await fs.promises.stat(fromFile)).size;
 	const res = await drive.files.create(
 		{
 			fields: "id,name",
@@ -568,7 +569,7 @@ const UploadFileToDrive = async (
 				name: fileName,
 			},
 			media: {
-				body: fs.createReadStream(fileFolder),
+				body: fs.createReadStream(fromFile),
 			},
 			supportsAllDrives: true,
 		},

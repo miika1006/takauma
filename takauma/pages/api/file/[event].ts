@@ -68,20 +68,16 @@ export default async function handler(
 
 							if (!file) reject("file is required");
 
-							const filePath = path.join(file.path, file.name ?? "");
-							console.log(
-								"Uploaded a file '" +
-									file.name +
-									"', now uploading it to google drive"
-							);
-
 							const result = await UploadGoogleDriveFile(
 								user.accessToken,
 								user.refreshToken,
 								folderid as string,
-								filePath
+								file.filepath,
+								file.originalFilename ?? file.newFilename ?? ""
 							);
-							fs.unlinkSync(file.path);
+							fs.unlink(file.filepath, () => {
+								console.log(`fs.unlink callback ok on file '${file.filepath}'`);
+							});
 							resolve({
 								id: result?.id,
 								name: result?.name,

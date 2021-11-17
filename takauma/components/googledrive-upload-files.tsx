@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import useLoadingIndicator from "../common/hooks/loading-indicator";
 import Loading from "../components/loading";
 import { FromEmailAndFolderTooBase64 } from "../lib/event";
-
 import styles from "../styles/googledriveupload-files.module.css";
 import Slider, { SliderItem } from "./slider";
 import { showErrorToast } from "./toast";
@@ -66,23 +65,22 @@ export default function GoogleDriveUploadFiles({
 
 	return (
 		<div className={styles.event}>
-			{files.length === 0 ? null : (
-				<Slider
-					t={t}
-					items={files.map((f) => {
-						const item: SliderItem = {
-							id: f.id,
-							thumbnailLink: f.thumbnailLink,
-							webContentLink: f.webContentLink,
-							imageMediaMetadata: {
-								width: f.imageMediaMetadata?.width ?? 0,
-								height: f.imageMediaMetadata?.height ?? 0,
-							},
-						};
-						return item;
-					})}
-				/>
-			)}
+			<Slider
+				t={t}
+				items={files.map((f) => {
+					const item: SliderItem = {
+						id: f.id,
+						thumbnailLink: f.thumbnailLink,
+						webContentLink: f.webContentLink,
+						imageMediaMetadata: {
+							width: f.imageMediaMetadata?.width ?? 0,
+							height: f.imageMediaMetadata?.height ?? 0,
+						},
+					};
+					return item;
+				})}
+			/>
+
 			{loading && <Loading />}
 		</div>
 	);

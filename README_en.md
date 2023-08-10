@@ -10,13 +10,11 @@ The app sees and has access only folders and files created with the application.
 
 Signed user then creates new event, and where a folder is actually created to Google Drive by given event name.
 
-#### Google service account
-
 In the app, anyone who receives the link can upload photos to Google Drive without signing in. This behaviour is a challenge with google permissions. How to upload photos to users Google Drive. A signed-in user can upload photos to a folder so that they appear to the folder created by the user.
 
 But, what about a situation where some unknown user wants to upload photos without signing in.
 
-todo: complete
+To make this happen, the users refresh token is saved to database. When someone uploads a photo with the app, the refresh token is used in google upload requests.
 
 If the application were to be used in some business scenario, a service account could be configured to upload photos on behalf of a user. However, this cannot be done in this kind of public usable application for everyone.
 

@@ -16,15 +16,15 @@ In the app, anyone who receives the link can upload photos to Google Drive witho
 
 But, what about a situation where some unknown user wants to upload photos without signing in.
 
-To do this, a service account has been created for the application to Google. Folders created by the application are given permission to the service account to allow the application to upload new files to the folders. By using the service account the application cannot view, download or edit any files other than inside the shared folders.
+todo: complete
 
-If the application were to be used in some business scenario, the service account could be configured to upload photos on behalf of a user, in which case this sharing would not need to be done. However, this cannot be done in this kind of public usable application for everyone.
+If the application were to be used in some business scenario, a service account could be configured to upload photos on behalf of a user. However, this cannot be done in this kind of public usable application for everyone.
 
-The user creates events that are folders. User is the owner of the folders. The folder is assigned editing rights to the service account. The user then shares the event (folder in Drive) and creates a sharing link to upload the photos.
+The user creates events that are folders. User is the owner of the folders. The user then shares the event (folder in Drive) and creates a sharing link to upload the photos.
 
-The link receivers open the application and upload some photos, the photos are created with the service account, so the service account is the owner of those photos in Google Drive.
+The link receivers open the application and upload some photos, the photos are created into the users Google Drive Folder.
 
-Google does not permit transfer of ownership of files between users at different @domains. With this app, it is not possible to transfer ownership of the uploaded photo from the service account to the user who owns the folder.
+Google does not permit transfer of ownership of files between users at different @domains. With this app, it is not possible to transfer ownership of the uploaded photo.
 
 When creating a share link, you also share the folder publicly on the Internet. the app changes the sharing permissions on the Google Drive folder. Note, everyone with the link will be able to see the photos. This is exactly same as if you share a link directly to a folder from Google Drive. The address is not easily guessable.
 

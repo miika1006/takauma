@@ -438,11 +438,15 @@ export const GetGoogleDriveFolderById = async (
 		}
 
 		const folder = res.data;
+		const isShared =
+			folder.permissions?.some((s) => s.type === "anyone") ?? false;
 
 		console.log(
 			"GetGoogleDriveFolderById found folder",
 			folder.id,
-			folder.name
+			folder.name,
+			", is shared",
+			isShared
 		);
 
 		if (folder.trashed) {
@@ -453,7 +457,7 @@ export const GetGoogleDriveFolderById = async (
 
 		return {
 			...folder,
-			shared: folder.permissions?.some((s) => s.type === "anyone") ?? false,
+			shared: isShared,
 		};
 	} catch (error) {
 		console.log("GetGoogleDriveFolderById error", error);
@@ -529,13 +533,6 @@ export const UploadGoogleDriveFile = async (
 ) => {
 	try {
 		const drive = CreateGoogleDriveInstance(accessToken, refreshToken);
-		/*	const folderResult = await GetOrCreateGoogleDriveFolderByFolderName(
-			accessToken,
-			refreshToken,
-			folder
-		);
-		if (folderResult == null) throw Error("failed to get folder");
-		*/
 		return await UploadFileToDrive(drive, folderId, fromFile, fileName);
 	} catch (error) {
 		console.log("UploadGoogleDriveFile error", error);

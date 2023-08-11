@@ -1,6 +1,7 @@
 import { FromBase64ToEmailAndFolder } from "./../../../lib/event";
 import {
 	GetGoogleDriveFilesByFolderId,
+	GetGoogleDriveFolderById,
 	UploadGoogleDriveFile,
 } from "../../../lib/googledrive";
 import formidable from "formidable";
@@ -26,6 +27,14 @@ export default async function handler(
 	if (folderid) {
 		const user = await dynamo.getUser(email as string);
 		if (user === null || user.IsBanned === true)
+			return res.status(403).send("Forbidden");
+
+		const folder = await GetGoogleDriveFolderById(
+			user.accessToken,
+			user.refreshToken,
+			folderid as string
+		);
+		if (folder === null || folder.shared === false)
 			return res.status(403).send("Forbidden");
 
 		// Query files by eventname (=foldername) Google Drive

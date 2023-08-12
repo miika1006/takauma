@@ -5,8 +5,8 @@ interface EventNotFoundProps {
 export default function EventNotFound({ t }: EventNotFoundProps) {
 	return (
 		<>
-			<h1>{t("eventnotfound")}</h1>
-			<p>{t("eventnotfoundinfo")}</p>
+			<h1>{t<string>("eventnotfound")}</h1>
+			<p>{t<string>("eventnotfoundinfo")}</p>
 		</>
 	);
 }

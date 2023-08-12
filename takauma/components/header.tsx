@@ -87,10 +87,12 @@ export default function Header({ t, locale }: HeaderProps) {
 											className={styles.buttonPrimary}
 											onClick={(e) => {
 												e.preventDefault();
-												signIn("google", { callbackUrl: window.location.origin + '/events' }); //Google, because it is only provider
+												signIn("google", {
+													callbackUrl: window.location.origin + "/events",
+												}); //Google, because it is only provider
 											}}
 										>
-											{t("googlesignin")}
+											{t<string>("googlesignin")}
 										</a>
 									</>
 								)}
@@ -99,7 +101,7 @@ export default function Header({ t, locale }: HeaderProps) {
 										<span
 											className={styles.signedInText + " " + styles.specialtext}
 										>
-											<small>{t("signedinas")}</small>
+											<small>{t<string>("signedinas")}</small>
 											<br />
 											<strong>{session.user.email || session.user.name}</strong>
 										</span>
@@ -111,7 +113,7 @@ export default function Header({ t, locale }: HeaderProps) {
 												signOut();
 											}}
 										>
-											{t("signout")}
+											{t<string>("signout")}
 										</a>
 									</>
 								)}
@@ -124,14 +126,14 @@ export default function Header({ t, locale }: HeaderProps) {
 							{router.route !== "/" && (
 								<li className={styles.navItem}>
 									<Link href="/">
-										<a>{t("home")}</a>
+										<a>{t<string>("home")}</a>
 									</Link>
 								</li>
 							)}
 							{session && (
 								<li className={styles.navItem}>
 									<Link href="/events">
-										<a>{t("eventstitle")}</a>
+										<a>{t<string>("eventstitle")}</a>
 									</Link>
 								</li>
 							)}

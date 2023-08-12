@@ -166,7 +166,7 @@ export default function GoogleDriveEventShare({
 		<div className={styles.share}>
 			<label>
 				<input type="checkbox" checked={shared} onChange={onShare} />
-				{loading ? <Loading /> : t("sharealink")}
+				{loading ? <Loading /> : t<string>("sharealink")}
 			</label>
 
 			{!pending && shared && (
@@ -180,19 +180,21 @@ export default function GoogleDriveEventShare({
 					/>
 
 					<div className={styles.shareoptionsmobile}>
-						<button onClick={shareToMobile}>{t("sharelink")}</button>
+						<button onClick={shareToMobile}>{t<string>("sharelink")}</button>
 						<a
 							href={shareUrl}
 							target="_blank"
 							rel="noopener noreferrer"
 							className="button"
 						>
-							{t("opensharelinkinfo")}
+							{t<string>("opensharelinkinfo")}
 						</a>
 					</div>
 					<div className={styles.shareoptionsdesktop}>
 						<button onClick={copySharelinkToClipboard}>
-							{copysuccess ? t("copysuccesss") : t("copytoclipboard")}
+							{copysuccess
+								? t<string>("copysuccesss")
+								: t<string>("copytoclipboard")}
 						</button>
 						<a
 							href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
@@ -202,7 +204,7 @@ export default function GoogleDriveEventShare({
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							{t("sharetowhatsapp")}
+							{t<string>("sharetowhatsapp")}
 						</a>
 						<a
 							href={`mailto:?subject=Takauma ${current?.name ?? ""}&body=${t(
@@ -210,7 +212,7 @@ export default function GoogleDriveEventShare({
 							)} ${shareUrl}.`}
 							className="button"
 						>
-							{t("sharebyemail")}
+							{t<string>("sharebyemail")}
 						</a>
 						<a
 							href={shareUrl}
@@ -218,7 +220,7 @@ export default function GoogleDriveEventShare({
 							rel="noopener noreferrer"
 							className="button"
 						>
-							{t("opensharelinkinfo")}
+							{t<string>("opensharelinkinfo")}
 						</a>
 					</div>
 				</>

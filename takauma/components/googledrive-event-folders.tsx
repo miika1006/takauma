@@ -91,7 +91,7 @@ export default function GoogleDriveEventFolders({
 								<div className={styles.controls}>
 									{folder.name !== current?.name && (
 										<button onClick={() => select(folder)}>
-											{t("select")}
+											{t<string>("select")}
 										</button>
 									)}
 									<GoogleDriveEventDelete

@@ -91,7 +91,7 @@ export default function GoogleDriveEventForm({
 		</div>
 	) : (
 		<form onSubmit={createEvent} className={styles.eventform}>
-			<h2>{t("createnewevent")}</h2>
+			<h2>{t<string>("createnewevent")}</h2>
 			<input
 				type="text"
 				value={createEventName}
@@ -99,7 +99,7 @@ export default function GoogleDriveEventForm({
 				placeholder={t("inputnameofevent")}
 				onChange={(e) => setCreateEventName(e.target.value)}
 			/>
-			<button type="submit">{t("save")}</button>
+			<button type="submit">{t<string>("save")}</button>
 		</form>
 	);
 }

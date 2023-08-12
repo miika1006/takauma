@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { TFunction } from "next-i18next";
 import "photoswipe/dist/photoswipe.css";
-import "photoswipe/dist/default-skin/default-skin.css";
 import styles from "../styles/slider.module.css";
 import { Gallery, Item } from "react-photoswipe-gallery";
 import { isMobile } from "react-device-detect";
@@ -75,26 +74,18 @@ export default function Slider({ t, items }: SliderProps) {
 		)
 	) : null;
 }
+
 export function ImageGallery({ t, items }: SliderProps) {
 	return (
 		<Gallery
 			id="photo-gallery"
-			closeButtonCaption={t("close")}
-			shareButtonCaption={t("share")}
-			toggleFullscreenButtonCaption={t("fullscreen")}
-			zoomButtonCaption={t("zoom")}
-			prevButtonCaption={t("previous")}
-			nextButtonCaption={t("next")}
 			options={{
-				shareButtons: [
-					{
-						id: "download",
-						label: t("downloadoriginal"),
-						url: "{{raw_image_url}}",
-						download: true,
-					},
-				],
+				closeTitle: t("close"),
+				zoomTitle: t("zoom"),
+				arrowNextTitle: t("next"),
+				arrowPrevTitle: t("previous"),
 			}}
+			withDownloadButton={true}
 		>
 			{items.map((item, idx) => (
 				<Item

@@ -16,8 +16,8 @@ export default function Footer({ t }: FooterProps) {
 					<Link href="/">
 						<a className={styles.app}>
 							<Image src="/logo.svg" alt="Logo" width={40} height={40} />
-							<h4 className={styles.apptitle}>{t("apptitle")}</h4>
-							<p className={styles.appdesc}>{t("appdescription")}</p>
+							<h4 className={styles.apptitle}>{t<string>("apptitle")}</h4>
+							<p className={styles.appdesc}>{t<string>("appdescription")}</p>
 						</a>
 					</Link>
 				</li>
@@ -28,12 +28,12 @@ export default function Footer({ t }: FooterProps) {
 
 				<li className={styles.navItem}>
 					<Link href="/privacy">
-						<a>{t("privacypolicy")}</a>
+						<a>{t<string>("privacypolicy")}</a>
 					</Link>
 				</li>
 				<li className={styles.navItem}>
 					<Link href="/terms">
-						<a>{t("termsofservice")}</a>
+						<a>{t<string>("termsofservice")}</a>
 					</Link>
 				</li>
 			</ul>

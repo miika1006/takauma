@@ -6,7 +6,7 @@ interface AccessDeniedProps {
 export default function AccessDenied({ t }: AccessDeniedProps) {
 	return (
 		<>
-			<h1>{t("accessdenied")}</h1>
+			<h1>{t<string>("accessdenied")}</h1>
 			<p>
 				<a
 					href={`/api/auth/signin`}
@@ -15,7 +15,7 @@ export default function AccessDenied({ t }: AccessDeniedProps) {
 						signIn("google"); //Google, because it is only provider
 					}}
 				>
-					{t("googlesignin")}
+					{t<string>("googlesignin")}
 				</a>
 			</p>
 		</>

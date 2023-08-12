@@ -15,7 +15,7 @@ export default function Page({ locale }: PageProps) {
 	return (
 		<ParallaxProvider>
 			<Layout t={t} locale={locale}>
-				<Parallax y={[-40, 40]} className={styles.coverimage} tagOuter="div">
+				<Parallax translateY={[-40, 40]} className={styles.coverimage}>
 					<Image
 						src="/images/metsa2.jpeg"
 						width={2048}
@@ -29,11 +29,9 @@ export default function Page({ locale }: PageProps) {
 						<div className={styles.applogo}>
 							<Image src="/logo.svg" alt="Logo" width={100} height={100} />
 						</div>
-						<Parallax y={[-70, 70]} tagOuter="div">
-							{t("apptitle")}
-						</Parallax>
+						<Parallax translateY={[-70, 70]}>{t("apptitle")}</Parallax>
 					</h1>
-					<Parallax y={[0, 60]} tagOuter="div">
+					<Parallax translateY={[0, 60]}>
 						<p className={styles.appdesc}>
 							{applicationDescription.split(".").map((text, index) =>
 								text != "" ? (

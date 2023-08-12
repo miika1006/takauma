@@ -173,7 +173,7 @@ export default function GoogleDriveUploadForm({
 					type="button"
 					onClick={() => setFormOpened((c) => !c)}
 				>
-					{t("upload_photos")}
+					{t<string>("upload_photos")}
 				</button>
 			)}
 			{formOpened && (
@@ -188,8 +188,9 @@ export default function GoogleDriveUploadForm({
 							/>
 						))}
 						<br />
-						{images?.length ?? 0} {loading ? t("sending") : t("ready_for_send")}{" "}
-						{resizing && t("resizing")}
+						{images?.length ?? 0}{" "}
+						{loading ? t<string>("sending") : t<string>("ready_for_send")}{" "}
+						{resizing && t<string>("resizing")}
 					</div>
 					{loading || resizing ? (
 						<div className={styles.uploadform}>
@@ -201,7 +202,7 @@ export default function GoogleDriveUploadForm({
 								htmlFor="photo-upload-field"
 								className={"button " + styles.fileuploadselect}
 							>
-								{t("select_photos_from_your_device")}
+								{t<string>("select_photos_from_your_device")}
 							</label>
 							<input
 								type="file"
@@ -211,13 +212,13 @@ export default function GoogleDriveUploadForm({
 								ref={fileInputRef}
 								onChange={setToPagePreview}
 							/>
-							<button type="submit">{t("upload")}</button>
+							<button type="submit">{t<string>("upload")}</button>
 
 							<details className={styles.helpdetails}>
-								<summary>{t("do_you_need_help")}</summary>
-								<h4>{t("selectimages")}</h4>
+								<summary>{t<string>("do_you_need_help")}</summary>
+								<h4>{t<string>("selectimages")}</h4>
 								<p>
-									<small>{t("selectimages_desc")}</small>
+									<small>{t<string>("selectimages_desc")}</small>
 								</p>
 							</details>
 						</form>

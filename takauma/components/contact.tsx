@@ -17,17 +17,10 @@ export default function Contact({ t, hideTitle }: ContactProps) {
 	};
 	return (
 		<div>
-			{!hideTitle && <h2>{t("contact")}</h2>}
+			{!hideTitle && <h2>{t<string>("contact")}</h2>}
 			<p>
-				{t("author")}: Miika Mehtälä. &nbsp;
-				{/* Mehtälä
-				<br /> Linkedin:{" "}
-				<a href="https://fi.linkedin.com/in/miikamehtala">
-					https://fi.linkedin.com/in/miikamehtala
-				</a>
-				<br />
-				 */}
-				{t("apprelatedcontact")}:{" "}
+				{t<string>("author")}: Miika Mehtälä. &nbsp;
+				{t<string>("apprelatedcontact")}:{" "}
 				<a
 					href="#"
 					className={styles.cssmail}

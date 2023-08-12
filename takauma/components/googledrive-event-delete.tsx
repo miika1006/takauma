@@ -83,6 +83,6 @@ export default function GoogleDriveEventDelete({
 	return loading ? (
 		<Loading />
 	) : (
-		<button onClick={deleteEvent}>{t("delete")}</button>
+		<button onClick={deleteEvent}>{t<string>("delete")}</button>
 	);
 }

@@ -3,24 +3,15 @@ import Image from "next/image";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSideProps } from "next";
-import { Session } from "next-auth";
-import { getSession, signIn, signout } from "next-auth/client";
 import { PageProps } from "../common/types";
 import styles from "../styles/index.module.css";
 import { Parallax, ParallaxProvider } from "react-scroll-parallax";
-import { useEffect } from "react";
-import { dynamo } from "../lib/dynamo-db";
+import { signIn } from "next-auth/client";
 
-export default function Page({ locale, shouldSingOut }: PageProps) {
+export default function Page({ locale }: PageProps) {
 	const { t } = useTranslation("common");
 	const applicationDescription = t("appdescription");
 
-	useEffect(() => {
-		if (shouldSingOut) {
-			console.log("Signing out");
-			signout();
-		}
-	});
 	return (
 		<ParallaxProvider>
 			<Layout t={t} locale={locale}>
@@ -71,7 +62,9 @@ export default function Page({ locale, shouldSingOut }: PageProps) {
 									href={`/api/auth/signin`}
 									onClick={(e) => {
 										e.preventDefault();
-										signIn("google", { callbackUrl: window.location.origin + '/events' }); //Google, because it is only provider
+										signIn("google", {
+											callbackUrl: window.location.origin + "/events",
+										}); //Google, because it is only provider
 									}}
 								>
 									{t("googlesignin")}
@@ -92,17 +85,9 @@ export default function Page({ locale, shouldSingOut }: PageProps) {
 }
 
 // Export the `session` prop to use sessions with Server Side Rendering
-export const getServerSideProps: GetServerSideProps<{
-	session: Session | null;
-}> = async (context) => {
-	const session = await getSession(context);
-
+export const getServerSideProps: GetServerSideProps = async (context) => {
 	return {
 		props: {
-			session,
-			shouldSingOut: session
-				? await dynamo.isBanned(session.user?.email)
-				: false,
 			locale: context.locale as string,
 			...(await serverSideTranslations(context.locale as string, ["common"])),
 		},

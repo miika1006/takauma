@@ -6,7 +6,6 @@ import {
 } from "../../../lib/googledrive";
 import formidable from "formidable";
 import fs from "fs";
-import path from "path";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { drive_v3 } from "googleapis";
 import { dynamo } from "../../../lib/dynamo-db";
@@ -32,7 +31,8 @@ export default async function handler(
 		const folder = await GetGoogleDriveFolderById(
 			user.accessToken,
 			user.refreshToken,
-			folderid as string
+			folderid as string,
+			true
 		);
 		if (folder === null || folder.shared === false)
 			return res.status(403).send("Forbidden");

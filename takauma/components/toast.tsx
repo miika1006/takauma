@@ -3,29 +3,40 @@ import { toast } from "react-toastify";
 import styles from "../styles/toast.module.css";
 interface ToastProps {
 	t: TFunction;
+	title?: string;
 	message?: string;
 	error?: string;
 }
 
-export const showWarningToast = (t: TFunction, msg: string) => {
-	toast(<Toast t={t} message={msg} />, {
+export const showWarningToast = (t: TFunction, msg: string, title?: string) => {
+	toast(<Toast t={t} title={title} message={msg} />, {
 		type: "warning",
 	});
 };
 
-export const showErrorToast = (t: TFunction, error: string, msg?: string) => {
+export const showErrorToast = (
+	t: TFunction,
+	error: string,
+	msg?: string,
+	title?: string
+) => {
 	toast(
-		<Toast t={t} message={msg ? msg : t("somethingwentwrong")} error={error} />,
+		<Toast
+			t={t}
+			title={title}
+			message={msg ? msg : t("somethingwentwrong")}
+			error={error}
+		/>,
 		{
 			type: "error",
 		}
 	);
 };
 
-export default function Toast({ t, message, error }: ToastProps) {
+export default function Toast({ t, title, message, error }: ToastProps) {
 	return (
 		<div className={styles.toast}>
-			<h2>{t("woops")}</h2>
+			<h2>{title ?? t("woops")}</h2>
 			{message && <p>{message}</p>}
 			{error && (
 				<details>

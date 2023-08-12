@@ -135,6 +135,7 @@ export default NextAuth({
 				return {
 					...token,
 					accessTokenExpires: Date.now(),
+					error: "Expired",
 				};
 			}
 
@@ -188,7 +189,7 @@ export default NextAuth({
 					refreshToken: account.refreshToken ?? account.refresh_token ?? "",
 				});
 			}
-		}
+		},
 	},
 
 	// Enable debug messages in the console if you are having problems

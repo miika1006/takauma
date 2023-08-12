@@ -1,4 +1,4 @@
-import { Provider, signIn, useSession } from "next-auth/client";
+import { Provider, signIn, signOut, useSession } from "next-auth/client";
 import { appWithTranslation, SSRConfig } from "next-i18next";
 import type { AppProps } from "next/app";
 import React, { useEffect } from "react";
@@ -49,7 +49,9 @@ function Comp({ Component, pageProps }: AppProps) {
 		if (session?.error === "RefreshAccessTokenError") {
 			signIn("google", {
 				callbackUrl: process.env.NEXTAUTH_URL,
-			}); // Force sign in
+			});
+		} else if (session?.error === "Expired") {
+			signOut();
 		}
 	}, [session]);
 	return (

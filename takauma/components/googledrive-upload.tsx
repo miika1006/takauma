@@ -32,6 +32,7 @@ export default function GoogleDriveUpload({
 			/>
 			<GoogleDriveUploadForm
 				t={t}
+				defaultOpen={driveFiles.length === 0}
 				folder={folder}
 				email={email}
 				add={(file) => setDriveFiles((currentFiles) => [...currentFiles, file])}

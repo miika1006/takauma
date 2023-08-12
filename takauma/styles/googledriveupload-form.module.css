@@ -21,7 +21,16 @@
 	padding: 6px 12px;
 	cursor: pointer;
 }
-
+.uploadopener {
+	margin-top: 1em;
+}
+.uploadopener::before {
+	content: "↳ ";
+	font-weight: bold;
+	font-size: 120%;
+	font-family: serif;
+	vertical-align: middle;
+}
 .uploadform input[type="file"] {
 	display: none;
 }

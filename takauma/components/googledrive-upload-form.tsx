@@ -30,6 +30,7 @@ export default function GoogleDriveUploadForm({
 }: GoogleDriveUploadFormProps) {
 	const [loading, setLoading] = useLoadingIndicator(false, 1);
 	const [resizing, setResizing] = useState<boolean>(false);
+	const [formOpened, setFormOpened] = useState<boolean>(false);
 	const [images, setImages] = useState<ImageSelect[] | null>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -166,49 +167,62 @@ export default function GoogleDriveUploadForm({
 	};
 	return (
 		<div className={styles.uploadcontainer}>
-			<div className={styles.uploadqueue}>
-				{images?.map((image, idx) => (
-					<img
-						key={`imageurl-${idx}`}
-						className={styles.thumbnail}
-						alt="image"
-						src={image.objectUrl}
-					/>
-				))}
-				<br />
-				{images?.length ?? 0} {loading ? t("sending") : t("ready_for_send")}{" "}
-				{resizing && t("resizing")}
-			</div>
-			{loading || resizing ? (
-				<div className={styles.uploadform}>
-					<Loading />
-				</div>
-			) : (
-				<form onSubmit={upload} className={styles.uploadform}>
-					<label
-						htmlFor="photo-upload-field"
-						className={"button " + styles.fileuploadselect}
-					>
-						{t("select_photos_from_your_device")}
-					</label>
-					<input
-						type="file"
-						id="photo-upload-field"
-						multiple
-						accept="image/*"
-						ref={fileInputRef}
-						onChange={setToPagePreview}
-					/>
-					<button type="submit">{t("upload")}</button>
+			{!formOpened && (
+				<button
+					className={styles.uploadopener}
+					type="button"
+					onClick={() => setFormOpened((c) => !c)}
+				>
+					{t("upload_photos")}
+				</button>
+			)}
+			{formOpened && (
+				<>
+					<div className={styles.uploadqueue}>
+						{images?.map((image, idx) => (
+							<img
+								key={`imageurl-${idx}`}
+								className={styles.thumbnail}
+								alt="image"
+								src={image.objectUrl}
+							/>
+						))}
+						<br />
+						{images?.length ?? 0} {loading ? t("sending") : t("ready_for_send")}{" "}
+						{resizing && t("resizing")}
+					</div>
+					{loading || resizing ? (
+						<div className={styles.uploadform}>
+							<Loading />
+						</div>
+					) : (
+						<form onSubmit={upload} className={styles.uploadform}>
+							<label
+								htmlFor="photo-upload-field"
+								className={"button " + styles.fileuploadselect}
+							>
+								{t("select_photos_from_your_device")}
+							</label>
+							<input
+								type="file"
+								id="photo-upload-field"
+								multiple
+								accept="image/*"
+								ref={fileInputRef}
+								onChange={setToPagePreview}
+							/>
+							<button type="submit">{t("upload")}</button>
 
-					<details className={styles.helpdetails}>
-						<summary>{t("do_you_need_help")}</summary>
-						<h4>{t("selectimages")}</h4>
-						<p>
-							<small>{t("selectimages_desc")}</small>
-						</p>
-					</details>
-				</form>
+							<details className={styles.helpdetails}>
+								<summary>{t("do_you_need_help")}</summary>
+								<h4>{t("selectimages")}</h4>
+								<p>
+									<small>{t("selectimages_desc")}</small>
+								</p>
+							</details>
+						</form>
+					)}
+				</>
 			)}
 		</div>
 	);

@@ -83,7 +83,7 @@
 	"getting_started_allow_app_to": "Salli sovelluksen lukea sähköpostiosoitteesi ja pääsy tallentamaan kuvia Google Driveen. Pääsy on ainoastaan sovelluksen luomiin kuviin.",
 	"create_new_event": "Luo uusi tapahtuma.",
 	"share_link": "Jaa linkki.",
-	"upload_photos": "Lataa kuvia.",
+	"upload_photos": "Lähetä kuvia.",
 	"everyone_with_the_link_can": "Linkin saaneet näkevät kaikki ladatut kuvat ja voivat ladata uusia kuvia niin kauan kunnes lopetat jaon.",
 	"how_to_delete": "Kuvia ei voi poistaa sovelluksella. Tapahtuman luoja voi poistaa kuvia Google Driven kautta.",
 	"image_resize_failed": "Kuvat ovat aika isoja, ohjelma koittaa pienentää niitä vähän, ja sitten lähettää. Kuvan pienennyksessä kuitenkin tapahtui jokin häiriö. Yritä uudestaan tai päivitä sivua ja yritä.",

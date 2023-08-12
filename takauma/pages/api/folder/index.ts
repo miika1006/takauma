@@ -78,7 +78,7 @@ export default async function protectedHandler(
 					request.folderId
 				);
 
-				return res.status(deleteResult ? 200 : 409).send("");
+				return res.status(deleteResult === true ? 200 : 409).send("");
 			} catch (error) {
 				res.status(400).send(error);
 			}

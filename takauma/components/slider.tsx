@@ -99,7 +99,7 @@ export function ImageGallery({ t, items }: SliderProps) {
 			{items.map((item, idx) => (
 				<Item
 					id={item.id ?? ""}
-					key={`photo_${item.id}`}
+					key={`photo_${item.id}_${item.thumbnailLink}`}
 					original={item.webContentLink ?? ""}
 					thumbnail={item.thumbnailLink ?? ""}
 					width={item.imageMediaMetadata?.width}

@@ -31,8 +31,10 @@ export default function GoogleDriveEventShare({
 	useEffect(() => {
 		if (current) {
 			setShared(current.shared ?? false);
+
 			setShareUrl(
 				window?.location?.origin +
+					(router.locale ? `/${router.locale}` : "") +
 					router.pathname +
 					"/" +
 					FromEmailAndFolderTooBase64(email, current.id as string)

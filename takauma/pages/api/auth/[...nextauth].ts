@@ -2,7 +2,6 @@ import { JWT } from "next-auth/jwt";
 import NextAuth, { Session, User } from "next-auth";
 import Providers from "next-auth/providers";
 import AWS from "aws-sdk";
-import { DynamoDBAdapter } from "@next-auth/dynamodb-adapter";
 import { dynamo } from "../../../lib/dynamo-db";
 
 AWS.config.update({

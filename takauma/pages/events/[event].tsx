@@ -6,7 +6,6 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { PageProps } from "../../common/types";
 import { GetGoogleDriveFolderById } from "../../lib/googledrive";
 import { drive_v3 } from "googleapis";
-import { useRouter } from "next/router";
 import EventNotFound from "../../components/eventnotfound";
 import GoogleDriveUpload from "../../components/googledrive-upload";
 import { dynamo } from "../../lib/dynamo-db";
@@ -59,7 +58,8 @@ export const getServerSideProps: GetServerSideProps<{
 					? await GetGoogleDriveFolderById(
 							user.accessToken,
 							user.refreshToken,
-							folderid as string
+							folderid as string,
+							true
 					  )
 					: null,
 		},

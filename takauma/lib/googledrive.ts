@@ -2,7 +2,8 @@ import path from "path";
 import { drive_v3, google } from "googleapis";
 import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
-
+import NodeCache from "node-cache";
+const cache = new NodeCache();
 /**
  * Create new instance of google drive with auth tokens to authenticate it
  * @param accessToken
@@ -65,22 +66,15 @@ export const DeleteGoogleDriveFolder = async (
 		);
 
 		console.log("DeleteGoogleDriveFolder Deleting folder");
-		let insufficient = false;
-		try {
-			const deleteResult = await drive.files.delete({
-				fileId: folderId,
-			});
-			console.log(
-				"DeleteGoogleDriveFolder Deleting folder Status",
-				deleteResult.status
-			);
-			if (deleteResult.status != 204) insufficient = true;
-		} catch (error) {
-			console.log("DeleteGoogleDriveFolder Deleting folder error", error);
-			insufficient = true;
-		}
 
-		return true;
+		const deleteResult = await drive.files.delete({
+			fileId: folderId,
+		});
+		console.log(
+			"DeleteGoogleDriveFolder Deleting folder Status",
+			deleteResult.status
+		);
+		return deleteResult.status === 200;
 	} catch (error) {
 		console.log("DeleteGoogleDriveFolder error", error);
 		return false;
@@ -415,10 +409,25 @@ export const GetGoogleDriveFolderByName = async (
 export const GetGoogleDriveFolderById = async (
 	accessToken: string,
 	refreshToken: string,
-	folderId: string
+	folderId: string,
+	useCache: boolean = false
 ): Promise<drive_v3.Schema$File | null> => {
 	try {
 		if (folderId == "") return null;
+		if (useCache) {
+			console.log(
+				"GetGoogleDriveFolderById getting folder from cache if found"
+			);
+			const folderFromCache = cache.get<drive_v3.Schema$File>(
+				`GetGoogleDriveFolderById(${folderId})`
+			);
+			if (folderFromCache) {
+				console.log(
+					"GetGoogleDriveFolderById Found folder from cache, returning it"
+				);
+				return folderFromCache;
+			}
+		}
 
 		console.log(
 			"GetGoogleDriveFolderById Getting folder by id from Google Drive"
@@ -455,10 +464,16 @@ export const GetGoogleDriveFolderById = async (
 			);
 		}
 
-		return {
+		const result = {
 			...folder,
 			shared: isShared,
 		};
+
+		if (useCache) {
+			console.log("GetGoogleDriveFolderById Saving folder to cache");
+			cache.set(`GetGoogleDriveFolderById(${folderId})`, result, 90);
+		}
+		return result;
 	} catch (error) {
 		console.log("GetGoogleDriveFolderById error", error);
 		return null;

@@ -9,6 +9,7 @@
 		"lint": "next lint"
 	},
 	"dependencies": {
+		"@vercel/analytics": "^1.0.2",
 		"aws-sdk": "^2.1030.0",
 		"colcade": "^0.2.0",
 		"formidable": "^2.0.1",
@@ -18,16 +19,16 @@
 		"next-i18next": "^9.1.0",
 		"node-cache": "^5.1.2",
 		"photoswipe": "5.3.8",
+		"prop-types": "15.8.1",
 		"react": "^17",
-		"react-dom": "^17",
 		"react-device-detect": "^2.1.2",
+		"react-dom": "^17",
 		"react-image-file-resizer": "^0.4.7",
 		"react-photoswipe-gallery": "2.2.7",
 		"react-scroll-parallax": "3.4.2",
 		"react-toastify": "^8.1.0",
 		"sanitize-filename": "^1.6.3",
-		"uuid": "^8.3.2",
-		"prop-types": "15.8.1"
+		"uuid": "^8.3.2"
 	},
 	"devDependencies": {
 		"@types/formidable": "^2.0.0",

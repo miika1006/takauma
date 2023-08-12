@@ -4,6 +4,7 @@ import type { AppProps } from "next/app";
 import React, { useEffect } from "react";
 import { ToastContainer } from "react-toastify";
 import PageLoadBar from "../components/page-loadbar";
+import { Analytics } from "@vercel/analytics/react";
 
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/globals.css";
@@ -58,6 +59,7 @@ const Comp = ({ Component, pageProps }: AppProps) => {
 			<PageLoadBar />
 			<ToastContainer closeOnClick={false} />
 			<Component {...pageProps} />
+			<Analytics />
 		</>
 	);
 };

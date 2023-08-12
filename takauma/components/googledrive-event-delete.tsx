@@ -61,10 +61,11 @@ export default function GoogleDriveEventDelete({
 					response.statusText +
 					" " +
 					(await response.text());
-				showErrorToast(t, errormsg, t("foldermaycontain"));
+				showErrorToast(t, errormsg, t("foldermaycontain"), t("deletefailed"));
 				console.error(
 					"onDelete error",
-					`${t("foldermaycontain")} [${errormsg}]`
+					`${t("foldermaycontain")} [${errormsg}]`,
+					t("deletefailed")
 				);
 			}
 			console.log("onDelete response", response);
@@ -72,7 +73,8 @@ export default function GoogleDriveEventDelete({
 			console.error("onDelete error", error);
 			showErrorToast(
 				t,
-				error instanceof Error ? error.message : "delete error"
+				error instanceof Error ? error.message : "delete error",
+				t("deletefailed")
 			);
 		} finally {
 			setLoading(false);

@@ -165,7 +165,7 @@ export default function GoogleDriveUploadForm({
 		}
 	};
 	return (
-		<>
+		<div className={styles.uploadcontainer}>
 			<div className={styles.uploadqueue}>
 				{images?.map((image, idx) => (
 					<img
@@ -210,6 +210,6 @@ export default function GoogleDriveUploadForm({
 					</details>
 				</form>
 			)}
-		</>
+		</div>
 	);
 }

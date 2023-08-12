@@ -70,3 +70,10 @@
 	margin: -0.5em -0.5em 0;
 	padding: 0.5em;
 }
+.uploadcontainer {
+	position: sticky;
+	bottom: 0;
+	background-color: rgb(254 255 248 / 90%);
+	padding: 1em;
+	padding-top: 0;
+}

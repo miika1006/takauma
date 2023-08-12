@@ -25,7 +25,7 @@ interface Colcade {
 	reload: () => void;
 }
 export default function Slider({ t, items }: SliderProps) {
-	const [colcade, setColcade] = useState<Colcade | null>(null);
+	const colcade = useRef<Colcade | null>(null);
 	const timer = useRef<number | null>(null);
 	useEffect(() => {
 		const loadColcade = async () => {
@@ -34,31 +34,31 @@ export default function Slider({ t, items }: SliderProps) {
 			);
 
 			// selector string as first argument
-			setColcade(
-				new Colcade(`.${styles.grid}`, {
-					columns: `.${styles.gridcol}`,
-					items: `.${styles.griditem}`,
-				})
-			);
+
+			colcade.current = new Colcade(`.${styles.grid}`, {
+				columns: `.${styles.gridcol}`,
+				items: `.${styles.griditem}`,
+			});
 		};
-		if (!isMobile && colcade === null && items.length > 0) loadColcade();
-	}, [items, colcade]);
+		if (!isMobile && colcade.current === null && items.length > 0)
+			loadColcade();
+	}, [items]);
 
 	useEffect(() => {
 		if (isMobile) return;
 		if (timer.current) window.clearTimeout(timer.current);
 
 		timer.current = window.setTimeout(() => {
-			if (colcade && items && items.length > 0) {
+			if (colcade.current && items && items.length > 0) {
 				console.log("reloading colcade");
-				colcade.reload();
+				colcade.current.reload();
 			}
 		}, 2000);
 
 		return () => {
 			if (timer.current) window.clearTimeout(timer.current);
 		};
-	}, [colcade, items]);
+	}, [items]);
 
 	return items.length > 0 ? (
 		isMobile ? (

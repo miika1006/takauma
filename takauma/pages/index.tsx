@@ -7,6 +7,7 @@ import { PageProps } from "../common/types";
 import styles from "../styles/index.module.css";
 import { Parallax, ParallaxProvider } from "react-scroll-parallax";
 import { signIn } from "next-auth/client";
+import coverImageSrc from "/public/images/metsa2.jpeg";
 
 export default function Page({ locale }: PageProps) {
 	const { t } = useTranslation("common");
@@ -17,9 +18,12 @@ export default function Page({ locale }: PageProps) {
 			<Layout t={t} locale={locale}>
 				<Parallax translateY={[-40, 40]} className={styles.coverimage}>
 					<Image
-						src="/images/metsa2.jpeg"
+						src={coverImageSrc}
 						width={2048}
 						height={1367}
+						placeholder="blur"
+						priority
+						layout="fill"
 						alt="Metsä kansikuva"
 					/>
 				</Parallax>

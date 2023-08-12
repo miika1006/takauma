@@ -1,9 +1,9 @@
-import React, { useEffect } from "react";
-import { getSession, signout, useSession } from "next-auth/client";
+import React from "react";
+import { getSession, useSession } from "next-auth/client";
 import Layout from "../../components/layout";
 import AccessDenied from "../../components/access-denied";
 import { Session } from "next-auth";
-import { GetServerSideProps, GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { PageProps } from "../../common/types";
@@ -11,19 +11,9 @@ import GoogleDriveEvent from "../../components/googledrive-event";
 import { dynamo } from "../../lib/dynamo-db";
 
 export interface EventPageProps {}
-export default function Page({
-	locale,
-	shouldSingOut,
-}: PageProps & EventPageProps) {
+export default function Page({ locale }: PageProps & EventPageProps) {
 	const { t } = useTranslation("common");
 	const [session, loading] = useSession();
-
-	useEffect(() => {
-		if (shouldSingOut) {
-			console.log("Signing out");
-			signout();
-		}
-	});
 
 	// When rendering client side don't display anything until loading is complete
 	if (typeof window !== "undefined" && loading) return null;

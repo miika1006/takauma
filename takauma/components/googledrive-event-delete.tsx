@@ -35,6 +35,7 @@ export default function GoogleDriveEventDelete({
 	) => {
 		try {
 			e.preventDefault();
+			if (!window.confirm(t("areyousure"))) return;
 			console.log("deleting folder", folder);
 			setLoading(true);
 			const response = await fetch("/api/folder", {

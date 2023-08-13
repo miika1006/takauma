@@ -1,10 +1,7 @@
 import { drive_v3 } from "googleapis";
 import { TFunction } from "next-i18next";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import useLoadingIndicator from "../common/hooks/loading-indicator";
-import styles from "../styles/googledriveupload.module.css";
-import Slider, { SliderItem } from "./slider";
-import Loading from "../components/loading";
 import GoogleDriveUploadForm from "./googledrive-upload-form";
 import GoogleDriveUploadFiles from "./googledrive-upload-files";
 
@@ -20,7 +17,7 @@ export default function GoogleDriveUpload({
 	email,
 }: GoogleDriveUploadProps) {
 	const [driveFiles, setDriveFiles] = useState<drive_v3.Schema$File[]>([]);
-
+	const [loading, setLoading] = useLoadingIndicator(false, 1);
 	return (
 		<>
 			<GoogleDriveUploadFiles
@@ -29,12 +26,15 @@ export default function GoogleDriveUpload({
 				email={email}
 				files={driveFiles}
 				refresh={setDriveFiles}
+				loading={loading}
 			/>
 			<GoogleDriveUploadForm
 				t={t}
 				defaultOpen={driveFiles.length === 0}
 				folder={folder}
 				email={email}
+				loading={loading}
+				setLoading={setLoading}
 				add={(file) => setDriveFiles((currentFiles) => [...currentFiles, file])}
 			/>
 		</>

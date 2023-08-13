@@ -1,7 +1,6 @@
 import { drive_v3 } from "googleapis";
 import { TFunction } from "next-i18next";
 import React, { useEffect, useRef, useState } from "react";
-import useLoadingIndicator from "../common/hooks/loading-indicator";
 import { showErrorToast } from "../components/toast";
 import styles from "../styles/googledriveupload-form.module.css";
 import Loading from "./loading";
@@ -15,6 +14,8 @@ interface GoogleDriveUploadFormProps {
 	email: string;
 	add: (file: drive_v3.Schema$File) => void;
 	defaultOpen: boolean;
+	loading: boolean;
+	setLoading: (loading: boolean) => void;
 }
 
 interface ImageSelect {
@@ -29,8 +30,9 @@ export default function GoogleDriveUploadForm({
 	email,
 	add,
 	defaultOpen,
+	loading,
+	setLoading,
 }: GoogleDriveUploadFormProps) {
-	const [loading, setLoading] = useLoadingIndicator(false, 1);
 	const [resizing, setResizing] = useState<boolean>(false);
 	const [formOpened, setFormOpened] = useState<boolean>(defaultOpen);
 	const [images, setImages] = useState<ImageSelect[] | null>(null);

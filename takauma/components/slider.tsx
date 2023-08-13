@@ -1,13 +1,17 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { TFunction } from "next-i18next";
 import "photoswipe/dist/photoswipe.css";
 import styles from "../styles/slider.module.css";
 import { Gallery, Item } from "react-photoswipe-gallery";
 import { isMobile } from "react-device-detect";
 import usePrevious from "../common/hooks/use-previous";
-import ReactDOMServer from "react-dom/server";
 
 interface SliderProps {
+	t: TFunction;
+	items: SliderItem[];
+	loading: boolean;
+}
+interface ImageGalleryProps {
 	t: TFunction;
 	items: SliderItem[];
 }
@@ -31,17 +35,23 @@ interface Colcade {
 	append: (items: any[]) => void;
 	prepend: (items: any[]) => void;
 }
-function htmlToElement(html: string) {
-	var template = document.createElement("template");
-	html = html.trim();
-	template.innerHTML = html;
-	return template.content.firstChild;
-}
-export default function Slider({ t, items }: SliderProps) {
-	const [initialItems, setInitialItems] = useState<SliderItem[]>(items);
+export default function Slider({ t, items, loading }: SliderProps) {
 	const colcade = useRef<Colcade | null>(null);
-	const timer = useRef<number | null>(null);
-	const previousItems = usePrevious<SliderItem[]>(items);
+	const previousLoading = usePrevious<boolean>(loading);
+
+	useLayoutEffect(() => {
+		if (
+			!isMobile &&
+			previousLoading === true &&
+			loading === false &&
+			colcade.current &&
+			items.length > 0
+		) {
+			console.log("Reloading colcade");
+			colcade.current.reload();
+		}
+	}, [items, loading, previousLoading]);
+
 	useEffect(() => {
 		const loadColcade = async () => {
 			const Colcade: any = await import("colcade").then(
@@ -55,43 +65,9 @@ export default function Slider({ t, items }: SliderProps) {
 				items: `.${styles.griditem}`,
 			});
 		};
-		if (previousItems?.length === 0) setInitialItems(items);
 		if (!isMobile && colcade.current === null && items.length > 0)
 			loadColcade();
-	}, [items, previousItems?.length]);
-
-	useEffect(() => {
-		if (isMobile) return;
-		if (timer.current) window.clearTimeout(timer.current);
-
-		timer.current = window.setTimeout(() => {
-			if (colcade.current && items && items.length > 0) {
-				const newItems = items
-					.filter(
-						(newItem) =>
-							!(previousItems ?? []).some(
-								(previousItem) =>
-									previousItem.id === newItem.id &&
-									previousItem.thumbnailLink === newItem.thumbnailLink
-							)
-					)
-					.map((i) =>
-						htmlToElement(
-							ReactDOMServer.renderToStaticMarkup(
-								<ImageItem key={`photo_${i.id}_${i.thumbnailLink}`} item={i} />
-							)
-						)
-					);
-				console.log("appending items to colcade", newItems);
-
-				colcade.current.append(newItems);
-			}
-		}, 100);
-
-		return () => {
-			if (timer.current) window.clearTimeout(timer.current);
-		};
-	}, [items, previousItems]);
+	}, [items]);
 
 	return isMobile ? (
 		<ImageGallery t={t} items={items} />
@@ -101,7 +77,7 @@ export default function Slider({ t, items }: SliderProps) {
 			<div className={styles.gridcol + " " + styles.gridcoltwo}></div>
 			<div className={styles.gridcol + " " + styles.gridcolthree}></div>
 			<div className={styles.gridcol + " " + styles.gridcolfour}></div>
-			<ImageGallery t={t} items={initialItems} />
+			<ImageGallery t={t} items={items} />
 		</div>
 	);
 }
@@ -127,7 +103,7 @@ export function ImageItem({ item }: ImageItemProps) {
 	);
 }
 
-export function ImageGallery({ t, items }: SliderProps) {
+export function ImageGallery({ t, items }: ImageGalleryProps) {
 	return (
 		<Gallery
 			id="photo-gallery"

@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef } from "react";
 import { TFunction } from "next-i18next";
 import "photoswipe/dist/photoswipe.css";
 import styles from "../styles/slider.module.css";
@@ -84,7 +84,6 @@ export default function Slider({ t, items, loading }: SliderProps) {
 export function ImageItem({ item }: ImageItemProps) {
 	return (
 		<Item
-			id={item.id ?? ""}
 			original={item.webContentLink ?? ""}
 			thumbnail={item.thumbnailLink ?? ""}
 			width={item.imageMediaMetadata?.width}
@@ -106,7 +105,6 @@ export function ImageItem({ item }: ImageItemProps) {
 export function ImageGallery({ t, items }: ImageGalleryProps) {
 	return (
 		<Gallery
-			id="photo-gallery"
 			options={{
 				closeTitle: t("close"),
 				zoomTitle: t("zoom"),

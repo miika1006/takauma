@@ -2,11 +2,11 @@ import { drive_v3 } from "googleapis";
 import { TFunction } from "next-i18next";
 import { useEffect, useState } from "react";
 import useLoadingIndicator from "../common/hooks/loading-indicator";
-import Loading from "../components/loading";
 import { FromEmailAndFolderTooBase64 } from "../lib/event";
 import styles from "../styles/googledriveupload-files.module.css";
 import Slider, { SliderItem } from "./slider";
 import { showErrorToast } from "./toast";
+import usePrevious from "../common/hooks/use-previous";
 
 interface GoogleDriveUploadFilesProps {
 	t: TFunction;
@@ -14,6 +14,7 @@ interface GoogleDriveUploadFilesProps {
 	files: drive_v3.Schema$File[];
 	refresh: (folders: drive_v3.Schema$File[]) => void;
 	email: string;
+	loading: boolean;
 }
 
 export default function GoogleDriveUploadFiles({
@@ -22,14 +23,16 @@ export default function GoogleDriveUploadFiles({
 	files,
 	refresh,
 	email,
+	loading,
 }: GoogleDriveUploadFilesProps) {
-	const [loading, setLoading] = useLoadingIndicator(true, 1);
+	const prevFolder = usePrevious<drive_v3.Schema$File>(folder);
+	const [loadingFiles, setLoadingFiles] = useLoadingIndicator(true, 1);
 
 	useEffect(() => {
 		const getFiles = async (eventName: string) => {
 			try {
 				if (eventName === "") return;
-				setLoading(true);
+				setLoadingFiles(true);
 				const event = FromEmailAndFolderTooBase64(email, folder.id as string);
 				const response = await fetch(`/api/file/${event}`, {
 					headers: {
@@ -56,16 +59,26 @@ export default function GoogleDriveUploadFiles({
 					error instanceof Error ? error.message : "get files error"
 				);
 			} finally {
-				setLoading(false);
+				setLoadingFiles(false);
 			}
 		};
 
-		if (folder && folder.name) getFiles(folder.name);
-	}, [email, folder, folder.name, refresh, setLoading, t]);
+		if (folder && folder.name && prevFolder?.name !== folder.name)
+			getFiles(folder.name);
+	}, [
+		email,
+		folder,
+		folder.name,
+		prevFolder?.name,
+		refresh,
+		setLoadingFiles,
+		t,
+	]);
 
 	return (
 		<div className={styles.event}>
 			<Slider
+				loading={loadingFiles || loading}
 				t={t}
 				items={files.map((f) => {
 					const item: SliderItem = {
@@ -80,8 +93,6 @@ export default function GoogleDriveUploadFiles({
 					return item;
 				})}
 			/>
-
-			{loading && <Loading />}
 		</div>
 	);
 }

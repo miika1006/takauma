@@ -180,7 +180,7 @@ export default function GoogleDriveUploadForm({
 					type="button"
 					onClick={() => setFormOpened((c) => !c)}
 				>
-					{t<string>("upload_photos")}
+					{t<string>("upload_photos")} {loading && <Loading />}
 				</button>
 			)}
 			{formOpened && (

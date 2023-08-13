@@ -92,5 +92,6 @@
 	"ready_for_send": "photos ready to be sent.",
 	"select_photos_from_your_device": "Select photos from your device",
 	"sending": "Sending",
-	"resizing": "Resizing photos"
+	"resizing": "Resizing photos",
+	"areyousure": "Are you sure?"
 }

@@ -92,5 +92,6 @@
 	"ready_for_send": "kuvaa valmiina lähetystä varten.",
 	"select_photos_from_your_device": "Valitse kuvia laitteeltasi",
 	"sending": "Lähetetään",
-	"resizing": "Pienennetään kuvia"
+	"resizing": "Pienennetään kuvia",
+	"areyousure": "Oletko varma?"
 }

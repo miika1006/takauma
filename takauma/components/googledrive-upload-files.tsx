@@ -86,8 +86,8 @@ export default function GoogleDriveUploadFiles({
 						thumbnailLink: f.thumbnailLink,
 						webContentLink: f.webContentLink,
 						imageMediaMetadata: {
-							width: f.imageMediaMetadata?.width ?? 0,
-							height: f.imageMediaMetadata?.height ?? 0,
+							width: f.imageMediaMetadata?.width || undefined,
+							height: f.imageMediaMetadata?.height || undefined,
 						},
 					};
 					return item;

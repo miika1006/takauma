@@ -1,4 +1,4 @@
-import { TFunction } from "next-i18next";
+import { TFunction } from "../common/types";
 import { toast } from "react-toastify";
 import styles from "../styles/toast.module.css";
 interface ToastProps {
@@ -36,11 +36,11 @@ export const showErrorToast = (
 export default function Toast({ t, title, message, error }: ToastProps) {
 	return (
 		<div className={styles.toast}>
-			<h2>{title ?? t<string>("woops")}</h2>
+			<h2>{title ?? t("woops")}</h2>
 			{message && <p>{message}</p>}
 			{error && (
 				<details>
-					<summary>{t<string>("errordetails")}</summary>
+					<summary>{t("errordetails")}</summary>
 					<p>{error}</p>
 				</details>
 			)}

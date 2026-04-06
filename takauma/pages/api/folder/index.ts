@@ -6,7 +6,8 @@ import {
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import sanitize from "sanitize-filename";
-import { getSession } from "next-auth/client";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../auth/[...nextauth]";
 
 type CreateData = {
 	name: string;
@@ -18,7 +19,7 @@ export default async function protectedHandler(
 	req: NextApiRequest,
 	res: NextApiResponse
 ) {
-	const session = await getSession({ req });
+	const session = await getServerSession(req, res, authOptions);
 
 	if (session) {
 		//Get list of folders

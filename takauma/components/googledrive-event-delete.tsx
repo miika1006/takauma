@@ -1,5 +1,5 @@
 import { drive_v3 } from "googleapis";
-import { TFunction } from "next-i18next";
+import { TFunction } from "../common/types";
 import { useEffect } from "react";
 import useLoadingIndicator from "../common/hooks/loading-indicator";
 import Loading from "../components/loading";
@@ -84,6 +84,6 @@ export default function GoogleDriveEventDelete({
 	return loading ? (
 		<Loading />
 	) : (
-		<button onClick={deleteEvent}>{t<string>("delete")}</button>
+		<button onClick={deleteEvent}>{t("delete")}</button>
 	);
 }

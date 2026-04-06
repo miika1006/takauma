@@ -1,12 +1,12 @@
-import { signIn } from "next-auth/client";
-import { TFunction } from "next-i18next";
+import { signIn } from "next-auth/react";
+import { TFunction } from "../common/types";
 interface AccessDeniedProps {
 	t: TFunction;
 }
 export default function AccessDenied({ t }: AccessDeniedProps) {
 	return (
 		<>
-			<h1>{t<string>("accessdenied")}</h1>
+			<h1>{t("accessdenied")}</h1>
 			<p>
 				<a
 					href={`/api/auth/signin`}
@@ -15,7 +15,7 @@ export default function AccessDenied({ t }: AccessDeniedProps) {
 						signIn("google"); //Google, because it is only provider
 					}}
 				>
-					{t<string>("googlesignin")}
+					{t("googlesignin")}
 				</a>
 			</p>
 		</>

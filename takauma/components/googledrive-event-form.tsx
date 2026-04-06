@@ -1,5 +1,5 @@
 import { drive_v3 } from "googleapis";
-import { TFunction } from "next-i18next";
+import { TFunction } from "../common/types";
 import { useState } from "react";
 import useLoadingIndicator from "../common/hooks/loading-indicator";
 import { showErrorToast, showWarningToast } from "../components/toast";
@@ -91,7 +91,7 @@ export default function GoogleDriveEventForm({
 		</div>
 	) : (
 		<form onSubmit={createEvent} className={styles.eventform}>
-			<h2>{t<string>("createnewevent")}</h2>
+			<h2>{t("createnewevent")}</h2>
 			<input
 				type="text"
 				value={createEventName}
@@ -99,7 +99,7 @@ export default function GoogleDriveEventForm({
 				placeholder={t("inputnameofevent")}
 				onChange={(e) => setCreateEventName(e.target.value)}
 			/>
-			<button type="submit">{t<string>("save")}</button>
+			<button type="submit">{t("save")}</button>
 		</form>
 	);
 }

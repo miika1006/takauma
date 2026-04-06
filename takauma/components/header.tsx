@@ -1,13 +1,9 @@
 import Link from "next/link";
 import Head from "next/head";
-import { signIn, signOut, useSession } from "next-auth/client";
+import { signIn, signOut, useSession } from "next-auth/react";
 import styles from "../styles/header.module.css";
-import { TFunction } from "next-i18next";
+import { TFunction } from "../common/types";
 import { useRouter } from "next/router";
-
-// The approach used in this component shows how to built a sign in and sign out
-// component that works on pages which support both client and server side
-// rendering, and avoids any flash incorrect content on initial page load.
 
 interface HeaderProps {
 	t: TFunction;
@@ -17,7 +13,8 @@ interface HeaderProps {
 export default function Header({ t, locale }: HeaderProps) {
 	const router = useRouter();
 
-	const [session, loading] = useSession();
+	const { data: session, status } = useSession();
+	const loading = status === "loading";
 
 	return (
 		<header
@@ -81,27 +78,25 @@ export default function Header({ t, locale }: HeaderProps) {
 								}`}
 							>
 								{!session && (
-									<>
-										<a
-											href={`/api/auth/signin`}
-											className={styles.buttonPrimary}
-											onClick={(e) => {
-												e.preventDefault();
-												signIn("google", {
-													callbackUrl: window.location.origin + "/events",
-												}); //Google, because it is only provider
-											}}
-										>
-											{t<string>("googlesignin")}
-										</a>
-									</>
+									<a
+										href={`/api/auth/signin`}
+										className={styles.buttonPrimary}
+										onClick={(e) => {
+											e.preventDefault();
+											signIn("google", {
+												callbackUrl: window.location.origin + "/events",
+											});
+										}}
+									>
+										{t("googlesignin")}
+									</a>
 								)}
 								{session?.user && (
 									<>
 										<span
 											className={styles.signedInText + " " + styles.specialtext}
 										>
-											<small>{t<string>("signedinas")}</small>
+											<small>{t("signedinas")}</small>
 											<br />
 											<strong>{session.user.email || session.user.name}</strong>
 										</span>
@@ -113,7 +108,7 @@ export default function Header({ t, locale }: HeaderProps) {
 												signOut();
 											}}
 										>
-											{t<string>("signout")}
+											{t("signout")}
 										</a>
 									</>
 								)}
@@ -125,39 +120,31 @@ export default function Header({ t, locale }: HeaderProps) {
 						<>
 							{router.route !== "/" && (
 								<li className={styles.navItem}>
-									<Link href="/">
-										<a>{t<string>("home")}</a>
-									</Link>
+									<Link href="/">{t("home")}</Link>
 								</li>
 							)}
 							{session && (
 								<li className={styles.navItem}>
-									<Link href="/events">
-										<a>{t<string>("eventstitle")}</a>
-									</Link>
+									<Link href="/events">{t("eventstitle")}</Link>
 								</li>
 							)}
 						</>
 
 						<li className={styles.navItemRight}>
-							<Link href={router.asPath} locale={"fi"}>
-								<a
-									className={
-										locale === "fi" ? styles.boldtext : styles.normaltext
-									}
-								>
-									Suomi
-								</a>
+							<Link
+								href={router.asPath}
+								locale={"fi"}
+								className={locale === "fi" ? styles.boldtext : styles.normaltext}
+							>
+								Suomi
 							</Link>
 							&nbsp;|&nbsp;
-							<Link href={router.asPath} locale={"en"}>
-								<a
-									className={
-										locale === "en" ? styles.boldtext : styles.normaltext
-									}
-								>
-									English
-								</a>
+							<Link
+								href={router.asPath}
+								locale={"en"}
+								className={locale === "en" ? styles.boldtext : styles.normaltext}
+							>
+								English
 							</Link>
 						</li>
 					</ul>

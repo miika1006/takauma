@@ -1,5 +1,5 @@
 import { drive_v3 } from "googleapis";
-import { TFunction } from "next-i18next";
+import { TFunction } from "../common/types";
 import { useState } from "react";
 import useLoadingIndicator from "../common/hooks/loading-indicator";
 import GoogleDriveUploadForm from "./googledrive-upload-form";

@@ -6,7 +6,7 @@ import { GetServerSideProps } from "next";
 import { PageProps } from "../common/types";
 import styles from "../styles/index.module.css";
 import { Parallax, ParallaxProvider } from "react-scroll-parallax";
-import { signIn } from "next-auth/client";
+import { signIn } from "next-auth/react";
 import coverImageSrc from "/public/images/metsa2.jpeg";
 
 export default function Page({ locale }: PageProps) {
@@ -19,12 +19,11 @@ export default function Page({ locale }: PageProps) {
 				<Parallax translateY={[-40, 40]} className={styles.coverimage}>
 					<Image
 						src={coverImageSrc}
-						width={2048}
-						height={1367}
+						fill
 						placeholder="blur"
 						priority
-						layout="fill"
 						alt="Metsä kansikuva"
+						style={{ objectFit: "cover" }}
 					/>
 				</Parallax>
 

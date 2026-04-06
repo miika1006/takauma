@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef } from "react";
-import { TFunction } from "next-i18next";
+import { TFunction } from "../common/types";
 import "photoswipe/dist/photoswipe.css";
 import styles from "../styles/slider.module.css";
 import { Gallery, Item } from "react-photoswipe-gallery";
@@ -93,7 +93,7 @@ export function ImageItem({ item }: ImageItemProps) {
 				<img
 					className={styles.griditem}
 					alt={`photo_${item.id}_${item.thumbnailLink}_thumb`}
-					ref={ref as React.RefObject<HTMLImageElement>}
+					ref={ref as React.Ref<HTMLImageElement>}
 					onClick={open}
 					src={item.thumbnailLink ?? ""}
 				/>

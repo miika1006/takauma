@@ -1,7 +1,7 @@
 import Header from "./header";
 import Footer from "./footer";
 import styles from "../styles/layout.module.css";
-import { TFunction } from "next-i18next";
+import { TFunction } from "../common/types";
 interface LayoutProps {
 	children: React.ReactNode;
 	t: TFunction;

@@ -1,4 +1,4 @@
-import { TFunction } from "next-i18next";
+import { TFunction } from "../common/types";
 import Link from "next/link";
 import styles from "../styles/contact.module.css";
 
@@ -17,10 +17,10 @@ export default function Contact({ t, hideTitle }: ContactProps) {
 	};
 	return (
 		<div>
-			{!hideTitle && <h2>{t<string>("contact")}</h2>}
+			{!hideTitle && <h2>{t("contact")}</h2>}
 			<p>
-				{t<string>("author")}: Miika Mehtälä. &nbsp;
-				{t<string>("apprelatedcontact")}:{" "}
+				{t("author")}: Miika Mehtälä. &nbsp;
+				{t("apprelatedcontact")}:{" "}
 				<a
 					href="#"
 					className={styles.cssmail}

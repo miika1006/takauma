@@ -1,5 +1,5 @@
 import { drive_v3 } from "googleapis";
-import { TFunction } from "next-i18next";
+import { TFunction } from "../common/types";
 import { useEffect, useRef, useState } from "react";
 import useLoadingIndicator from "../common/hooks/loading-indicator";
 import { showErrorToast, showWarningToast } from "../components/toast";
@@ -168,7 +168,7 @@ export default function GoogleDriveEventShare({
 		<div className={styles.share}>
 			<label>
 				<input type="checkbox" checked={shared} onChange={onShare} />
-				{loading ? <Loading /> : t<string>("sharealink")}
+				{loading ? <Loading /> : t("sharealink")}
 			</label>
 
 			{!pending && shared && (
@@ -182,21 +182,21 @@ export default function GoogleDriveEventShare({
 					/>
 
 					<div className={styles.shareoptionsmobile}>
-						<button onClick={shareToMobile}>{t<string>("sharelink")}</button>
+						<button onClick={shareToMobile}>{t("sharelink")}</button>
 						<a
 							href={shareUrl}
 							target="_blank"
 							rel="noopener noreferrer"
 							className="button"
 						>
-							{t<string>("opensharelinkinfo")}
+							{t("opensharelinkinfo")}
 						</a>
 					</div>
 					<div className={styles.shareoptionsdesktop}>
 						<button onClick={copySharelinkToClipboard}>
 							{copysuccess
-								? t<string>("copysuccesss")
-								: t<string>("copytoclipboard")}
+								? t("copysuccesss")
+								: t("copytoclipboard")}
 						</button>
 						<a
 							href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
@@ -206,7 +206,7 @@ export default function GoogleDriveEventShare({
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							{t<string>("sharetowhatsapp")}
+							{t("sharetowhatsapp")}
 						</a>
 						<a
 							href={`mailto:?subject=Takauma ${current?.name ?? ""}&body=${t(
@@ -214,7 +214,7 @@ export default function GoogleDriveEventShare({
 							)} ${shareUrl}.`}
 							className="button"
 						>
-							{t<string>("sharebyemail")}
+							{t("sharebyemail")}
 						</a>
 						<a
 							href={shareUrl}
@@ -222,7 +222,7 @@ export default function GoogleDriveEventShare({
 							rel="noopener noreferrer"
 							className="button"
 						>
-							{t<string>("opensharelinkinfo")}
+							{t("opensharelinkinfo")}
 						</a>
 					</div>
 				</>

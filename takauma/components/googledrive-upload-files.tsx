@@ -1,5 +1,5 @@
 import { drive_v3 } from "googleapis";
-import { TFunction } from "next-i18next";
+import { TFunction } from "../common/types";
 import { useEffect, useState } from "react";
 import useLoadingIndicator from "../common/hooks/loading-indicator";
 import { FromEmailAndFolderTooBase64 } from "../lib/event";

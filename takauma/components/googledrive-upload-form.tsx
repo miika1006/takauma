@@ -1,5 +1,5 @@
 import { drive_v3 } from "googleapis";
-import { TFunction } from "next-i18next";
+import { TFunction } from "../common/types";
 import React, { useEffect, useRef, useState } from "react";
 import { showErrorToast } from "../components/toast";
 import styles from "../styles/googledriveupload-form.module.css";
@@ -180,7 +180,7 @@ export default function GoogleDriveUploadForm({
 					type="button"
 					onClick={() => setFormOpened((c) => !c)}
 				>
-					{t<string>("upload_photos")} {loading && <Loading />}
+					{t("upload_photos")} {loading && <Loading />}
 				</button>
 			)}
 			{formOpened && (
@@ -196,8 +196,8 @@ export default function GoogleDriveUploadForm({
 						))}
 						<br />
 						{images?.length ?? 0}{" "}
-						{loading ? t<string>("sending") : t<string>("ready_for_send")}{" "}
-						{resizing && t<string>("resizing")}
+						{loading ? t("sending") : t("ready_for_send")}{" "}
+						{resizing && t("resizing")}
 					</div>
 					{loading || resizing ? (
 						<div className={styles.uploadform}>
@@ -209,7 +209,7 @@ export default function GoogleDriveUploadForm({
 								htmlFor="photo-upload-field"
 								className={"button " + styles.fileuploadselect}
 							>
-								{t<string>("select_photos_from_your_device")}
+								{t("select_photos_from_your_device")}
 							</label>
 							<input
 								type="file"
@@ -219,13 +219,13 @@ export default function GoogleDriveUploadForm({
 								ref={fileInputRef}
 								onChange={setToPagePreview}
 							/>
-							<button type="submit">{t<string>("upload")}</button>
+							<button type="submit">{t("upload")}</button>
 
 							<details className={styles.helpdetails}>
-								<summary>{t<string>("do_you_need_help")}</summary>
-								<h4>{t<string>("selectimages")}</h4>
+								<summary>{t("do_you_need_help")}</summary>
+								<h4>{t("selectimages")}</h4>
 								<p>
-									<small>{t<string>("selectimages_desc")}</small>
+									<small>{t("selectimages_desc")}</small>
 								</p>
 							</details>
 						</form>

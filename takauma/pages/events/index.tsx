@@ -1,5 +1,7 @@
 import React from "react";
-import { getSession, useSession } from "next-auth/client";
+import { getServerSession } from "next-auth/next";
+import { useSession } from "next-auth/react";
+import { authOptions } from "../api/auth/[...nextauth]";
 import Layout from "../../components/layout";
 import AccessDenied from "../../components/access-denied";
 import { Session } from "next-auth";
@@ -13,7 +15,8 @@ import { dynamo } from "../../lib/dynamo-db";
 export interface EventPageProps {}
 export default function Page({ locale }: PageProps & EventPageProps) {
 	const { t } = useTranslation("common");
-	const [session, loading] = useSession();
+	const { data: session, status } = useSession();
+	const loading = status === "loading";
 
 	// When rendering client side don't display anything until loading is complete
 	if (typeof window !== "undefined" && loading) return null;
@@ -41,7 +44,7 @@ export default function Page({ locale }: PageProps & EventPageProps) {
 export const getServerSideProps: GetServerSideProps<{
 	session: Session | null;
 }> = async (context) => {
-	const session = await getSession(context);
+	const session = await getServerSession(context.req, context.res, authOptions);
 	return {
 		props: {
 			session: session,

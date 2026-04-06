@@ -1,5 +1,5 @@
 import { drive_v3 } from "googleapis";
-import { TFunction } from "next-i18next";
+import { TFunction } from "../common/types";
 import { useEffect } from "react";
 import useLoadingIndicator from "../common/hooks/loading-indicator";
 import Loading from "../components/loading";
@@ -91,7 +91,7 @@ export default function GoogleDriveEventFolders({
 								<div className={styles.controls}>
 									{folder.name !== current?.name && (
 										<button onClick={() => select(folder)}>
-											{t<string>("select")}
+											{t("select")}
 										</button>
 									)}
 									<GoogleDriveEventDelete

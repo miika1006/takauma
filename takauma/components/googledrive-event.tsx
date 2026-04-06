@@ -1,5 +1,5 @@
 import { drive_v3 } from "googleapis";
-import { TFunction } from "next-i18next";
+import { TFunction } from "../common/types";
 import { useState } from "react";
 import GoogleDriveEventFolders from "./googledrive-event-folders";
 import GoogleDriveEventForm from "./googledrive-event-form";

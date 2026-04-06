@@ -6,6 +6,9 @@ import {
 } from "../../../lib/googledrive";
 import formidable from "formidable";
 import fs from "fs";
+import os from "os";
+import path from "path";
+import sanitize from "sanitize-filename";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { drive_v3 } from "googleapis";
 import { dynamo } from "../../../lib/dynamo-db";
@@ -59,10 +62,11 @@ export default async function handler(
 				})) ?? []
 			);
 		} catch (error) {
-			return res.status(400).send(error);
+			console.error("GET /api/file error", error);
+			return res.status(400).send("Bad request");
 		}
 	} else if (req.method === "POST") {
-		const form = formidable({});
+		const form = formidable({ uploadDir: os.tmpdir(), keepExtensions: true });
 		try {
 			const result = await new Promise<drive_v3.Schema$File | null>(
 				(resolve, reject) => {
@@ -76,15 +80,28 @@ export default async function handler(
 
 						if (!file) return reject(new Error("file is required"));
 
+						// Validate that the temp file path is inside the OS temp directory
+						// to prevent path traversal attacks.
+						const resolvedPath = path.resolve(file.filepath);
+						const resolvedTmp = path.resolve(os.tmpdir());
+						if (!resolvedPath.startsWith(resolvedTmp + path.sep)) {
+							return reject(new Error("Invalid file path"));
+						}
+
+						// Sanitize the user-supplied filename before passing it to Drive.
+						const safeFileName = sanitize(
+							file.originalFilename ?? file.newFilename ?? ""
+						);
+
 						const uploaded = await UploadGoogleDriveFile(
 							user.accessToken,
 							user.refreshToken,
 							folderid as string,
-							file.filepath,
-							file.originalFilename ?? file.newFilename ?? ""
+							resolvedPath,
+							safeFileName
 						);
-						fs.unlink(file.filepath, () => {
-							console.log(`fs.unlink callback ok on file '${file.filepath}'`);
+						fs.unlink(resolvedPath, () => {
+							console.log(`fs.unlink ok on temp file`);
 						});
 						resolve({
 							id: uploaded?.id,
@@ -102,7 +119,8 @@ export default async function handler(
 			);
 			return res.status(201).send(result);
 		} catch (error) {
-			return res.status(400).send(error);
+			console.error("POST /api/file error", error);
+			return res.status(400).send("Bad request");
 		}
 	} else {
 		return res.status(400).send("Invalid method");

@@ -33,6 +33,9 @@
 		"sanitize-filename": "^1.6.3",
 		"uuid": "^10.0.0"
 	},
+	"engines": {
+		"node": ">=24.x"
+	},
 	"devDependencies": {
 		"@types/formidable": "^3.4.0",
 		"@types/react": "^18.3.0",

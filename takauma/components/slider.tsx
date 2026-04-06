@@ -35,6 +35,20 @@ interface Colcade {
 	append: (items: any[]) => void;
 	prepend: (items: any[]) => void;
 }
+
+/**
+ * Build a direct-loadable high-resolution URL for a publicly-shared Google
+ * Drive file.  webContentLink is a download-redirect and cannot be used as
+ * an <img> src (CORS / redirect chain blocks image load in PhotoSwipe).
+ */
+function buildFullSizeUrl(item: SliderItem): string {
+	if (item.id) {
+		return `https://drive.google.com/thumbnail?id=${item.id}&sz=w4000`;
+	}
+	// Fallback: enlarge the thumbnail URL by bumping the size suffix.
+	return item.thumbnailLink?.replace(/=[swh][\d]+(-[a-z]+)*$/, "=s4000") ?? "";
+}
+
 export default function Slider({ t, items, loading }: SliderProps) {
 	const colcade = useRef<Colcade | null>(null);
 	const previousLoading = usePrevious<boolean>(loading);
@@ -58,8 +72,6 @@ export default function Slider({ t, items, loading }: SliderProps) {
 				(module) => module.default
 			);
 
-			// selector string as first argument
-
 			colcade.current = new Colcade(`.${styles.grid}`, {
 				columns: `.${styles.gridcol}`,
 				items: `.${styles.griditem}`,
@@ -82,17 +94,21 @@ export default function Slider({ t, items, loading }: SliderProps) {
 	);
 }
 export function ImageItem({ item }: ImageItemProps) {
+	const fullSizeUrl = buildFullSizeUrl(item);
+	const width = item.imageMediaMetadata?.width || undefined;
+	const height = item.imageMediaMetadata?.height || undefined;
+
 	return (
 		<Item
-			original={item.webContentLink ?? ""}
+			original={fullSizeUrl}
 			thumbnail={item.thumbnailLink ?? ""}
-			width={item.imageMediaMetadata?.width}
-			height={item.imageMediaMetadata?.height}
+			width={width}
+			height={height}
 		>
 			{({ ref, open }) => (
 				<img
 					className={styles.griditem}
-					alt={`photo_${item.id}_${item.thumbnailLink}_thumb`}
+					alt={`photo_${item.id}`}
 					ref={ref as React.Ref<HTMLImageElement>}
 					onClick={open}
 					src={item.thumbnailLink ?? ""}
@@ -114,7 +130,7 @@ export function ImageGallery({ t, items }: ImageGalleryProps) {
 			withDownloadButton={true}
 		>
 			{items.map((item) => (
-				<ImageItem item={item} key={`photo_${item.id}_${item.thumbnailLink}`} />
+				<ImageItem item={item} key={`photo_${item.id}`} />
 			))}
 		</Gallery>
 	);

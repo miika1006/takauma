@@ -120,7 +120,7 @@ export function ImageItem({ item }: ImageItemProps) {
 				<img
 					className={styles.griditem}
 					alt={`photo_${item.id}`}
-					ref={ref as React.Ref<HTMLImageElement>}
+					ref={ref}
 					onClick={open}
 					src={gridUrl}
 				/>

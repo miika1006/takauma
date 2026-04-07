@@ -1,7 +1,7 @@
 import Layout from "../components/layout";
 import Image from "next/image";
-import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next/pages";
+import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import { GetServerSideProps } from "next";
 import { PageProps } from "../common/types";
 import styles from "../styles/index.module.css";

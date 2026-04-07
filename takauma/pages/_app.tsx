@@ -1,5 +1,5 @@
 import { SessionProvider, signIn, signOut, useSession } from "next-auth/react";
-import { appWithTranslation, SSRConfig } from "next-i18next";
+import { appWithTranslation, SSRConfig } from "next-i18next/pages";
 import type { AppProps } from "next/app";
 import React, { useEffect } from "react";
 import { ToastContainer } from "react-toastify";

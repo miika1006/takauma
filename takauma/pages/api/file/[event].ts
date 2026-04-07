@@ -47,8 +47,10 @@ export default async function handler(
 	req: NextApiRequest,
 	res: NextApiResponse
 ) {
-	const { event, fileId } = req.query;
-	const { email, folderid } = FromBase64ToEmailAndFolder(event as string);
+	// Dynamic route params are always strings; query params can be string[].
+	const event = Array.isArray(req.query.event) ? req.query.event[0] : req.query.event;
+	const fileId = Array.isArray(req.query.fileId) ? req.query.fileId[0] : req.query.fileId;
+	const { email, folderid } = FromBase64ToEmailAndFolder(event ?? "");
 
 	if (!folderid) return res.status(404).send("Invalid folderid");
 

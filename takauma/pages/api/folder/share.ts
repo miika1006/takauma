@@ -8,6 +8,8 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]";
 
+const DRIVE_ID_RE = /^[a-zA-Z0-9_-]{10,200}$/;
+
 type ShareData = {
 	folderId: string;
 	share: boolean;
@@ -22,8 +24,10 @@ export default async function protectedHandler(
 		//Update share state for a folder
 		if (req.method === "PUT") {
 			try {
-				//share
 				const request = req.body as ShareData;
+
+				if (!request.folderId || !DRIVE_ID_RE.test(request.folderId))
+					return res.status(400).send("Invalid folderId");
 
 				if (request.share) {
 					//Share folder to the world so photos will be available without login
@@ -53,11 +57,10 @@ export default async function protectedHandler(
 					});
 				}
 			} catch (error) {
-				res.status(400).send(error);
+				console.error("folder share PUT error", error);
+				return res.status(400).send("Bad request");
 			}
-		} else return res.status(403).send("Invalid method");
+		} else return res.status(405).send("Method not allowed");
 	}
-	res.status(403).send({
-		error: "You must sign in.",
-	});
+	return res.status(403).send({ error: "You must sign in." });
 }

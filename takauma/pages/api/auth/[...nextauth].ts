@@ -35,7 +35,13 @@ export const authOptions: NextAuthOptions = {
 				"verified_email:",
 				(profile as { verified_email?: boolean })?.verified_email
 			);
-			return (await dynamo.isBanned(user.email)) === false;
+			try {
+				return (await dynamo.isBanned(user.email)) === false;
+			} catch (error) {
+				// Fail closed: if we cannot verify ban status, deny sign-in.
+				console.error("signIn: failed to check ban status, denying", error);
+				return false;
+			}
 		},
 
 		async jwt({ token, user, account }) {
@@ -58,16 +64,24 @@ export const authOptions: NextAuthOptions = {
 			}
 
 			// If token expired, check if banned
-			if (await dynamo.isBanned(token.email as string)) {
-				console.log(
-					"jwt check",
-					"user is banned, expires now and skipping refresh"
-				);
-				return {
-					...token,
-					accessTokenExpires: Date.now(),
-					error: "Expired",
-				};
+			try {
+				if (await dynamo.isBanned(token.email as string)) {
+					console.log(
+						"jwt check",
+						"user is banned, expires now and skipping refresh"
+					);
+					return {
+						...token,
+						accessTokenExpires: Date.now(),
+						error: "Expired",
+					};
+				}
+			} catch (error) {
+				// If DynamoDB is unreachable we cannot verify ban status.
+				// Return an error token so the session is invalidated rather
+				// than silently allowing a potentially banned user through.
+				console.error("jwt check: failed to check ban status", error);
+				return { ...token, accessTokenExpires: Date.now(), error: "Expired" };
 			}
 
 			// Access token has expired, try to update it
@@ -76,12 +90,17 @@ export const authOptions: NextAuthOptions = {
 			const email = (token.email ?? newJwt.email ?? "") as string;
 			if (email) {
 				console.log("Saving new tokens for user to dynamoDB");
-				dynamo.saveUser({
-					UserEmail: email,
-					IsBanned: false,
-					accessToken: (newJwt.accessToken as string) ?? "",
-					refreshToken: (newJwt.refreshToken as string) ?? "",
-				});
+				try {
+					await dynamo.saveUser({
+						UserEmail: email,
+						IsBanned: false,
+						accessToken: (newJwt.accessToken as string) ?? "",
+						refreshToken: (newJwt.refreshToken as string) ?? "",
+					});
+				} catch (error) {
+					// Non-fatal: token refresh succeeded; log but don't fail the session.
+					console.error("jwt check: failed to save refreshed tokens", error);
+				}
 			}
 
 			return newJwt;
@@ -100,12 +119,16 @@ export const authOptions: NextAuthOptions = {
 		async signIn({ user, account }) {
 			console.log("User signed in", user.email);
 			if (user.email && account) {
-				dynamo.saveUser({
-					UserEmail: user.email,
-					IsBanned: false,
-					accessToken: account.access_token ?? "",
-					refreshToken: account.refresh_token ?? "",
-				});
+				try {
+					await dynamo.saveUser({
+						UserEmail: user.email,
+						IsBanned: false,
+						accessToken: account.access_token ?? "",
+						refreshToken: account.refresh_token ?? "",
+					});
+				} catch (error) {
+					console.error("signIn event: failed to save tokens", error);
+				}
 			}
 		},
 	},
@@ -131,13 +154,13 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
 			refresh_token: (token.refreshToken as string) ?? "",
 		});
 
-		const response = await fetch(
-			"https://oauth2.googleapis.com/token?" + params.toString(),
-			{
-				method: "POST",
-				headers: { "Content-Type": "application/x-www-form-urlencoded" },
-			}
-		);
+		// Params must be in the request body, not the URL — putting client_secret
+		// or refresh_token in the query string would expose them in server logs.
+		const response = await fetch("https://oauth2.googleapis.com/token", {
+			method: "POST",
+			headers: { "Content-Type": "application/x-www-form-urlencoded" },
+			body: params.toString(),
+		});
 
 		const refreshedTokens = await response.json();
 

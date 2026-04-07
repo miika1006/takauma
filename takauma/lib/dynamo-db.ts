@@ -50,18 +50,15 @@ export const dynamo: Dynamo = {
 	isBanned: async (email: string | null | undefined): Promise<boolean> => {
 		if (!email) return false;
 		console.log("Checking if isBanned:true for", email);
-		try {
-			const result = await docClient.send(
-				new GetCommand({
-					TableName: process.env.APP_AWS_TABLE_NAME,
-					Key: { UserEmail: email },
-				})
-			);
-			return result.Item ? (result.Item as AppUser).IsBanned : false;
-		} catch (error) {
-			console.log("DynamoDb.isBanned error", error);
-			return false;
-		}
+		// Do NOT catch here — let the error propagate so callers can fail closed
+		// (deny access) rather than fail open (allow banned users through).
+		const result = await docClient.send(
+			new GetCommand({
+				TableName: process.env.APP_AWS_TABLE_NAME,
+				Key: { UserEmail: email },
+			})
+		);
+		return result.Item ? (result.Item as AppUser).IsBanned : false;
 	},
 
 	setbanUser: async (email: string, isbanned: boolean): Promise<boolean> => {
@@ -84,7 +81,8 @@ export const dynamo: Dynamo = {
 	},
 
 	saveUser: async (user: AppUser): Promise<AppUser | null> => {
-		console.log("Saving user", user);
+		// Log only the email — never log access/refresh tokens.
+		console.log("Saving user", user.UserEmail);
 		try {
 			await docClient.send(
 				new PutCommand({

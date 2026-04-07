@@ -1,6 +1,6 @@
 import { drive_v3 } from "googleapis";
 import { TFunction } from "../common/types";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import useLoadingIndicator from "../common/hooks/loading-indicator";
 import { FromEmailAndFolderTooBase64 } from "../lib/event";
 import styles from "../styles/googledriveupload-files.module.css";
@@ -15,6 +15,8 @@ interface GoogleDriveUploadFilesProps {
 	refresh: (folders: drive_v3.Schema$File[]) => void;
 	email: string;
 	loading: boolean;
+	/** Increment this value to force a re-fetch from the Drive API. */
+	refreshTrigger?: number;
 }
 
 export default function GoogleDriveUploadFiles({
@@ -24,56 +26,56 @@ export default function GoogleDriveUploadFiles({
 	refresh,
 	email,
 	loading,
+	refreshTrigger,
 }: GoogleDriveUploadFilesProps) {
 	const prevFolder = usePrevious<drive_v3.Schema$File>(folder);
 	const [loadingFiles, setLoadingFiles] = useLoadingIndicator(true, 1);
 
-	useEffect(() => {
-		const getFiles = async (eventName: string) => {
-			try {
-				if (eventName === "") return;
-				setLoadingFiles(true);
-				const event = FromEmailAndFolderTooBase64(email, folder.id as string);
-				const response = await fetch(`/api/file/${event}`, {
-					headers: {
-						"Content-Type": "application/json",
-						Accept: "application/json",
-					},
-					method: "GET",
-				});
+	const getFiles = useCallback(async () => {
+		try {
+			if (!folder.id) return;
+			setLoadingFiles(true);
+			const event = FromEmailAndFolderTooBase64(email, folder.id as string);
+			const response = await fetch(`/api/file/${event}`, {
+				headers: {
+					"Content-Type": "application/json",
+					Accept: "application/json",
+				},
+				method: "GET",
+			});
 
-				if (!response.ok) {
-					const msg = response.statusText + " " + (await response.text());
-					showErrorToast(t, msg);
-					console.error("getFiles error", msg);
-				} else {
-					const files = await response.json();
-					refresh(files);
-				}
-
-				console.log("getFiles response", response);
-			} catch (error) {
-				console.error("getFiles error", error);
-				showErrorToast(
-					t,
-					error instanceof Error ? error.message : "get files error"
-				);
-			} finally {
-				setLoadingFiles(false);
+			if (!response.ok) {
+				const msg = response.statusText + " " + (await response.text());
+				showErrorToast(t, msg);
+				console.error("getFiles error", msg);
+			} else {
+				refresh(await response.json());
 			}
-		};
+		} catch (error) {
+			console.error("getFiles error", error);
+			showErrorToast(
+				t,
+				error instanceof Error ? error.message : "get files error"
+			);
+		} finally {
+			setLoadingFiles(false);
+		}
+	}, [email, folder.id, refresh, setLoadingFiles, t]);
 
-		if (folder && folder.name && prevFolder?.name !== folder.name)
-			getFiles(folder.name);
-	}, [
-		email,
-		folder,
-		folder.name,
-		prevFolder?.name,
-		refresh,
-		setLoadingFiles,
-		t,
-	]);
+	// Fetch on initial load and when the folder changes.
+	useEffect(() => {
+		if (folder && folder.name && prevFolder?.name !== folder.name) {
+			getFiles();
+		}
+	}, [folder, folder.name, getFiles, prevFolder?.name]);
+
+	// Re-fetch when the parent signals that new uploads have completed so we
+	// get the server-side thumbnailLinks that Drive generates after a delay.
+	useEffect(() => {
+		if (refreshTrigger && refreshTrigger > 0) {
+			getFiles();
+		}
+	}, [refreshTrigger, getFiles]);
 
 	return (
 		<div className={styles.event}>

@@ -600,19 +600,23 @@ const UploadFileToDrive = async (
 	console.log("Upload file " + fileName + " Status", res.status);
 
 	if (res.data?.id) {
-		//GoogleApi Returns 500 status - Error if creating new file with thumbnaillink and webcontentlink fields
-		//Extra request here to get those fields
+		// A second request is needed because the Drive API returns a 500 if
+		// thumbnailLink/webContentLink are requested in the create call.
 		console.log("Getting file details by fileid ", res.data.id);
-
-		const queryfiles = await drive.files.get({
-			fileId: res.data.id,
-			fields: "id,name,thumbnailLink,webContentLink,imageMediaMetadata",
-			supportsAllDrives: true,
-		});
-
-		console.log("Getting file details by fileid status ", res.status);
-
-		return queryfiles.data;
+		try {
+			const queryfiles = await drive.files.get({
+				fileId: res.data.id,
+				fields: "id,name,thumbnailLink,webContentLink,imageMediaMetadata",
+				supportsAllDrives: true,
+			});
+			console.log("Getting file details by fileid status ", queryfiles.status);
+			return queryfiles.data;
+		} catch (detailError) {
+			// Thumbnail/metadata fetch failed but the file was created — return
+			// the base data so the upload is not treated as a failure.
+			console.log("Getting file details failed (thumbnail may not be ready), returning base data", detailError);
+			return res.data;
+		}
 	}
 	return res.data;
 };

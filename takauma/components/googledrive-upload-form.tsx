@@ -13,6 +13,7 @@ interface GoogleDriveUploadFormProps {
 	folder: drive_v3.Schema$File;
 	email: string;
 	add: (file: drive_v3.Schema$File) => void;
+	onUploadsComplete: () => void;
 	defaultOpen: boolean;
 	loading: boolean;
 	setLoading: (loading: boolean) => void;
@@ -24,11 +25,17 @@ interface ImageSelect {
 	objectUrl: string;
 }
 
+// Max dimension for resized images sent to the server.
+const MAX_DIMENSION = 2048;
+// JPEG quality (0–100). 82 is a good balance between quality and file size.
+const JPEG_QUALITY = 82;
+
 export default function GoogleDriveUploadForm({
 	t,
 	folder,
 	email,
 	add,
+	onUploadsComplete,
 	defaultOpen,
 	loading,
 	setLoading,
@@ -41,129 +48,111 @@ export default function GoogleDriveUploadForm({
 	useEffect(() => {
 		setFormOpened(defaultOpen);
 	}, [defaultOpen]);
+
 	const setToPagePreview = async (
 		event: React.ChangeEvent<HTMLInputElement>
 	) => {
-		if (event.target.files && event.target.files.length > 0) {
-			//First resize images
-			const selectedImageFiles = Array.from(event.target.files ?? []);
-			const resizedImages = [];
-			if (selectedImageFiles.length > 0) {
-				setResizing(true);
+		if (!event.target.files || event.target.files.length === 0) return;
+
+		const selectedFiles = Array.from(event.target.files);
+		setResizing(true);
+		const resized: ImageSelect[] = [];
+
+		try {
+			for (const file of selectedFiles) {
+				const resizedFile = await resizeImage(file);
+				resized.push({
+					id: uuidv4(),
+					image: resizedFile,
+					objectUrl: URL.createObjectURL(resizedFile),
+				});
 			}
-
-			try {
-				for (let x = 0; x < selectedImageFiles.length; x++) {
-					//Resize one image at a time, just to make sure nothing crashes :)
-					resizedImages.push(await resizeImage(selectedImageFiles[x]));
-				}
-
-				setImages(
-					resizedImages.map((i) => {
-						return {
-							id: uuidv4(),
-							image: i,
-							objectUrl: URL.createObjectURL(i),
-						};
-					})
-				);
-
-				setResizing(false);
-			} catch (error) {
-				console.error("resize error", error);
-				showErrorToast(t, t("image_resize_failed"));
-				setResizing(false);
-			}
+			setImages(resized);
+		} catch (error) {
+			console.error("resize error", error);
+			showErrorToast(t, t("image_resize_failed"));
+		} finally {
+			setResizing(false);
 		}
 	};
 
 	const removeLoadedImage = (id: string) =>
-		setImages(
-			(currentImages) => currentImages?.filter((i) => i.id !== id) ?? []
-		);
+		setImages((cur) => cur?.filter((i) => i.id !== id) ?? []);
+
 	const upload = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-
-		if (
-			images === null ||
-			images.length === 0 ||
-			folder === null ||
-			folder.name === ""
-		)
-			return;
+		if (!images?.length || !folder?.id) return;
 
 		setLoading(true);
 
-		const uploadPromises = [];
-		for (let x = 0; x < images.length; x++) {
-			uploadPromises.push(uploadImage(images[x]));
-			if (uploadPromises.length > 4) {
-				console.log("5 promises, waiting ");
-				await Promise.all(uploadPromises);
-				console.log("cleared wait promises ");
-				uploadPromises.splice(0, uploadPromises.length);
+		// Upload in batches of 4 to avoid overwhelming the server.
+		const batch: Promise<void>[] = [];
+		for (const img of images) {
+			batch.push(uploadImage(img));
+			if (batch.length >= 4) {
+				await Promise.all(batch);
+				batch.splice(0, batch.length);
 			}
 		}
-		if (uploadPromises.length > 0) await Promise.all(uploadPromises);
+		if (batch.length > 0) await Promise.all(batch);
 
-		if (fileInputRef?.current) fileInputRef.current.value = "";
+		if (fileInputRef.current) fileInputRef.current.value = "";
 		setLoading(false);
+		// Signal parent to re-fetch from Drive so thumbnails generated server-side
+		// are picked up (Drive takes a moment to generate them after upload).
+		onUploadsComplete();
 	};
 
-	const resizeImage = async (file: File): Promise<File> => {
-		const imageFormat =
-			file.type.toLowerCase() === "image/jpeg"
-				? "JPEG"
-				: file.type.toLowerCase() === "image/png"
-				? "PNG"
-				: file.type.toLowerCase() === "image/webp"
-				? "WEBP"
-				: ""; //If empty, then image cannot be resized, then dont.
-
-		return imageFormat === ""
-			? Promise.resolve(file)
-			: resize(file, imageFormat);
-	};
-	const resize = (
-		file: File,
-		format: "JPEG" | "PNG" | "WEBP"
-	): Promise<File> => {
-		return new Promise((resolve) => {
+	/**
+	 * Resize an image before upload.
+	 *
+	 * - All formats are converted to JPEG (far smaller than PNG for photos).
+	 * - Max dimension 2048 px, quality 82.
+	 * - EXIF rotation is preserved (Resizer handles it via the rotation param).
+	 */
+	const resizeImage = (file: File): Promise<File> => {
+		return new Promise((resolve, reject) => {
 			Resizer.imageFileResizer(
 				file,
-				1920,
-				1920,
-				format,
-				95,
-				0,
-				(resizedImage) => {
-					console.log("Resized", resizedImage);
-					resolve(resizedImage as File);
-				},
+				MAX_DIMENSION,
+				MAX_DIMENSION,
+				"JPEG",
+				JPEG_QUALITY,
+				0, // auto-rotate from EXIF
+				(resized) => resolve(resized as File),
 				"file"
 			);
 		});
 	};
+
 	const uploadImage = async (imageselect: ImageSelect) => {
 		try {
 			const event = FromEmailAndFolderTooBase64(email, folder.id as string);
 			const body = new FormData();
-			body.append("file", imageselect.image);
+			body.append("file", imageselect.image, imageselect.image.name);
 			body.append("eventName", folder.name ?? "");
+
 			const response = await fetch(`/api/file/${event}`, {
 				method: "POST",
 				body,
 			});
+
 			if (!response.ok) {
 				const msg = response.statusText + " " + (await response.text());
 				showErrorToast(t, msg);
 				console.error("upload error", msg);
-			} else {
-				const newFile = await response.json();
-				removeLoadedImage(imageselect.id);
-				add(newFile);
+				return;
 			}
-			console.log("upload response", response);
+
+			const newFile: drive_v3.Schema$File = await response.json();
+			removeLoadedImage(imageselect.id);
+
+			// Drive takes time to generate thumbnailLink after upload.
+			// Use the local blob URL as a fallback so the image appears immediately.
+			add({
+				...newFile,
+				thumbnailLink: newFile.thumbnailLink ?? imageselect.objectUrl,
+			});
 		} catch (error) {
 			console.error("upload error", error);
 			showErrorToast(
@@ -172,6 +161,7 @@ export default function GoogleDriveUploadForm({
 			);
 		}
 	};
+
 	return (
 		<div className={styles.uploadcontainer}>
 			{!formOpened && (
@@ -190,7 +180,7 @@ export default function GoogleDriveUploadForm({
 							<img
 								key={`imageurl-${idx}`}
 								className={styles.thumbnail}
-								alt="image"
+								alt="preview"
 								src={image.objectUrl}
 							/>
 						))}

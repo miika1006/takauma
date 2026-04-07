@@ -18,6 +18,9 @@ export default function GoogleDriveUpload({
 }: GoogleDriveUploadProps) {
 	const [driveFiles, setDriveFiles] = useState<drive_v3.Schema$File[]>([]);
 	const [loading, setLoading] = useLoadingIndicator(false, 1);
+	// Incrementing this triggers GoogleDriveUploadFiles to re-fetch from Drive.
+	const [refreshTrigger, setRefreshTrigger] = useState(0);
+
 	return (
 		<>
 			<GoogleDriveUploadFiles
@@ -27,6 +30,7 @@ export default function GoogleDriveUpload({
 				files={driveFiles}
 				refresh={setDriveFiles}
 				loading={loading}
+				refreshTrigger={refreshTrigger}
 			/>
 			<GoogleDriveUploadForm
 				t={t}
@@ -36,6 +40,7 @@ export default function GoogleDriveUpload({
 				loading={loading}
 				setLoading={setLoading}
 				add={(file) => setDriveFiles((currentFiles) => [...currentFiles, file])}
+				onUploadsComplete={() => setRefreshTrigger((n) => n + 1)}
 			/>
 		</>
 	);

@@ -103,15 +103,18 @@ export default async function handler(
 						fs.unlink(resolvedPath, () => {
 							console.log(`fs.unlink ok on temp file`);
 						});
+						if (!uploaded?.id) {
+							return reject(new Error("Upload to Google Drive failed"));
+						}
 						resolve({
-							id: uploaded?.id,
-							name: uploaded?.name,
-							webContentLink: uploaded?.webContentLink,
-							thumbnailLink: uploaded?.thumbnailLink,
+							id: uploaded.id,
+							name: uploaded.name,
+							webContentLink: uploaded.webContentLink ?? null,
+							thumbnailLink: uploaded.thumbnailLink ?? null,
 							imageMediaMetadata: {
-								width: uploaded?.imageMediaMetadata?.width,
-								height: uploaded?.imageMediaMetadata?.height,
-								rotation: uploaded?.imageMediaMetadata?.rotation,
+								width: uploaded.imageMediaMetadata?.width,
+								height: uploaded.imageMediaMetadata?.height,
+								rotation: uploaded.imageMediaMetadata?.rotation,
 							},
 						});
 					});

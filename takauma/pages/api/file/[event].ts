@@ -2,12 +2,20 @@ import { FromBase64ToEmailAndFolder } from "./../../../lib/event";
 import {
 	GetGoogleDriveFilesByFolderId,
 	GetGoogleDriveFolderById,
-	CreateResumableUploadSession,
 	GetGoogleDriveFileDetails,
+	UploadFileDataToDrive,
 } from "../../../lib/googledrive";
 import sanitize from "sanitize-filename";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { dynamo } from "../../../lib/dynamo-db";
+
+export const config = {
+	api: {
+		bodyParser: {
+			sizeLimit: "6mb",
+		},
+	},
+};
 
 export default async function handler(
 	req: NextApiRequest,
@@ -96,39 +104,54 @@ export default async function handler(
 	}
 
 	// ── POST /api/file/[event] ───────────────────────────────────────────────
-	// Create a Drive resumable-upload session.  Returns { uploadUri } — a
-	// pre-authenticated, file-specific URL the browser uses to PUT the image
-	// bytes directly to Google's servers.  No file bytes pass through this
-	// function, so Vercel's timeout and body-size limits are not a concern.
+	// Upload a photo.  The browser sends { fileName, mimeType, data } where
+	// data is a base64-encoded JPEG.  The server uploads to Drive on the
+	// owner's behalf and returns the file metadata.
 	if (req.method === "POST") {
 		try {
-			const { fileName, mimeType } = req.body as {
+			const { fileName, mimeType, data } = req.body as {
 				fileName?: string;
 				mimeType?: string;
+				data?: string;
 			};
 
-			const safeFileName = sanitize(fileName ?? "").trim();
-			if (!safeFileName) return res.status(400).send("fileName is required");
+			const safeFileName = sanitize(fileName ?? "").trim() || "image.jpg";
 
-			const safeMime =
-				["image/jpeg", "image/png", "image/webp"].includes(mimeType ?? "")
-					? (mimeType as string)
-					: "image/jpeg";
+			// Only accept JPEG (all images are resized to JPEG client-side).
+			const safeMime = mimeType === "image/jpeg" ? "image/jpeg" : "image/jpeg";
 
-			const uploadUri = await CreateResumableUploadSession(
+			if (!data || typeof data !== "string")
+				return res.status(400).send("data is required");
+
+			const fileBuffer = Buffer.from(data, "base64");
+			if (fileBuffer.length === 0)
+				return res.status(400).send("data is empty");
+
+			const uploaded = await UploadFileDataToDrive(
 				user.accessToken,
 				user.refreshToken,
 				folderid as string,
 				safeFileName,
-				safeMime
+				safeMime,
+				fileBuffer
 			);
 
-			if (!uploadUri)
-				return res.status(500).send("Failed to create upload session");
+			if (!uploaded?.id)
+				return res.status(500).send("Upload failed");
 
-			return res.status(200).json({ uploadUri });
+			return res.status(200).json({
+				id: uploaded.id,
+				name: uploaded.name,
+				webContentLink: uploaded.webContentLink ?? null,
+				thumbnailLink: uploaded.thumbnailLink ?? null,
+				imageMediaMetadata: {
+					width: uploaded.imageMediaMetadata?.width,
+					height: uploaded.imageMediaMetadata?.height,
+					rotation: uploaded.imageMediaMetadata?.rotation,
+				},
+			});
 		} catch (error) {
-			console.error("POST /api/file session error", error);
+			console.error("POST /api/file upload error", error);
 			return res.status(400).send("Bad request");
 		}
 	}

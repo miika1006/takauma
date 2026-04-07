@@ -127,77 +127,43 @@ export default function GoogleDriveUploadForm({
 		});
 
 	/**
-	 * Upload a single image via three lightweight server round-trips:
+	 * Upload a single image via the server.
 	 *
-	 * 1. POST /api/file/[event]          → server creates a Drive resumable-upload
-	 *                                       session using the owner's OAuth tokens
-	 *                                       and returns { uploadUri }.
-	 *
-	 * 2. PUT  {uploadUri}  (googleapis)  → browser streams bytes directly to
-	 *                                       Google.  No bytes pass through Vercel.
-	 *                                       Drive returns { id, name }.
-	 *
-	 * 3. GET  /api/file/[event]?fileId=  → server fetches thumbnailLink /
-	 *                                       webContentLink from Drive and returns
-	 *                                       the full file metadata.
+	 * The browser encodes the resized JPEG as base64 and POSTs it to
+	 * /api/file/[event].  The server uploads to Drive on the owner's behalf
+	 * and returns the file metadata.  No cross-origin requests are made from
+	 * the browser — CORS is not a concern.
 	 */
 	const uploadImage = async (imageselect: ImageSelect) => {
 		const eventId = FromEmailAndFolderTooBase64(email, folder.id as string);
 
 		try {
-			// ── Step 1: Create resumable session ──────────────────────────────
-			const sessionRes = await fetch(`/api/file/${eventId}`, {
+			const base64 = await fileToBase64(imageselect.image);
+
+			const uploadRes = await fetch(`/api/file/${eventId}`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
 					fileName: imageselect.image.name || "image.jpg",
 					mimeType: "image/jpeg",
+					data: base64,
 				}),
 			});
 
-			if (!sessionRes.ok) {
-				const msg = sessionRes.statusText + " " + (await sessionRes.text());
-				showErrorToast(t, msg);
-				console.error("session error", msg);
+			if (!uploadRes.ok) {
+				const msg = await uploadRes.text();
+				showErrorToast(t, msg || uploadRes.statusText);
+				console.error("upload error", msg);
 				return;
 			}
 
-			const { uploadUri } = (await sessionRes.json()) as { uploadUri: string };
-
-			// ── Step 2: Upload directly to Drive ───────────────────────────────
-			// Drive's resumable URI is pre-authenticated — no Authorization header
-			// needed.  The browser streams bytes straight to Google's servers.
-			const driveRes = await fetch(uploadUri, {
-				method: "PUT",
-				headers: { "Content-Type": "image/jpeg" },
-				body: imageselect.image,
-			});
-
-			if (!driveRes.ok) {
-				const msg = `Drive upload failed: ${driveRes.status}`;
-				showErrorToast(t, msg);
-				console.error(msg);
-				return;
-			}
-
-			const { id: fileId } = (await driveRes.json()) as { id: string; name: string };
-
-			// ── Step 3: Fetch file metadata (thumbnailLink etc.) ───────────────
-			// thumbnailLink is usually not ready immediately — use the local blob
-			// URL as an instant fallback and let the post-upload re-fetch update it.
-			let fileDetails: drive_v3.Schema$File = { id: fileId };
-			try {
-				const detailsRes = await fetch(
-					`/api/file/${eventId}?fileId=${encodeURIComponent(fileId)}`
-				);
-				if (detailsRes.ok) fileDetails = await detailsRes.json();
-			} catch {
-				// Non-fatal — gallery will refresh via onUploadsComplete()
-			}
+			const fileDetails = (await uploadRes.json()) as drive_v3.Schema$File;
 
 			removeLoadedImage(imageselect.id);
 			add({
 				...fileDetails,
+				// Use local blob URL as instant preview; gallery re-fetch will
+				// replace it with the Drive thumbnailLink once Drive is ready.
 				thumbnailLink: fileDetails.thumbnailLink ?? imageselect.objectUrl,
 			});
 		} catch (error) {
@@ -208,6 +174,20 @@ export default function GoogleDriveUploadForm({
 			);
 		}
 	};
+
+	/** Encode a File to a base64 string (data URL → strip prefix). */
+	const fileToBase64 = (file: File): Promise<string> =>
+		new Promise((resolve, reject) => {
+			const reader = new FileReader();
+			reader.onload = () => {
+				const result = reader.result as string;
+				// result is "data:image/jpeg;base64,XXXX" — strip the prefix
+				const comma = result.indexOf(",");
+				resolve(comma >= 0 ? result.slice(comma + 1) : result);
+			};
+			reader.onerror = reject;
+			reader.readAsDataURL(file);
+		});
 
 	return (
 		<div className={styles.uploadcontainer}>

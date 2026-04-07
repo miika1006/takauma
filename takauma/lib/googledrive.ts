@@ -623,6 +623,53 @@ const UploadFileToDrive = async (
 };
 
 /**
+ * Upload raw file bytes (as a Buffer) to a Drive folder.
+ * Used by the API route so uploads go server → Drive, avoiding browser CORS
+ * restrictions.  The googleapis library transparently refreshes the access
+ * token on 401, so no manual expiry handling is needed.
+ */
+export const UploadFileDataToDrive = async (
+	accessToken: string,
+	refreshToken: string,
+	folderId: string,
+	fileName: string,
+	mimeType: string,
+	fileData: Buffer
+): Promise<drive_v3.Schema$File | null> => {
+	try {
+		const { Readable } = await import("stream");
+		const drive = CreateGoogleDriveInstance(accessToken, refreshToken);
+
+		const res = await drive.files.create({
+			fields: "id,name",
+			requestBody: { name: fileName, parents: [folderId] },
+			media: { mimeType, body: Readable.from(fileData) },
+			supportsAllDrives: true,
+		});
+
+		console.log("UploadFileDataToDrive Status", res.status);
+
+		if (res.data?.id) {
+			try {
+				const details = await drive.files.get({
+					fileId: res.data.id,
+					fields: "id,name,thumbnailLink,webContentLink,imageMediaMetadata",
+					supportsAllDrives: true,
+				});
+				return details.data;
+			} catch {
+				// Thumbnail may not be ready yet — return base data; caller will refresh.
+				return res.data;
+			}
+		}
+		return res.data;
+	} catch (error) {
+		console.log("UploadFileDataToDrive error", error);
+		return null;
+	}
+};
+
+/**
  * Create a Drive resumable upload session on behalf of the folder owner.
  *
  * Returns the upload URI — a short-lived, pre-authenticated URL the browser
@@ -643,10 +690,7 @@ export const CreateResumableUploadSession = async (
 			clientId: process.env.GOOGLE_ID,
 			clientSecret: process.env.GOOGLE_SECRET,
 		});
-		// Set expiry_date to 1 (past epoch) so getAccessToken() always uses
-		// the refresh token to obtain a fresh access token, regardless of what
-		// stale token was stored in DynamoDB.
-		auth.setCredentials({ access_token: accessToken, refresh_token: refreshToken, expiry_date: 1 });
+		auth.setCredentials({ access_token: accessToken, refresh_token: refreshToken });
 
 		// getAccessToken() transparently refreshes if the stored token is expired.
 		const { token } = await auth.getAccessToken();

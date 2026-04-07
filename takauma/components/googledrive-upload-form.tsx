@@ -7,7 +7,6 @@ import Loading from "./loading";
 import { v4 as uuidv4 } from "uuid";
 import { FromEmailAndFolderTooBase64 } from "../lib/event";
 import Resizer from "react-image-file-resizer";
-
 interface GoogleDriveUploadFormProps {
 	t: TFunction;
 	folder: drive_v3.Schema$File;
@@ -45,11 +44,20 @@ export default function GoogleDriveUploadForm({
 	const [resizing, setResizing] = useState(false);
 	const [formOpened, setFormOpened] = useState(defaultOpen);
 	const [images, setImages] = useState<ImageSelect[] | null>(null);
+	const [zoomedUrl, setZoomedUrl] = useState<string | null>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
 		setFormOpened(defaultOpen);
 	}, [defaultOpen]);
+
+	// Close lightbox on Escape key.
+	useEffect(() => {
+		if (!zoomedUrl) return;
+		const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setZoomedUrl(null); };
+		window.addEventListener("keydown", onKey);
+		return () => window.removeEventListener("keydown", onKey);
+	}, [zoomedUrl]);
 
 	const setToPagePreview = async (
 		event: React.ChangeEvent<HTMLInputElement>
@@ -76,8 +84,18 @@ export default function GoogleDriveUploadForm({
 		}
 	};
 
+	// Called after a successful upload — keep the objectUrl alive for the gallery thumbnail.
 	const removeLoadedImage = (id: string) =>
 		setImages((cur) => cur?.filter((i) => i.id !== id) ?? []);
+
+	// Called when the user clicks ✕ to discard a preview before uploading.
+	const discardPreviewImage = (id: string) => {
+		setImages((cur) => {
+			const item = cur?.find((i) => i.id === id);
+			if (item) URL.revokeObjectURL(item.objectUrl);
+			return cur?.filter((i) => i.id !== id) ?? [];
+		});
+	};
 
 	const upload = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -170,6 +188,31 @@ export default function GoogleDriveUploadForm({
 	};
 
 	return (
+		<>
+			{zoomedUrl && (
+				<div
+					className={styles.lightboxOverlay}
+					onClick={() => setZoomedUrl(null)}
+					role="dialog"
+					aria-modal="true"
+				>
+					{/* eslint-disable-next-line @next/next/no-img-element */}
+					<img
+						className={styles.lightboxImage}
+						src={zoomedUrl}
+						alt="preview"
+						onClick={(e) => e.stopPropagation()}
+					/>
+					<button
+						type="button"
+						className={styles.lightboxClose}
+						onClick={() => setZoomedUrl(null)}
+						aria-label={t("close")}
+					>
+						&times;
+					</button>
+				</div>
+			)}
 		<div className={styles.uploadcontainer}>
 			{!formOpened && (
 				<button
@@ -183,13 +226,24 @@ export default function GoogleDriveUploadForm({
 			{formOpened && (
 				<>
 					<div className={styles.uploadqueue}>
-						{images?.map((image, idx) => (
-							<img
-								key={`imageurl-${idx}`}
-								className={styles.thumbnail}
-								alt="preview"
-								src={image.objectUrl}
-							/>
+						{images?.map((image) => (
+							<div key={image.id} className={styles.previewItem}>
+								<img
+									className={styles.thumbnail}
+									alt="preview"
+									src={image.objectUrl}
+									onClick={() => setZoomedUrl(image.objectUrl)}
+									title={t("zoom")}
+								/>
+								<button
+									type="button"
+									className={styles.deleteBtn}
+									onClick={() => discardPreviewImage(image.id)}
+									aria-label={t("delete")}
+								>
+									&times;
+								</button>
+							</div>
 						))}
 						<br />
 						{images?.length ?? 0}{" "}
@@ -230,5 +284,6 @@ export default function GoogleDriveUploadForm({
 				</>
 			)}
 		</div>
+		</>
 	);
 }

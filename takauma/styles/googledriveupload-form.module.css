@@ -1,10 +1,93 @@
+/* ── Preview grid ─────────────────────────────────────────────────────────── */
+
+.previewItem {
+	position: relative;
+	display: inline-block;
+	margin: 0.5em;
+}
+
 .thumbnail {
 	width: 100px;
 	height: 100px;
 	object-fit: cover;
-	margin: 0.5em;
 	border-radius: 4px;
-	opacity: 0.6;
+	opacity: 0.85;
+	cursor: zoom-in;
+	display: block;
+	transition: opacity 0.15s;
+}
+
+.thumbnail:hover {
+	opacity: 1;
+}
+
+.deleteBtn {
+	position: absolute;
+	top: -7px;
+	right: -7px;
+	width: 22px;
+	height: 22px;
+	border-radius: 50%;
+	background: rgba(0, 0, 0, 0.65);
+	color: #fff;
+	border: none;
+	cursor: pointer;
+	font-size: 15px;
+	line-height: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	transition: background 0.15s;
+}
+
+.deleteBtn:hover {
+	background: #cc2200;
+}
+
+/* ── Lightbox ─────────────────────────────────────────────────────────────── */
+
+.lightboxOverlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.88);
+	z-index: 1000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: zoom-out;
+}
+
+.lightboxImage {
+	max-width: 92vw;
+	max-height: 92vh;
+	object-fit: contain;
+	border-radius: 4px;
+	cursor: default;
+	box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+}
+
+.lightboxClose {
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
+	background: rgba(0, 0, 0, 0.55);
+	color: #fff;
+	border: 2px solid rgba(255, 255, 255, 0.3);
+	border-radius: 50%;
+	width: 42px;
+	height: 42px;
+	font-size: 24px;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	transition: background 0.15s;
+}
+
+.lightboxClose:hover {
+	background: rgba(0, 0, 0, 0.85);
 }
 .uploadform {
 	margin-top: 1em;

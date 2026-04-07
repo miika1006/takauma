@@ -643,7 +643,10 @@ export const CreateResumableUploadSession = async (
 			clientId: process.env.GOOGLE_ID,
 			clientSecret: process.env.GOOGLE_SECRET,
 		});
-		auth.setCredentials({ access_token: accessToken, refresh_token: refreshToken });
+		// Set expiry_date to 1 (past epoch) so getAccessToken() always uses
+		// the refresh token to obtain a fresh access token, regardless of what
+		// stale token was stored in DynamoDB.
+		auth.setCredentials({ access_token: accessToken, refresh_token: refreshToken, expiry_date: 1 });
 
 		// getAccessToken() transparently refreshes if the stored token is expired.
 		const { token } = await auth.getAccessToken();

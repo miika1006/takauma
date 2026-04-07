@@ -37,16 +37,26 @@ interface Colcade {
 }
 
 /**
- * Build a direct-loadable high-resolution URL for a publicly-shared Google
- * Drive file.  webContentLink is a download-redirect and cannot be used as
- * an <img> src (CORS / redirect chain blocks image load in PhotoSwipe).
+ * Build a direct-loadable URL for a Google Drive file at the given width.
+ * webContentLink is a download-redirect and cannot be used as an <img> src.
  */
-function buildFullSizeUrl(item: SliderItem): string {
+function buildDriveUrl(item: SliderItem, size: string): string {
 	if (item.id) {
-		return `https://drive.google.com/thumbnail?id=${item.id}&sz=w4000`;
+		return `https://drive.google.com/thumbnail?id=${item.id}&sz=${size}`;
 	}
-	// Fallback: enlarge the thumbnail URL by bumping the size suffix.
-	return item.thumbnailLink?.replace(/=[swh][\d]+(-[a-z]+)*$/, "=s4000") ?? "";
+	// Fallback for blob/local preview URLs — return as-is (no Drive ID yet).
+	return item.thumbnailLink ?? "";
+}
+
+function buildFullSizeUrl(item: SliderItem): string {
+	return buildDriveUrl(item, "w4000");
+}
+
+/** Medium-res URL for grid thumbnails — sharp on retina without being too heavy. */
+function buildGridThumbnailUrl(item: SliderItem): string {
+	// If the thumbnailLink is a local blob URL (just-uploaded image), use it directly.
+	if (item.thumbnailLink?.startsWith("blob:")) return item.thumbnailLink;
+	return buildDriveUrl(item, "w800");
 }
 
 export default function Slider({ t, items, loading }: SliderProps) {
@@ -95,13 +105,14 @@ export default function Slider({ t, items, loading }: SliderProps) {
 }
 export function ImageItem({ item }: ImageItemProps) {
 	const fullSizeUrl = buildFullSizeUrl(item);
+	const gridUrl = buildGridThumbnailUrl(item);
 	const width = item.imageMediaMetadata?.width || undefined;
 	const height = item.imageMediaMetadata?.height || undefined;
 
 	return (
 		<Item
 			original={fullSizeUrl}
-			thumbnail={item.thumbnailLink ?? ""}
+			thumbnail={gridUrl}
 			width={width}
 			height={height}
 		>
@@ -111,7 +122,7 @@ export function ImageItem({ item }: ImageItemProps) {
 					alt={`photo_${item.id}`}
 					ref={ref as React.Ref<HTMLImageElement>}
 					onClick={open}
-					src={item.thumbnailLink ?? ""}
+					src={gridUrl}
 				/>
 			)}
 		</Item>

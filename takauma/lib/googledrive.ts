@@ -625,8 +625,10 @@ const UploadFileToDrive = async (
 /**
  * Upload raw file bytes (as a Buffer) to a Drive folder.
  * Used by the API route so uploads go server → Drive, avoiding browser CORS
- * restrictions.  The googleapis library transparently refreshes the access
- * token on 401, so no manual expiry handling is needed.
+ * restrictions.
+ *
+ * The access token stored in DynamoDB may be stale (no expiry_date known).
+ * We attempt the upload with the stored token; on 401 we refresh once and retry.
  */
 export const UploadFileDataToDrive = async (
 	accessToken: string,
@@ -636,33 +638,54 @@ export const UploadFileDataToDrive = async (
 	mimeType: string,
 	fileData: Buffer
 ): Promise<drive_v3.Schema$File | null> => {
-	try {
-		const { Readable } = await import("stream");
-		const drive = CreateGoogleDriveInstance(accessToken, refreshToken);
+	const { Readable } = await import("stream");
 
+	const doUpload = async (token: string) => {
+		const drive = CreateGoogleDriveInstance(token, refreshToken);
 		const res = await drive.files.create({
 			fields: "id,name",
 			requestBody: { name: fileName, parents: [folderId] },
 			media: { mimeType, body: Readable.from(fileData) },
 			supportsAllDrives: true,
 		});
-
 		console.log("UploadFileDataToDrive Status", res.status);
+		return { drive, data: res.data };
+	};
 
-		if (res.data?.id) {
+	try {
+		let result: Awaited<ReturnType<typeof doUpload>>;
+		try {
+			result = await doUpload(accessToken);
+		} catch (err: unknown) {
+			// On 401 the stored token is expired — refresh once and retry.
+			const status = (err as { response?: { status?: number } })?.response?.status;
+			if (status !== 401) throw err;
+
+			console.log("UploadFileDataToDrive: 401, refreshing token and retrying");
+			const auth = new google.auth.OAuth2({
+				clientId: process.env.GOOGLE_ID,
+				clientSecret: process.env.GOOGLE_SECRET,
+			});
+			auth.setCredentials({ access_token: accessToken, refresh_token: refreshToken });
+			const { credentials } = await auth.refreshAccessToken();
+			if (!credentials.access_token) throw new Error("Token refresh failed");
+			result = await doUpload(credentials.access_token);
+		}
+
+		if (result.data?.id) {
 			try {
-				const details = await drive.files.get({
-					fileId: res.data.id,
+				const details = await result.drive.files.get({
+					fileId: result.data.id,
 					fields: "id,name,thumbnailLink,webContentLink,imageMediaMetadata",
 					supportsAllDrives: true,
 				});
 				return details.data;
 			} catch {
-				// Thumbnail may not be ready yet — return base data; caller will refresh.
-				return res.data;
+				// Thumbnail may not be ready yet — return base data; gallery will refresh.
+				return result.data;
 			}
 		}
-		return res.data;
+		return result.data;
 	} catch (error) {
 		console.log("UploadFileDataToDrive error", error);
 		return null;

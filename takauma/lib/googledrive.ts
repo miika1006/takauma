@@ -2,6 +2,7 @@ import path from "path";
 import { drive_v3, google } from "googleapis";
 import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
+// node-fetch is not needed — Node 18+ has built-in fetch
 import NodeCache from "node-cache";
 const cache = new NodeCache();
 /**
@@ -619,4 +620,85 @@ const UploadFileToDrive = async (
 		}
 	}
 	return res.data;
+};
+
+/**
+ * Create a Drive resumable upload session on behalf of the folder owner.
+ *
+ * Returns the upload URI — a short-lived, pre-authenticated URL the browser
+ * can PUT file bytes to directly, with no Authorization header required.
+ * This avoids routing file bytes through our Vercel serverless function.
+ *
+ * https://developers.google.com/drive/api/guides/manage-uploads#resumable
+ */
+export const CreateResumableUploadSession = async (
+	accessToken: string,
+	refreshToken: string,
+	folderId: string,
+	fileName: string,
+	mimeType: string
+): Promise<string | null> => {
+	try {
+		const auth = new google.auth.OAuth2({
+			clientId: process.env.GOOGLE_ID,
+			clientSecret: process.env.GOOGLE_SECRET,
+		});
+		auth.setCredentials({ access_token: accessToken, refresh_token: refreshToken });
+
+		// getAccessToken() transparently refreshes if the stored token is expired.
+		const { token } = await auth.getAccessToken();
+		if (!token) throw new Error("Could not obtain a valid access token");
+
+		const response = await fetch(
+			// Request id+name back in the upload-completion response body.
+			"https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&fields=id,name",
+			{
+				method: "POST",
+				headers: {
+					Authorization: `Bearer ${token}`,
+					"Content-Type": "application/json",
+					"X-Upload-Content-Type": mimeType,
+				},
+				body: JSON.stringify({ name: fileName, parents: [folderId] }),
+			}
+		);
+
+		if (!response.ok) {
+			const body = await response.text();
+			throw new Error(`Session initiation failed: ${response.status} ${body}`);
+		}
+
+		const uploadUri = response.headers.get("location");
+		if (!uploadUri) throw new Error("Drive did not return a Location header");
+
+		console.log("CreateResumableUploadSession ok, uploadUri obtained");
+		return uploadUri;
+	} catch (error) {
+		console.log("CreateResumableUploadSession error", error);
+		return null;
+	}
+};
+
+/**
+ * Fetch metadata for a single Drive file (id, thumbnailLink, webContentLink,
+ * imageMediaMetadata).  Used after a browser-direct upload to retrieve the
+ * fields Drive doesn't return in the resumable-upload completion body.
+ */
+export const GetGoogleDriveFileDetails = async (
+	accessToken: string,
+	refreshToken: string,
+	fileId: string
+): Promise<drive_v3.Schema$File | null> => {
+	try {
+		const drive = CreateGoogleDriveInstance(accessToken, refreshToken);
+		const res = await drive.files.get({
+			fileId,
+			fields: "id,name,thumbnailLink,webContentLink,imageMediaMetadata",
+			supportsAllDrives: true,
+		});
+		return res.data;
+	} catch (error) {
+		console.log("GetGoogleDriveFileDetails error", error);
+		return null;
+	}
 };

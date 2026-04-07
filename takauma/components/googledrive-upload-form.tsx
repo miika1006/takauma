@@ -21,13 +21,15 @@ interface GoogleDriveUploadFormProps {
 
 interface ImageSelect {
 	id: string;
+	/** Resized JPEG File ready for upload. */
 	image: File;
+	/** Local blob URL for immediate gallery preview. */
 	objectUrl: string;
 }
 
-// Max dimension for resized images sent to the server.
+// Max dimension (px) for the resized JPEG sent to Drive.
 const MAX_DIMENSION = 2048;
-// JPEG quality (0–100). 82 is a good balance between quality and file size.
+// JPEG quality 0–100.  82 is visually identical to 95 but ~40 % smaller.
 const JPEG_QUALITY = 82;
 
 export default function GoogleDriveUploadForm({
@@ -40,8 +42,8 @@ export default function GoogleDriveUploadForm({
 	loading,
 	setLoading,
 }: GoogleDriveUploadFormProps) {
-	const [resizing, setResizing] = useState<boolean>(false);
-	const [formOpened, setFormOpened] = useState<boolean>(defaultOpen);
+	const [resizing, setResizing] = useState(false);
+	const [formOpened, setFormOpened] = useState(defaultOpen);
 	const [images, setImages] = useState<ImageSelect[] | null>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -52,15 +54,13 @@ export default function GoogleDriveUploadForm({
 	const setToPagePreview = async (
 		event: React.ChangeEvent<HTMLInputElement>
 	) => {
-		if (!event.target.files || event.target.files.length === 0) return;
-
+		if (!event.target.files?.length) return;
 		const selectedFiles = Array.from(event.target.files);
 		setResizing(true);
 		const resized: ImageSelect[] = [];
-
 		try {
 			for (const file of selectedFiles) {
-				const resizedFile = await resizeImage(file);
+				const resizedFile = await resizeToJpeg(file);
 				resized.push({
 					id: uuidv4(),
 					image: resizedFile,
@@ -79,13 +79,13 @@ export default function GoogleDriveUploadForm({
 	const removeLoadedImage = (id: string) =>
 		setImages((cur) => cur?.filter((i) => i.id !== id) ?? []);
 
-	const upload = async (event: React.FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
+	const upload = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
 		if (!images?.length || !folder?.id) return;
 
 		setLoading(true);
 
-		// Upload in batches of 4 to avoid overwhelming the server.
+		// Upload at most 4 images concurrently.
 		const batch: Promise<void>[] = [];
 		for (const img of images) {
 			batch.push(uploadImage(img));
@@ -98,60 +98,107 @@ export default function GoogleDriveUploadForm({
 
 		if (fileInputRef.current) fileInputRef.current.value = "";
 		setLoading(false);
-		// Signal parent to re-fetch from Drive so thumbnails generated server-side
-		// are picked up (Drive takes a moment to generate them after upload).
+		// Ask the gallery to re-fetch so it picks up server-generated thumbnailLinks
+		// once Drive finishes processing the newly uploaded files.
 		onUploadsComplete();
 	};
 
 	/**
-	 * Resize an image before upload.
-	 *
-	 * - All formats are converted to JPEG (far smaller than PNG for photos).
-	 * - Max dimension 2048 px, quality 82.
-	 * - EXIF rotation is preserved (Resizer handles it via the rotation param).
+	 * Resize any image to a JPEG before upload.
+	 * Converting PNG / WEBP → JPEG dramatically reduces file size for photos.
+	 * EXIF orientation is preserved via the rotation=0 (auto) parameter.
 	 */
-	const resizeImage = (file: File): Promise<File> => {
-		return new Promise((resolve, reject) => {
-			Resizer.imageFileResizer(
-				file,
-				MAX_DIMENSION,
-				MAX_DIMENSION,
-				"JPEG",
-				JPEG_QUALITY,
-				0, // auto-rotate from EXIF
-				(resized) => resolve(resized as File),
-				"file"
-			);
+	const resizeToJpeg = (file: File): Promise<File> =>
+		new Promise((resolve, reject) => {
+			try {
+				Resizer.imageFileResizer(
+					file,
+					MAX_DIMENSION,
+					MAX_DIMENSION,
+					"JPEG",
+					JPEG_QUALITY,
+					0, // auto-rotate from EXIF
+					(resized) => resolve(resized as File),
+					"file"
+				);
+			} catch (err) {
+				reject(err);
+			}
 		});
-	};
 
+	/**
+	 * Upload a single image via three lightweight server round-trips:
+	 *
+	 * 1. POST /api/file/[event]          → server creates a Drive resumable-upload
+	 *                                       session using the owner's OAuth tokens
+	 *                                       and returns { uploadUri }.
+	 *
+	 * 2. PUT  {uploadUri}  (googleapis)  → browser streams bytes directly to
+	 *                                       Google.  No bytes pass through Vercel.
+	 *                                       Drive returns { id, name }.
+	 *
+	 * 3. GET  /api/file/[event]?fileId=  → server fetches thumbnailLink /
+	 *                                       webContentLink from Drive and returns
+	 *                                       the full file metadata.
+	 */
 	const uploadImage = async (imageselect: ImageSelect) => {
-		try {
-			const event = FromEmailAndFolderTooBase64(email, folder.id as string);
-			const body = new FormData();
-			body.append("file", imageselect.image, imageselect.image.name);
-			body.append("eventName", folder.name ?? "");
+		const eventId = FromEmailAndFolderTooBase64(email, folder.id as string);
 
-			const response = await fetch(`/api/file/${event}`, {
+		try {
+			// ── Step 1: Create resumable session ──────────────────────────────
+			const sessionRes = await fetch(`/api/file/${eventId}`, {
 				method: "POST",
-				body,
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					fileName: imageselect.image.name || "image.jpg",
+					mimeType: "image/jpeg",
+				}),
 			});
 
-			if (!response.ok) {
-				const msg = response.statusText + " " + (await response.text());
+			if (!sessionRes.ok) {
+				const msg = sessionRes.statusText + " " + (await sessionRes.text());
 				showErrorToast(t, msg);
-				console.error("upload error", msg);
+				console.error("session error", msg);
 				return;
 			}
 
-			const newFile: drive_v3.Schema$File = await response.json();
-			removeLoadedImage(imageselect.id);
+			const { uploadUri } = (await sessionRes.json()) as { uploadUri: string };
 
-			// Drive takes time to generate thumbnailLink after upload.
-			// Use the local blob URL as a fallback so the image appears immediately.
+			// ── Step 2: Upload directly to Drive ───────────────────────────────
+			// Drive's resumable URI is pre-authenticated — no Authorization header
+			// needed.  The browser streams bytes straight to Google's servers.
+			const driveRes = await fetch(uploadUri, {
+				method: "PUT",
+				headers: { "Content-Type": "image/jpeg" },
+				body: imageselect.image,
+			});
+
+			if (!driveRes.ok) {
+				const msg = `Drive upload failed: ${driveRes.status}`;
+				showErrorToast(t, msg);
+				console.error(msg);
+				return;
+			}
+
+			const { id: fileId } = (await driveRes.json()) as { id: string; name: string };
+
+			// ── Step 3: Fetch file metadata (thumbnailLink etc.) ───────────────
+			// thumbnailLink is usually not ready immediately — use the local blob
+			// URL as an instant fallback and let the post-upload re-fetch update it.
+			let fileDetails: drive_v3.Schema$File = { id: fileId };
+			try {
+				const detailsRes = await fetch(
+					`/api/file/${eventId}?fileId=${encodeURIComponent(fileId)}`
+				);
+				if (detailsRes.ok) fileDetails = await detailsRes.json();
+			} catch {
+				// Non-fatal — gallery will refresh via onUploadsComplete()
+			}
+
+			removeLoadedImage(imageselect.id);
 			add({
-				...newFile,
-				thumbnailLink: newFile.thumbnailLink ?? imageselect.objectUrl,
+				...fileDetails,
+				thumbnailLink: fileDetails.thumbnailLink ?? imageselect.objectUrl,
 			});
 		} catch (error) {
 			console.error("upload error", error);

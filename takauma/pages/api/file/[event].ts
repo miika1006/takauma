@@ -2,28 +2,18 @@ import { FromBase64ToEmailAndFolder } from "./../../../lib/event";
 import {
 	GetGoogleDriveFilesByFolderId,
 	GetGoogleDriveFolderById,
-	UploadGoogleDriveFile,
+	CreateResumableUploadSession,
+	GetGoogleDriveFileDetails,
 } from "../../../lib/googledrive";
-import formidable from "formidable";
-import fs from "fs";
-import os from "os";
-import path from "path";
 import sanitize from "sanitize-filename";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { drive_v3 } from "googleapis";
 import { dynamo } from "../../../lib/dynamo-db";
-
-export const config = {
-	api: {
-		bodyParser: false,
-	},
-};
 
 export default async function handler(
 	req: NextApiRequest,
 	res: NextApiResponse
 ) {
-	const { event } = req.query;
+	const { event, fileId } = req.query;
 	const { email, folderid } = FromBase64ToEmailAndFolder(event as string);
 
 	if (!folderid) return res.status(404).send("Invalid folderid");
@@ -41,6 +31,36 @@ export default async function handler(
 	if (folder === null || folder.shared === false)
 		return res.status(403).send("Forbidden");
 
+	// ── GET /api/file/[event]?fileId=xxx ─────────────────────────────────────
+	// Fetch metadata for a single file after the browser has uploaded it
+	// directly to Drive via the resumable-upload URI.
+	if (req.method === "GET" && fileId) {
+		try {
+			const file = await GetGoogleDriveFileDetails(
+				user.accessToken,
+				user.refreshToken,
+				fileId as string
+			);
+			if (!file) return res.status(404).send("File not found");
+			return res.status(200).json({
+				id: file.id,
+				name: file.name,
+				webContentLink: file.webContentLink ?? null,
+				thumbnailLink: file.thumbnailLink ?? null,
+				imageMediaMetadata: {
+					width: file.imageMediaMetadata?.width,
+					height: file.imageMediaMetadata?.height,
+					rotation: file.imageMediaMetadata?.rotation,
+				},
+			});
+		} catch (error) {
+			console.error("GET /api/file details error", error);
+			return res.status(400).send("Bad request");
+		}
+	}
+
+	// ── GET /api/file/[event] ────────────────────────────────────────────────
+	// List all photos in the event folder.
 	if (req.method === "GET") {
 		try {
 			const result = await GetGoogleDriveFilesByFolderId(
@@ -48,7 +68,7 @@ export default async function handler(
 				user.refreshToken,
 				folderid as string
 			);
-			return res.status(200).send(
+			return res.status(200).json(
 				result?.map((item) => ({
 					id: item?.id,
 					name: item?.name,
@@ -62,70 +82,48 @@ export default async function handler(
 				})) ?? []
 			);
 		} catch (error) {
-			console.error("GET /api/file error", error);
+			console.error("GET /api/file list error", error);
 			return res.status(400).send("Bad request");
 		}
-	} else if (req.method === "POST") {
-		const form = formidable({ uploadDir: os.tmpdir(), keepExtensions: true });
-		try {
-			const result = await new Promise<drive_v3.Schema$File | null>(
-				(resolve, reject) => {
-					form.parse(req, async (err, _fields, files) => {
-						if (err) return reject(err);
-
-						const fileArray = files.file;
-						const file = Array.isArray(fileArray)
-							? fileArray[0]
-							: fileArray;
-
-						if (!file) return reject(new Error("file is required"));
-
-						// Validate that the temp file path is inside the OS temp directory
-						// to prevent path traversal attacks.
-						const resolvedPath = path.resolve(file.filepath);
-						const resolvedTmp = path.resolve(os.tmpdir());
-						if (!resolvedPath.startsWith(resolvedTmp + path.sep)) {
-							return reject(new Error("Invalid file path"));
-						}
-
-						// Sanitize the user-supplied filename before passing it to Drive.
-						const safeFileName = sanitize(
-							file.originalFilename ?? file.newFilename ?? ""
-						);
-
-						const uploaded = await UploadGoogleDriveFile(
-							user.accessToken,
-							user.refreshToken,
-							folderid as string,
-							resolvedPath,
-							safeFileName
-						);
-						fs.unlink(resolvedPath, () => {
-							console.log(`fs.unlink ok on temp file`);
-						});
-						if (!uploaded?.id) {
-							return reject(new Error("Upload to Google Drive failed"));
-						}
-						resolve({
-							id: uploaded.id,
-							name: uploaded.name,
-							webContentLink: uploaded.webContentLink ?? null,
-							thumbnailLink: uploaded.thumbnailLink ?? null,
-							imageMediaMetadata: {
-								width: uploaded.imageMediaMetadata?.width,
-								height: uploaded.imageMediaMetadata?.height,
-								rotation: uploaded.imageMediaMetadata?.rotation,
-							},
-						});
-					});
-				}
-			);
-			return res.status(201).send(result);
-		} catch (error) {
-			console.error("POST /api/file error", error);
-			return res.status(400).send("Bad request");
-		}
-	} else {
-		return res.status(400).send("Invalid method");
 	}
+
+	// ── POST /api/file/[event] ───────────────────────────────────────────────
+	// Create a Drive resumable-upload session.  Returns { uploadUri } — a
+	// pre-authenticated, file-specific URL the browser uses to PUT the image
+	// bytes directly to Google's servers.  No file bytes pass through this
+	// function, so Vercel's timeout and body-size limits are not a concern.
+	if (req.method === "POST") {
+		try {
+			const { fileName, mimeType } = req.body as {
+				fileName?: string;
+				mimeType?: string;
+			};
+
+			const safeFileName = sanitize(fileName ?? "").trim();
+			if (!safeFileName) return res.status(400).send("fileName is required");
+
+			const safeMime =
+				["image/jpeg", "image/png", "image/webp"].includes(mimeType ?? "")
+					? (mimeType as string)
+					: "image/jpeg";
+
+			const uploadUri = await CreateResumableUploadSession(
+				user.accessToken,
+				user.refreshToken,
+				folderid as string,
+				safeFileName,
+				safeMime
+			);
+
+			if (!uploadUri)
+				return res.status(500).send("Failed to create upload session");
+
+			return res.status(200).json({ uploadUri });
+		} catch (error) {
+			console.error("POST /api/file session error", error);
+			return res.status(400).send("Bad request");
+		}
+	}
+
+	return res.status(405).send("Method not allowed");
 }

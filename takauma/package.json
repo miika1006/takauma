@@ -14,7 +14,7 @@
 		"@vercel/analytics": "^1.4.0",
 		"colcade": "^0.2.0",
 		"formidable": "^3.5.0",
-		"googleapis": "^144.0.0",
+		"googleapis": "^171.0.0",
 		"i18next": "^23.11.0",
 		"next": "^14.2.0",
 		"next-auth": "^4.24.0",
@@ -35,6 +35,16 @@
 	},
 	"engines": {
 		"node": ">=24.x"
+	},
+	"resolutions": {
+		"cross-spawn": "7.0.6",
+		"flatted": "3.4.2",
+		"eslint/**/minimatch": "3.1.5",
+		"eslint/**/ajv": "6.14.0",
+		"**/minimatch/brace-expansion": "1.1.13",
+		"jws": "4.0.1",
+		"qs": "6.14.2",
+		"eslint-config-next/**/glob": "10.5.0"
 	},
 	"devDependencies": {
 		"@types/busboy": "^1.5.4",

@@ -671,6 +671,13 @@ export const CreateResumableUploadSession = async (
 		const uploadUri = response.headers.get("location");
 		if (!uploadUri) throw new Error("Drive did not return a Location header");
 
+		// Guard against an unexpected redirect to a non-Google host.
+		// The Location header must point to googleapis.com.
+		const uploadHost = new URL(uploadUri).hostname;
+		if (!uploadHost.endsWith(".googleapis.com")) {
+			throw new Error(`Unexpected upload host: ${uploadHost}`);
+		}
+
 		console.log("CreateResumableUploadSession ok, uploadUri obtained");
 		return uploadUri;
 	} catch (error) {

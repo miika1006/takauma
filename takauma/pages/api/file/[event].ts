@@ -35,6 +35,14 @@ export default async function handler(
 	// Fetch metadata for a single file after the browser has uploaded it
 	// directly to Drive via the resumable-upload URI.
 	if (req.method === "GET" && fileId) {
+		// Google Drive file IDs are base64url strings, 25–200 alphanumeric
+		// characters (plus hyphens and underscores).  Reject anything that
+		// doesn't match so a crafted fileId cannot influence the Drive API URL.
+		const DRIVE_ID_RE = /^[a-zA-Z0-9_-]{10,200}$/;
+		if (!DRIVE_ID_RE.test(fileId as string)) {
+			return res.status(400).send("Invalid fileId");
+		}
+
 		try {
 			const file = await GetGoogleDriveFileDetails(
 				user.accessToken,

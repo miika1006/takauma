@@ -43,7 +43,7 @@ export default function GoogleDriveEventShare({
 			setShared(false);
 			setShareUrl("");
 		}
-	}, [current, email, router.pathname]);
+	}, [current, email, router.pathname, router.locale]);
 
 	/**
 	 *  Sharing and what happens after that?

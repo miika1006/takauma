@@ -1,6 +1,7 @@
 import path from "path";
 import { drive_v3, google } from "googleapis";
 import fs from "fs";
+import { Readable } from "stream";
 import { v4 as uuidv4 } from "uuid";
 // node-fetch is not needed — Node 18+ has built-in fetch
 import NodeCache from "node-cache";
@@ -638,8 +639,6 @@ export const UploadFileDataToDrive = async (
 	mimeType: string,
 	fileData: Buffer
 ): Promise<drive_v3.Schema$File | null> => {
-	const { Readable } = await import("stream");
-
 	const doUpload = async (token: string) => {
 		const drive = CreateGoogleDriveInstance(token, refreshToken);
 		const res = await drive.files.create({

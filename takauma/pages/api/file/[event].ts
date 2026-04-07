@@ -8,12 +8,38 @@ import {
 import sanitize from "sanitize-filename";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { dynamo } from "../../../lib/dynamo-db";
+import Busboy from "busboy";
+
+/** Parse the first "file" field from a multipart/form-data request. */
+function parseMultipart(req: NextApiRequest): Promise<{ fileBuffer: Buffer; fileName: string }> {
+	return new Promise((resolve, reject) => {
+		const bb = Busboy({ headers: req.headers, limits: { files: 1, fileSize: 5 * 1024 * 1024 } });
+		let resolved = false;
+
+		bb.on("file", (_field, stream, info) => {
+			const chunks: Uint8Array[] = [];
+			stream.on("data", (chunk: Uint8Array) => chunks.push(chunk));
+			stream.on("end", () => {
+				if (!resolved) {
+					resolved = true;
+					resolve({ fileBuffer: Buffer.concat(chunks), fileName: info.filename ?? "image.jpg" });
+				}
+			});
+			stream.on("error", reject);
+		});
+
+		bb.on("error", reject);
+		bb.on("finish", () => {
+			if (!resolved) reject(new Error("No file in request"));
+		});
+
+		req.pipe(bb);
+	});
+}
 
 export const config = {
 	api: {
-		bodyParser: {
-			sizeLimit: "6mb",
-		},
+		bodyParser: false,
 	},
 };
 
@@ -104,35 +130,20 @@ export default async function handler(
 	}
 
 	// ── POST /api/file/[event] ───────────────────────────────────────────────
-	// Upload a photo.  The browser sends { fileName, mimeType, data } where
-	// data is a base64-encoded JPEG.  The server uploads to Drive on the
-	// owner's behalf and returns the file metadata.
+	// Upload a photo.  The browser sends a multipart/form-data request with a
+	// single "file" field.  The server uploads to Drive on the owner's behalf
+	// and returns the file metadata.
 	if (req.method === "POST") {
 		try {
-			const { fileName, mimeType, data } = req.body as {
-				fileName?: string;
-				mimeType?: string;
-				data?: string;
-			};
-
-			const safeFileName = sanitize(fileName ?? "").trim() || "image.jpg";
-
-			// Only accept JPEG (all images are resized to JPEG client-side).
-			const safeMime = mimeType === "image/jpeg" ? "image/jpeg" : "image/jpeg";
-
-			if (!data || typeof data !== "string")
-				return res.status(400).send("data is required");
-
-			const fileBuffer = Buffer.from(data, "base64");
-			if (fileBuffer.length === 0)
-				return res.status(400).send("data is empty");
+			const { fileBuffer, fileName } = await parseMultipart(req);
+			const safeFileName = sanitize(fileName).trim() || "image.jpg";
 
 			const uploaded = await UploadFileDataToDrive(
 				user.accessToken,
 				user.refreshToken,
 				folderid as string,
 				safeFileName,
-				safeMime,
+				"image/jpeg",
 				fileBuffer
 			);
 

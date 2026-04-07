@@ -129,25 +129,19 @@ export default function GoogleDriveUploadForm({
 	/**
 	 * Upload a single image via the server.
 	 *
-	 * The browser encodes the resized JPEG as base64 and POSTs it to
-	 * /api/file/[event].  The server uploads to Drive on the owner's behalf
-	 * and returns the file metadata.  No cross-origin requests are made from
-	 * the browser — CORS is not a concern.
+	 * The browser POSTs multipart/form-data to /api/file/[event].  The server
+	 * uploads to Drive on the owner's behalf and returns the file metadata.
 	 */
 	const uploadImage = async (imageselect: ImageSelect) => {
 		const eventId = FromEmailAndFolderTooBase64(email, folder.id as string);
 
 		try {
-			const base64 = await fileToBase64(imageselect.image);
+			const form = new FormData();
+			form.append("file", imageselect.image, imageselect.image.name || "image.jpg");
 
 			const uploadRes = await fetch(`/api/file/${eventId}`, {
 				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					fileName: imageselect.image.name || "image.jpg",
-					mimeType: "image/jpeg",
-					data: base64,
-				}),
+				body: form,
 			});
 
 			if (!uploadRes.ok) {
@@ -174,20 +168,6 @@ export default function GoogleDriveUploadForm({
 			);
 		}
 	};
-
-	/** Encode a File to a base64 string (data URL → strip prefix). */
-	const fileToBase64 = (file: File): Promise<string> =>
-		new Promise((resolve, reject) => {
-			const reader = new FileReader();
-			reader.onload = () => {
-				const result = reader.result as string;
-				// result is "data:image/jpeg;base64,XXXX" — strip the prefix
-				const comma = result.indexOf(",");
-				resolve(comma >= 0 ? result.slice(comma + 1) : result);
-			};
-			reader.onerror = reject;
-			reader.readAsDataURL(file);
-		});
 
 	return (
 		<div className={styles.uploadcontainer}>

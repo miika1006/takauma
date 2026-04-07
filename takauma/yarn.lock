@@ -1088,6 +1088,13 @@
   dependencies:
     tslib "^2.4.0"
 
+"@types/busboy@^1.5.4":
+  version "1.5.4"
+  resolved "https://registry.yarnpkg.com/@types/busboy/-/busboy-1.5.4.tgz#0038c31102ca90f2a7f0d8bc27ee5ebf1088e230"
+  integrity sha512-kG7WrUuAKK0NoyxfQHsVE6j1m01s6kMma64E+OZenQABMQyTJop1DumUWcLwAQ2JzpefU7PDYoRDKl8uZosFjw==
+  dependencies:
+    "@types/node" "*"
+
 "@types/formidable@^3.4.0":
   version "3.5.0"
   resolved "https://registry.yarnpkg.com/@types/formidable/-/formidable-3.5.0.tgz#9ebe5ad19ad4a939457739f70f655d391a391a2a"

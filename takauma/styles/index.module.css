@@ -50,7 +50,7 @@
 .applogo {
 	position: absolute;
 	margin-left: -0.4rem;
-	margin-top: -0.65em;
+	margin-top: -3rem;
 	z-index: 1;
 }
 .applogo img {
@@ -87,6 +87,7 @@
 	}
 	.applogo {
 		margin-left: -0.1em;
+		margin-top: -0.65em;
 	}
 	.applogo img {
 		width: unset;

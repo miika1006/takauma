@@ -8,6 +8,7 @@ const nextConfig = {
 	eslint: {
 		dirs: ["pages", "components", "lib", "common"],
 	},
+	serverExternalPackages: ["uuid"],
 };
 
 module.exports = nextConfig;

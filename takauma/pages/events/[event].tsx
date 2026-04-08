@@ -23,7 +23,14 @@ export default function Page({
 }: PageProps & EventPageProps) {
 	const { t } = useTranslation("common");
 	return (
-		<Layout t={t} locale={locale} padded centered>
+		<Layout
+			t={t}
+			locale={locale}
+			padded
+			centered
+			title={folder?.name ?? t("event")}
+			description={t("appdescription")}
+		>
 			{folder && folder.shared ? (
 				<>
 					<h1>{folder.name}</h1>

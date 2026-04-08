@@ -5,10 +5,10 @@ const nextConfig = {
 		locales: ["fi", "en"],
 	},
 	reactStrictMode: true,
-	eslint: {
-		dirs: ["pages", "components", "lib", "common"],
-	},
 	serverExternalPackages: ["uuid"],
+	turbopack: {
+		root: __dirname,
+	},
 };
 
 module.exports = nextConfig;

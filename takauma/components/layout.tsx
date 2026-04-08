@@ -8,6 +8,8 @@ interface LayoutProps {
 	locale: string;
 	padded?: boolean;
 	centered?: boolean;
+	title?: string;
+	description?: string;
 }
 
 export default function Layout({
@@ -16,10 +18,12 @@ export default function Layout({
 	locale,
 	padded,
 	centered,
+	title,
+	description,
 }: LayoutProps) {
 	return (
 		<div className={styles.main}>
-			<Header t={t} locale={locale} />
+			<Header t={t} locale={locale} title={title} description={description} />
 			<main>
 				<div
 					className={

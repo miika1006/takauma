@@ -93,5 +93,7 @@
 	"select_photos_from_your_device": "Valitse kuvia laitteeltasi",
 	"sending": "Lähetetään",
 	"resizing": "Pienennetään kuvia",
-	"areyousure": "Oletko varma?"
+	"areyousure": "Oletko varma?",
+	"meta_privacy_description": "Takauman tietosuojakäytäntö – yhteisöllinen tapahtumavalokuvasovellus. Lue miten tietojasi käsitellään.",
+	"meta_terms_description": "Takauman käyttöehdot – yhteisöllinen tapahtumavalokuvasovellus."
 }

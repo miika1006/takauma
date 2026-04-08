@@ -196,7 +196,6 @@ export default function GoogleDriveUploadForm({
 					role="dialog"
 					aria-modal="true"
 				>
-					{/* eslint-disable-next-line @next/next/no-img-element */}
 					<img
 						className={styles.lightboxImage}
 						src={zoomedUrl}

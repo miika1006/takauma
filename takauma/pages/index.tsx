@@ -8,15 +8,44 @@ import { PageProps } from "../common/types";
 import styles from "../styles/index.module.css";
 import { Parallax, ParallaxProvider } from "react-scroll-parallax";
 import { signIn } from "next-auth/react";
-import coverImageSrc from "/public/images/metsa2.jpeg";
+import coverImageSrc from "../public/images/metsa2.jpeg";
+import Head from "next/head";
+
+const BASE_URL = "https://takauma.vercel.app";
 
 export default function Page({ locale }: PageProps) {
 	const { t } = useTranslation("common");
 	const applicationDescription = t("appdescription");
 
+	const jsonLd = {
+		"@context": "https://schema.org",
+		"@type": "WebApplication",
+		name: "Takauma",
+		url: BASE_URL,
+		description: applicationDescription,
+		applicationCategory: "PhotographyApplication",
+		operatingSystem: "Web",
+		inLanguage: ["fi", "en"],
+		offers: {
+			"@type": "Offer",
+			price: "0",
+			priceCurrency: "EUR",
+		},
+		author: {
+			"@type": "Organization",
+			name: "Takauma",
+		},
+	};
+
 	return (
 		<ParallaxProvider>
-			<Layout t={t} locale={locale}>
+			<Head>
+				<script
+					type="application/ld+json"
+					dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+				/>
+			</Head>
+			<Layout t={t} locale={locale} description={applicationDescription}>
 				<Parallax translateY={[-40, 40]} className={styles.coverimage}>
 					<Image
 						src={coverImageSrc}

@@ -11,7 +11,14 @@ export default function Page({ locale }: PageProps) {
 	const { t } = useTranslation("common");
 
 	return (
-		<Layout t={t} locale={locale} padded centered>
+		<Layout
+			t={t}
+			locale={locale}
+			padded
+			centered
+			title={t("privacypolicy")}
+			description={t("meta_privacy_description")}
+		>
 			<Privacy t={t} />
 		</Layout>
 	);

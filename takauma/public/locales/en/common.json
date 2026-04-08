@@ -93,5 +93,7 @@
 	"select_photos_from_your_device": "Select photos from your device",
 	"sending": "Sending",
 	"resizing": "Resizing photos",
-	"areyousure": "Are you sure?"
+	"areyousure": "Are you sure?",
+	"meta_privacy_description": "Privacy policy for Takauma – the collaborative event photo collection app. Learn how your data is handled.",
+	"meta_terms_description": "Terms of service for Takauma – the collaborative event photo collection app."
 }

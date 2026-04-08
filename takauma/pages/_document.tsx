@@ -1,9 +1,19 @@
-import { Html, Head, Main, NextScript } from "next/document";
+import DefaultDocument, {
+	Html,
+	Head,
+	Main,
+	NextScript,
+	type DocumentContext,
+	type DocumentInitialProps,
+} from "next/document";
 
-export default function Document() {
+type Props = DocumentInitialProps & { locale: string };
+
+export default function Document({ locale }: Props) {
 	return (
-		<Html>
+		<Html lang={locale ?? "fi"}>
 			<Head>
+				<meta charSet="utf-8" />
 				<link rel="preconnect" href="https://fonts.gstatic.com" />
 				<link
 					href="https://fonts.googleapis.com/css2?family=Saira+Condensed&display=swap"
@@ -17,3 +27,8 @@ export default function Document() {
 		</Html>
 	);
 }
+
+Document.getInitialProps = async (ctx: DocumentContext): Promise<Props> => {
+	const initialProps = await DefaultDocument.getInitialProps(ctx);
+	return { ...initialProps, locale: ctx.locale ?? "fi" };
+};

@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /events/
+Disallow: /fi/events/
+Disallow: /en/events/
+
+Sitemap: https://takauma.app/sitemap.xml

@@ -8,6 +8,7 @@ import { Session } from "next-auth";
 import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next/pages";
 import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
+import nextI18NextConfig from "../../next-i18next.config";
 import { PageProps } from "../../common/types";
 import GoogleDriveEvent from "../../components/googledrive-event";
 import { dynamo } from "../../lib/dynamo-db";
@@ -48,7 +49,7 @@ export const getServerSideProps: GetServerSideProps<{
 	return {
 		props: {
 			session: session,
-			...(await serverSideTranslations(context.locale as string, ["common"])),
+			...(await serverSideTranslations(context.locale as string, ["common"], nextI18NextConfig)),
 			locale: context.locale as string,
 			shouldSingOut: session
 				? await dynamo.isBanned(session.user?.email)

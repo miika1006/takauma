@@ -5,6 +5,7 @@ import React, { useEffect } from "react";
 import { ToastContainer } from "react-toastify";
 import PageLoadBar from "../components/page-loadbar";
 import { Analytics } from "@vercel/analytics/react";
+import nextI18NextConfig from "../next-i18next.config";
 
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/globals.css";
@@ -16,7 +17,7 @@ declare type i18nextAppProps = AppProps & {
 
 const App = (props: AppProps) => (
 	<SessionProvider session={props.pageProps.session} refetchInterval={0}>
-		{appWithTranslation(Comp)(props as i18nextAppProps)}
+		{appWithTranslation(Comp, nextI18NextConfig)(props as i18nextAppProps)}
 	</SessionProvider>
 );
 

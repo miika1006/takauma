@@ -3,6 +3,7 @@ import Layout from "../../components/layout";
 import { GetServerSideProps } from "next";
 import { useTranslation } from "next-i18next/pages";
 import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
+import nextI18NextConfig from "../../next-i18next.config";
 import { PageProps } from "../../common/types";
 import { GetGoogleDriveFolderById } from "../../lib/googledrive";
 import { drive_v3 } from "googleapis";
@@ -47,7 +48,7 @@ export const getServerSideProps: GetServerSideProps<{
 
 	return {
 		props: {
-			...(await serverSideTranslations(context.locale as string, ["common"])),
+			...(await serverSideTranslations(context.locale as string, ["common"], nextI18NextConfig)),
 			locale: context.locale as string,
 			email: email,
 			folder:

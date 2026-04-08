@@ -54,7 +54,7 @@
 	z-index: 1;
 }
 .applogo img {
-	width: 50px;
+	width: unset;
 }
 .frontcontent {
 	font-family: "Saira Condensed", sans-serif;

@@ -2,6 +2,7 @@ import Layout from "../components/layout";
 import Image from "next/image";
 import { useTranslation } from "next-i18next/pages";
 import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
+import nextI18NextConfig from "../next-i18next.config";
 import { GetServerSideProps } from "next";
 import { PageProps } from "../common/types";
 import styles from "../styles/index.module.css";
@@ -90,13 +91,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 	return {
 		props: {
 			locale: context.locale as string,
-			...(await serverSideTranslations(context.locale as string, ["common"])),
+			...(await serverSideTranslations(context.locale as string, ["common"], nextI18NextConfig)),
 		},
 	};
 };
 /*
 export const getStaticProps: GetStaticProps = async ({ locale }) => ({
 	props: {
-		...(await serverSideTranslations(locale as string, ["common"])),
+		...(await serverSideTranslations(locale as string, ["common"], nextI18NextConfig)),
 	},
 });*/

@@ -1,6 +1,7 @@
 import Layout from "../components/layout";
 import { GetStaticProps } from "next";
 import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
+import nextI18NextConfig from "../next-i18next.config";
 import { useTranslation } from "next-i18next/pages";
 import { PageProps } from "../common/types";
 import Terms from "../components/terms";
@@ -16,7 +17,7 @@ export default function Page({ locale }: PageProps) {
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => ({
 	props: {
-		...(await serverSideTranslations(locale as string, ["common"])),
+		...(await serverSideTranslations(locale as string, ["common"], nextI18NextConfig)),
 		locale: locale as string,
 	},
 });

@@ -1,6 +1,6 @@
 import { GetServerSideProps } from "next";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "https://takauma.app";
+const BASE_URL = "https://takauma.vercel.app";
 
 // Public pages with their priorities and change frequencies
 const pages = [

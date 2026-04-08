@@ -5,7 +5,7 @@ import styles from "../styles/header.module.css";
 import { TFunction } from "../common/types";
 import { useRouter } from "next/router";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "";
+const BASE_URL = "https://takauma.vercel.app";
 
 const OG_LOCALE: Record<string, string> = {
 	fi: "fi_FI",

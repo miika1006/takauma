@@ -11,7 +11,7 @@ import { signIn } from "next-auth/react";
 import coverImageSrc from "../public/images/metsa2.jpeg";
 import Head from "next/head";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "";
+const BASE_URL = "https://takauma.vercel.app";
 
 export default function Page({ locale }: PageProps) {
 	const { t } = useTranslation("common");
@@ -21,7 +21,7 @@ export default function Page({ locale }: PageProps) {
 		"@context": "https://schema.org",
 		"@type": "WebApplication",
 		name: "Takauma",
-		url: BASE_URL || "https://takauma.app",
+		url: BASE_URL,
 		description: applicationDescription,
 		applicationCategory: "PhotographyApplication",
 		operatingSystem: "Web",
